@@ -1,0 +1,25 @@
+export const palette = {
+  primary: '#2563EB',
+  primaryLight: '#60A5FA',
+  primaryDark: '#1D4ED8',
+  background: '#FFFFFF',
+  backgroundDark: '#0B1220',
+  surface: '#F5F7FA',
+  surfaceDark: '#121A2B',
+  surfaceElevated: '#FFFFFF',
+  surfaceElevatedDark: '#1B2437',
+  text: '#0F172A',
+  textDark: '#F1F5F9',
+  textSecondary: '#64748B',
+  textSecondaryDark: '#94A3B8',
+  border: '#E2E8F0',
+  borderDark: '#2A3650',
+  error: '#EF4444',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  info: '#3B82F6',
+  white: '#FFFFFF',
+  black: '#000000',
+} as const;
+
+export type ColorName = keyof typeof palette;
