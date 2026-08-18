@@ -4,32 +4,48 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import type { RootStackParamList } from '../../App';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'MyLoans'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'AppliedLoans'>;
 
-const LOANS = [
+const APPLIED_LOANS = [
   {
-    id: 'HMT-PL-001',
+    id: 'APP-001',
     type: 'Personal Loan',
     amount: '₹5,00,000',
-    outstanding: '₹3,20,000',
-    emi: '₹12,500',
     tenure: '36 months',
-    status: 'Active',
+    appliedDate: '15 Jul 2026',
+    status: 'Approved',
     statusColor: '#22C55E',
   },
   {
-    id: 'HMT-HL-002',
+    id: 'APP-002',
+    type: 'Business Loan',
+    amount: '₹10,00,000',
+    tenure: '60 months',
+    appliedDate: '28 Jul 2026',
+    status: 'Under Review',
+    statusColor: '#F59E0B',
+  },
+  {
+    id: 'APP-003',
     type: 'Home Loan',
-    amount: '₹25,00,000',
-    outstanding: '₹18,50,000',
-    emi: '₹28,000',
+    amount: '₹30,00,000',
     tenure: '240 months',
-    status: 'Active',
-    statusColor: '#22C55E',
+    appliedDate: '05 Aug 2026',
+    status: 'Applied',
+    statusColor: '#3B82F6',
+  },
+  {
+    id: 'APP-004',
+    type: 'Vehicle Loan',
+    amount: '₹8,00,000',
+    tenure: '48 months',
+    appliedDate: '12 Aug 2026',
+    status: 'Rejected',
+    statusColor: '#EF4444',
   },
 ];
 
-export default function MyLoansScreen({ navigation }: Props) {
+export default function AppliedLoansScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
   const { colors, spacing, radius } = theme;
 
@@ -48,12 +64,12 @@ export default function MyLoansScreen({ navigation }: Props) {
           >
             <Text style={styles.backBtnText}>←</Text>
           </Pressable>
-          <Text style={styles.topTitle}>My Loans</Text>
+          <Text style={styles.topTitle}>Applied Loans</Text>
           <View style={{ width: 40 }} />
         </View>
         <View style={styles.headerBody}>
-          <Text style={styles.headerIcon}>🏦</Text>
-          <Text style={styles.headerLabel}>2 Active Loans</Text>
+          <Text style={styles.headerIcon}>📋</Text>
+          <Text style={styles.headerLabel}>{APPLIED_LOANS.length} Applications</Text>
         </View>
       </View>
 
@@ -62,7 +78,7 @@ export default function MyLoansScreen({ navigation }: Props) {
         contentContainerStyle={[styles.content, { padding: spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
-        {LOANS.map((loan, index) => (
+        {APPLIED_LOANS.map((loan, index) => (
           <View
             key={index}
             style={[
@@ -89,29 +105,18 @@ export default function MyLoansScreen({ navigation }: Props) {
 
             <View style={styles.loanGrid}>
               <View style={styles.loanField}>
-                <Text style={[styles.loanFieldLabel, { color: colors.textSecondary }]}>Loan Amount</Text>
+                <Text style={[styles.loanFieldLabel, { color: colors.textSecondary }]}>Amount</Text>
                 <Text style={[styles.loanFieldValue, { color: colors.text }]}>{loan.amount}</Text>
-              </View>
-              <View style={styles.loanField}>
-                <Text style={[styles.loanFieldLabel, { color: colors.textSecondary }]}>Outstanding</Text>
-                <Text style={[styles.loanFieldValue, { color: colors.text }]}>{loan.outstanding}</Text>
-              </View>
-              <View style={styles.loanField}>
-                <Text style={[styles.loanFieldLabel, { color: colors.textSecondary }]}>Monthly EMI</Text>
-                <Text style={[styles.loanFieldValue, { color: colors.primary }]}>{loan.emi}</Text>
               </View>
               <View style={styles.loanField}>
                 <Text style={[styles.loanFieldLabel, { color: colors.textSecondary }]}>Tenure</Text>
                 <Text style={[styles.loanFieldValue, { color: colors.text }]}>{loan.tenure}</Text>
               </View>
+              <View style={styles.loanField}>
+                <Text style={[styles.loanFieldLabel, { color: colors.textSecondary }]}>Applied On</Text>
+                <Text style={[styles.loanFieldValue, { color: colors.primary }]}>{loan.appliedDate}</Text>
+              </View>
             </View>
-
-            <Pressable
-              style={({ pressed }) => [styles.scheduleBtn, { opacity: pressed ? 0.7 : 1 }]}
-              onPress={() => navigation.navigate('RepaymentSchedule')}
-            >
-              <Text style={[styles.scheduleBtnText, { color: colors.primary }]}>View Schedule →</Text>
-            </Pressable>
           </View>
         ))}
       </ScrollView>
@@ -147,6 +152,4 @@ const styles = StyleSheet.create({
   loanField: { width: '46%' },
   loanFieldLabel: { fontSize: 11, fontWeight: '500' },
   loanFieldValue: { fontSize: 14, fontWeight: '700', marginTop: 3 },
-  scheduleBtn: { marginTop: 12, alignSelf: 'flex-end' },
-  scheduleBtnText: { fontSize: 13, fontWeight: '700' },
 });

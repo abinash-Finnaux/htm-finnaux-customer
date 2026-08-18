@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import type { RootStackParamList } from '../../App';
@@ -20,6 +30,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   const { colors, spacing, radius } = theme;
 
   const headerBg = isDark ? '#1E293B' : colors.primary;
+  const headerBgLight = isDark ? 'rgba(255,255,255,0.08)' : headerBg + '12';
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
 
   const [step, setStep] = useState(1);
@@ -37,9 +48,11 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   };
 
   const handleSubmit = () => {
-    Alert.alert('Application Submitted', 'Your loan application has been submitted successfully. Our team will contact you shortly.', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+    Alert.alert(
+      'Application Submitted',
+      'Your loan application has been submitted successfully. Our team will contact you shortly.',
+      [{ text: 'OK', onPress: () => navigation.goBack() }],
+    );
   };
 
   return (
@@ -52,7 +65,10 @@ export default function ApplyLoanScreen({ navigation }: Props) {
         <View style={styles.topBar}>
           <Pressable
             onPress={() => (step > 1 ? setStep(step - 1) : navigation.goBack())}
-            style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.6 : 1 }]}
+            style={({ pressed }) => [
+              styles.backBtn,
+              { opacity: pressed ? 0.6 : 1 },
+            ]}
           >
             <Text style={styles.backBtnText}>←</Text>
           </Pressable>
@@ -69,7 +85,8 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                 style={[
                   styles.progressDot,
                   {
-                    backgroundColor: s <= step ? '#FFFFFF' : 'rgba(255,255,255,0.25)',
+                    backgroundColor:
+                      s <= step ? '#FFFFFF' : 'rgba(255,255,255,0.25)',
                     width: s <= step ? 40 : 12,
                   },
                 ]}
@@ -81,7 +98,8 @@ export default function ApplyLoanScreen({ navigation }: Props) {
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
+        keyboardVerticalOffset={0}
       >
         <ScrollView
           style={styles.flex}
@@ -90,11 +108,17 @@ export default function ApplyLoanScreen({ navigation }: Props) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={{ paddingHorizontal: spacing.lg }}>
-
             {/* Step 1: Loan Type */}
             {step === 1 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: spacing.xl }]}>Select Loan Type</Text>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.xl },
+                  ]}
+                >
+                  Select Loan Type
+                </Text>
                 <View style={styles.loanGrid}>
                   {LOAN_TYPES.map(item => {
                     const selected = loanType === item.id;
@@ -105,18 +129,60 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                         style={({ pressed }) => [
                           styles.loanCard,
                           {
-                            backgroundColor: selected ? headerBg + '12' : colors.surfaceElevated,
-                            borderColor: selected ? headerBg : colors.border,
+                            backgroundColor: selected
+                              ? headerBg
+                              : pressed
+                              ? headerBgLight
+                              : colors.surfaceElevated,
+                            borderColor: selected ? colors.border : headerBg,
                             borderRadius: radius.lg,
-                            opacity: pressed ? 0.85 : 1,
                           },
                         ]}
                       >
-                        <View style={[styles.loanIconWrap, { backgroundColor: selected ? headerBg + '20' : colors.border }]}>
-                          <Text style={styles.loanIcon}>{item.icon}</Text>
+                        {selected && (
+                          <View style={styles.cardTick}>
+                            <Text style={styles.cardTickText}>✓</Text>
+                          </View>
+                        )}
+                        <View
+                          style={[
+                            styles.loanIconWrap,
+                            {
+                              backgroundColor: selected
+                                ? 'rgba(255,255,255,0.2)'
+                                : colors.border,
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.loanIcon,
+                              { color: selected ? '#FFFFFF' : undefined },
+                            ]}
+                          >
+                            {item.icon}
+                          </Text>
                         </View>
-                        <Text style={[styles.loanLabel, { color: colors.text }]}>{item.label}</Text>
-                        <Text style={[styles.loanRange, { color: colors.textSecondary }]}>{item.range}</Text>
+                        <Text
+                          style={[
+                            styles.loanLabel,
+                            { color: selected ? '#FFFFFF' : colors.text },
+                          ]}
+                        >
+                          {item.label}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.loanRange,
+                            {
+                              color: selected
+                                ? 'rgba(255,255,255,0.8)'
+                                : colors.textSecondary,
+                            },
+                          ]}
+                        >
+                          {item.range}
+                        </Text>
                       </Pressable>
                     );
                   })}
@@ -127,9 +193,32 @@ export default function ApplyLoanScreen({ navigation }: Props) {
             {/* Step 2: Amount & Tenure */}
             {step === 2 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: spacing.xl }]}>Loan Amount</Text>
-                <View style={[styles.inputCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.lg }]}>
-                  <Text style={[styles.inputPrefix, { color: colors.textSecondary }]}>₹</Text>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.xl },
+                  ]}
+                >
+                  Loan Amount
+                </Text>
+                <View
+                  style={[
+                    styles.inputCard,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      borderRadius: radius.lg,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.inputPrefix,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    ₹
+                  </Text>
                   <TextInput
                     style={[styles.input, { color: colors.text }]}
                     placeholder="Enter amount"
@@ -140,7 +229,14 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                   />
                 </View>
 
-                <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: spacing.xl }]}>Repayment Tenure</Text>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.xl },
+                  ]}
+                >
+                  Repayment Tenure
+                </Text>
                 <View style={styles.tenureRow}>
                   {TENURE_OPTIONS.map(t => {
                     const selected = tenure === t;
@@ -151,22 +247,64 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                         style={({ pressed }) => [
                           styles.tenureChip,
                           {
-                            backgroundColor: selected ? headerBg : colors.surfaceElevated,
+                            backgroundColor: selected
+                              ? headerBg
+                              : pressed
+                              ? headerBgLight
+                              : colors.surfaceElevated,
                             borderColor: selected ? headerBg : colors.border,
                             borderRadius: radius.md,
-                            opacity: pressed ? 0.85 : 1,
                           },
                         ]}
                       >
-                        <Text style={[styles.tenureVal, { color: selected ? '#FFFFFF' : colors.text }]}>{t}</Text>
-                        <Text style={[styles.tenureUnit, { color: selected ? 'rgba(255,255,255,0.7)' : colors.textSecondary }]}>months</Text>
+                        {selected && (
+                          <View style={styles.chipTickSmall}>
+                            <Text style={styles.chipTickTextSmall}>✓</Text>
+                          </View>
+                        )}
+                        <Text
+                          style={[
+                            styles.tenureVal,
+                            { color: selected ? '#FFFFFF' : colors.text },
+                          ]}
+                        >
+                          {t}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.tenureUnit,
+                            {
+                              color: selected
+                                ? 'rgba(255,255,255,0.7)'
+                                : colors.textSecondary,
+                            },
+                          ]}
+                        >
+                          months
+                        </Text>
                       </Pressable>
                     );
                   })}
                 </View>
 
-                <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: spacing.xl }]}>Loan Purpose (Optional)</Text>
-                <View style={[styles.textAreaCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.lg }]}>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.xl },
+                  ]}
+                >
+                  Loan Purpose (Optional)
+                </Text>
+                <View
+                  style={[
+                    styles.textAreaCard,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      borderRadius: radius.lg,
+                    },
+                  ]}
+                >
                   <TextInput
                     style={[styles.textArea, { color: colors.text }]}
                     placeholder="Describe purpose of loan..."
@@ -184,9 +322,32 @@ export default function ApplyLoanScreen({ navigation }: Props) {
             {/* Step 3: Employment Details */}
             {step === 3 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: spacing.xl }]}>Monthly Income</Text>
-                <View style={[styles.inputCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.lg }]}>
-                  <Text style={[styles.inputPrefix, { color: colors.textSecondary }]}>₹</Text>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.xl },
+                  ]}
+                >
+                  Monthly Income
+                </Text>
+                <View
+                  style={[
+                    styles.inputCard,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      borderRadius: radius.lg,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.inputPrefix,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    ₹
+                  </Text>
                   <TextInput
                     style={[styles.input, { color: colors.text }]}
                     placeholder="Enter monthly income"
@@ -197,9 +358,21 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                   />
                 </View>
 
-                <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: spacing.xl }]}>Employment Type</Text>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.xl },
+                  ]}
+                >
+                  Employment Type
+                </Text>
                 <View style={styles.employmentRow}>
-                  {['Salaried', 'Self-Employed', 'Business Owner', 'Freelancer'].map(type => {
+                  {[
+                    'Salaried',
+                    'Self-Employed',
+                    'Business Owner',
+                    'Freelancer',
+                  ].map(type => {
                     const selected = employment === type;
                     return (
                       <Pressable
@@ -208,31 +381,86 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                         style={({ pressed }) => [
                           styles.employmentChip,
                           {
-                            backgroundColor: selected ? headerBg : colors.surfaceElevated,
+                            backgroundColor: selected
+                              ? headerBg
+                              : pressed
+                              ? headerBgLight
+                              : colors.surfaceElevated,
                             borderColor: selected ? headerBg : colors.border,
                             borderRadius: radius.md,
-                            opacity: pressed ? 0.85 : 1,
                           },
                         ]}
                       >
-                        <Text style={[styles.employmentText, { color: selected ? '#FFFFFF' : colors.text }]}>{type}</Text>
+                        {selected && (
+                          <View style={styles.chipTickSmall}>
+                            <Text style={styles.chipTickTextSmall}>✓</Text>
+                          </View>
+                        )}
+                        <Text
+                          style={[
+                            styles.employmentText,
+                            { color: selected ? '#FFFFFF' : colors.text },
+                          ]}
+                        >
+                          {type}
+                        </Text>
                       </Pressable>
                     );
                   })}
                 </View>
 
-                <View style={[styles.summaryCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.lg, marginTop: spacing.xl }]}>
-                  <Text style={[styles.summaryTitle, { color: colors.text }]}>Application Summary</Text>
-                  <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+                <View
+                  style={[
+                    styles.summaryCard,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      borderRadius: radius.lg,
+                      marginTop: spacing.xl,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.summaryTitle, { color: colors.text }]}>
+                    Application Summary
+                  </Text>
+                  <View
+                    style={[
+                      styles.summaryDivider,
+                      { backgroundColor: colors.border },
+                    ]}
+                  />
                   {[
-                    { label: 'Loan Type', value: LOAN_TYPES.find(l => l.id === loanType)?.label || '' },
-                    { label: 'Amount', value: amount ? `₹${Number(amount).toLocaleString('en-IN')}` : '' },
-                    { label: 'Tenure', value: tenure ? `${tenure} months` : '' },
+                    {
+                      label: 'Loan Type',
+                      value:
+                        LOAN_TYPES.find(l => l.id === loanType)?.label || '',
+                    },
+                    {
+                      label: 'Amount',
+                      value: amount
+                        ? `₹${Number(amount).toLocaleString('en-IN')}`
+                        : '',
+                    },
+                    {
+                      label: 'Tenure',
+                      value: tenure ? `${tenure} months` : '',
+                    },
                     { label: 'Employment', value: employment },
                   ].map((item, i) => (
                     <View key={i} style={styles.summaryRow}>
-                      <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{item.label}</Text>
-                      <Text style={[styles.summaryValue, { color: colors.text }]}>{item.value}</Text>
+                      <Text
+                        style={[
+                          styles.summaryLabel,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+                      <Text
+                        style={[styles.summaryValue, { color: colors.text }]}
+                      >
+                        {item.value}
+                      </Text>
                     </View>
                   ))}
                 </View>
@@ -242,20 +470,37 @@ export default function ApplyLoanScreen({ navigation }: Props) {
           <View style={{ height: 40 }} />
         </ScrollView>
 
-        <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+        <View
+          style={[
+            styles.footer,
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
+            },
+          ]}
+        >
           <Pressable
             onPress={() => (step < 3 ? setStep(step + 1) : handleSubmit())}
             disabled={!canProceed()}
             style={({ pressed }) => [
               styles.nextBtn,
               {
-                backgroundColor: canProceed() ? headerBg : colors.border,
+                backgroundColor: canProceed()
+                  ? pressed
+                    ? colors.primaryDark
+                    : headerBg
+                  : colors.border,
                 borderRadius: radius.pill,
-                opacity: pressed ? 0.85 : 1,
+                opacity: pressed ? 0.9 : 1,
               },
             ]}
           >
-            <Text style={[styles.nextBtnText, { color: canProceed() ? '#FFFFFF' : colors.textSecondary }]}>
+            <Text
+              style={[
+                styles.nextBtnText,
+                { color: canProceed() ? '#FFFFFF' : colors.textSecondary },
+              ]}
+            >
               {step < 3 ? 'Continue' : 'Submit Application'}
             </Text>
           </Pressable>
@@ -268,51 +513,179 @@ export default function ApplyLoanScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   header: {
-    paddingTop: 56, paddingBottom: 28, paddingHorizontal: 24,
-    borderBottomLeftRadius: 32, borderBottomRightRadius: 32, overflow: 'hidden',
+    paddingTop: 56,
+    paddingBottom: 28,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
   },
-  decor1: { position: 'absolute', top: -40, right: -30, width: 160, height: 160, borderRadius: 80 },
-  decor2: { position: 'absolute', bottom: 10, left: -50, width: 120, height: 120, borderRadius: 60 },
-  decor3: { position: 'absolute', top: 30, right: 80, width: 60, height: 60, borderRadius: 30 },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  backBtn: { width: 40, height: 40, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  decor1: {
+    position: 'absolute',
+    top: -40,
+    right: -30,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+  },
+  decor2: {
+    position: 'absolute',
+    bottom: 10,
+    left: -50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  decor3: {
+    position: 'absolute',
+    top: 30,
+    right: 80,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   backBtnText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
   topTitle: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
   headerBody: { alignItems: 'center', marginTop: 20 },
-  stepLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '500' },
-  progressBar: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 6 },
+  stepLabel: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  progressBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    gap: 6,
+  },
   progressDot: { height: 6, borderRadius: 3 },
   flex: { flex: 1 },
   scrollContent: { paddingBottom: 20 },
-  sectionTitle: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 10,
+  },
 
   loanGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  loanCard: { width: '47%', borderWidth: 1.5, padding: 16, alignItems: 'center' },
-  loanIconWrap: { width: 52, height: 52, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
+  loanCard: {
+    width: '47%',
+    borderWidth: 1.5,
+    padding: 16,
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  loanIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   loanIcon: { fontSize: 26 },
   loanLabel: { fontSize: 14, fontWeight: '700', textAlign: 'center' },
   loanRange: { fontSize: 11, fontWeight: '500', marginTop: 3 },
 
-  inputCard: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, paddingHorizontal: 16, paddingVertical: 4 },
+  cardTick: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  cardTickText: { fontSize: 9, fontWeight: '800', color: '#1E293B' },
+
+  inputCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
   inputPrefix: { fontSize: 18, fontWeight: '700', marginRight: 8 },
   input: { flex: 1, fontSize: 17, fontWeight: '600', paddingVertical: 14 },
 
   tenureRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  tenureChip: { flex: 1, minWidth: 60, borderWidth: 1.5, paddingVertical: 14, alignItems: 'center' },
+  tenureChip: {
+    flex: 1,
+    minWidth: 60,
+    borderWidth: 1.5,
+    paddingVertical: 14,
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
   tenureVal: { fontSize: 16, fontWeight: '800' },
   tenureUnit: { fontSize: 10, fontWeight: '500', marginTop: 2 },
+
+  chipTick: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  chipTickText: { fontSize: 9, fontWeight: '800', color: '#1E293B' },
+
+  chipTickSmall: {
+    position: 'absolute',
+    top: 3,
+    right: 3,
+    width: 14,
+    height: 14,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  chipTickTextSmall: { fontSize: 9, fontWeight: '800', color: '#1E293B' },
 
   textAreaCard: { borderWidth: 1 },
   textArea: { fontSize: 14, padding: 16, minHeight: 100 },
 
   employmentRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  employmentChip: { borderWidth: 1.5, paddingVertical: 12, paddingHorizontal: 20 },
+  employmentChip: {
+    borderWidth: 1.5,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    overflow: 'hidden',
+  },
   employmentText: { fontSize: 14, fontWeight: '600' },
 
   summaryCard: { borderWidth: 1, padding: 20 },
   summaryTitle: { fontSize: 16, fontWeight: '700' },
   summaryDivider: { height: 1, marginVertical: 14 },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
   summaryLabel: { fontSize: 13, fontWeight: '500' },
   summaryValue: { fontSize: 13, fontWeight: '700' },
 

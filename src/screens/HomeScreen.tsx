@@ -133,8 +133,12 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   const heroBg = isDark ? '#1E293B' : colors.primary;
-  const heroDecor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
-  const heroStatBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.15)';
+  const heroDecor = isDark
+    ? 'rgba(255,255,255,0.04)'
+    : 'rgba(255,255,255,0.08)';
+  const heroStatBg = isDark
+    ? 'rgba(255,255,255,0.08)'
+    : 'rgba(255,255,255,0.15)';
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -151,7 +155,10 @@ export default function HomeScreen({ navigation }: Props) {
           <View style={styles.topBar}>
             <Pressable
               onPress={openProfile}
-              style={({ pressed }) => [styles.profileWrap, { opacity: pressed ? 0.7 : 1 }]}
+              style={({ pressed }) => [
+                styles.profileWrap,
+                { opacity: pressed ? 0.7 : 1 },
+              ]}
             >
               <View style={styles.profileAvatar}>
                 <Text style={styles.profileInitials}>JD</Text>
@@ -159,7 +166,11 @@ export default function HomeScreen({ navigation }: Props) {
               <View style={[styles.profileBadge, { borderColor: heroBg }]} />
             </Pressable>
 
-            <Image source={logo} style={styles.topBarLogo} resizeMode="contain" />
+            <Image
+              source={logo}
+              style={styles.topBarLogo}
+              resizeMode="contain"
+            />
 
             <Pressable
               onPress={toggleTheme}
@@ -222,6 +233,8 @@ export default function HomeScreen({ navigation }: Props) {
                 onPress={() => {
                   if (index === 0) {
                     navigation.navigate('ApplyLoan');
+                  } else if (index === 1) {
+                    navigation.navigate('RepaymentSchedule');
                   } else {
                     navigation.navigate('Service', {
                       title: service.title,
@@ -284,80 +297,115 @@ export default function HomeScreen({ navigation }: Props) {
               },
             ]}
           >
-              <View style={[styles.drawerHeader, { backgroundColor: heroBg }]}>
-                <View style={styles.drawerAvatar}>
-                  <Text style={styles.drawerAvatarText}>JD</Text>
-                </View>
-                <Text style={styles.drawerName}>John Doe</Text>
-                <Text style={styles.drawerEmail}>john.doe@email.com</Text>
-                <Text style={styles.drawerPhone}>+91 98765 43210</Text>
+            <View style={[styles.drawerHeader, { backgroundColor: heroBg }]}>
+              <View style={styles.drawerAvatar}>
+                <Text style={styles.drawerAvatarText}>JD</Text>
               </View>
+              <Text style={styles.drawerName}>John Doe</Text>
+              <Text style={styles.drawerEmail}>john.doe@email.com</Text>
+              <Text style={styles.drawerPhone}>+91 98765 43210</Text>
+            </View>
 
-              <View style={styles.drawerBody}>
+            <View style={styles.drawerBody}>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                activeOpacity={0.6}
+                onPress={() => {
+                  closeProfile();
+                  setTimeout(() => navigation.navigate('Profile'), 260);
+                }}
+              >
+                <Text style={styles.drawerItemIcon}>👤</Text>
+                <Text style={[styles.drawerItemLabel, { color: colors.text }]}>
+                  My Profile
+                </Text>
+                <Text
+                  style={[
+                    styles.drawerItemArrow,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  ›
+                </Text>
+              </TouchableOpacity>
+
+              {[
+                {
+                  icon: '📋',
+                  label: 'Applied Loans',
+                  route: 'AppliedLoans' as const,
+                },
+                { icon: '🏦', label: 'My Loans', route: 'MyLoans' as const },
+                {
+                  icon: '💳',
+                  label: 'Payment History',
+                  route: 'PaymentHistory' as const,
+                },
+                { icon: '⚙️', label: 'Settings', route: 'Settings' as const },
+                {
+                  icon: '❓',
+                  label: 'Help & Support',
+                  route: 'HelpSupport' as const,
+                },
+              ].map((item, i) => (
                 <TouchableOpacity
+                  key={i}
                   style={styles.drawerItem}
                   activeOpacity={0.6}
                   onPress={() => {
                     closeProfile();
-                    setTimeout(() => navigation.navigate('Profile'), 260);
+                    setTimeout(() => navigation.navigate(item.route), 260);
                   }}
                 >
-                  <Text style={styles.drawerItemIcon}>👤</Text>
-                  <Text style={[styles.drawerItemLabel, { color: colors.text }]}>
-                    My Profile
+                  <Text style={styles.drawerItemIcon}>{item.icon}</Text>
+                  <Text
+                    style={[styles.drawerItemLabel, { color: colors.text }]}
+                  >
+                    {item.label}
                   </Text>
-                  <Text style={[styles.drawerItemArrow, { color: colors.textSecondary }]}>
+                  <Text
+                    style={[
+                      styles.drawerItemArrow,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
                     ›
                   </Text>
                 </TouchableOpacity>
+              ))}
 
-                {[
-                  { icon: '🏦', label: 'My Loans', route: 'MyLoans' as const },
-                  { icon: '💳', label: 'Payment History', route: 'PaymentHistory' as const },
-                  { icon: '⚙️', label: 'Settings', route: 'Settings' as const },
-                  { icon: '❓', label: 'Help & Support', route: 'HelpSupport' as const },
-                ].map((item, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    style={styles.drawerItem}
-                    activeOpacity={0.6}
-                    onPress={() => {
-                      closeProfile();
-                      setTimeout(() => navigation.navigate(item.route), 260);
-                    }}
-                  >
-                    <Text style={styles.drawerItemIcon}>{item.icon}</Text>
-                    <Text style={[styles.drawerItemLabel, { color: colors.text }]}>
-                      {item.label}
-                    </Text>
-                    <Text style={[styles.drawerItemArrow, { color: colors.textSecondary }]}>
-                      ›
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              <View
+                style={[
+                  styles.drawerDivider,
+                  { backgroundColor: colors.border },
+                ]}
+              />
 
-                <View style={[styles.drawerDivider, { backgroundColor: colors.border }]} />
-
-                <TouchableOpacity
-                  style={styles.drawerItem}
-                  activeOpacity={0.6}
-                  onPress={handleLogout}
-                >
-                  <Text style={styles.drawerItemIcon}>🚪</Text>
-                  <Text style={[styles.drawerItemLabel, { color: '#EF4444' }]}>
-                    Logout
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.drawerFooter}>
-                <Text style={[styles.drawerFooterText, { color: colors.textSecondary }]}>
-                  v1.0.0
+              <TouchableOpacity
+                style={styles.drawerItem}
+                activeOpacity={0.6}
+                onPress={handleLogout}
+              >
+                <Text style={styles.drawerItemIcon}>🚪</Text>
+                <Text style={[styles.drawerItemLabel, { color: '#EF4444' }]}>
+                  Logout
                 </Text>
-              </View>
-            </Animated.View>
-          </Pressable>
-        </Modal>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.drawerFooter}>
+              <Text
+                style={[
+                  styles.drawerFooterText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                v1.0.0
+              </Text>
+            </View>
+          </Animated.View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -510,19 +558,53 @@ const styles = StyleSheet.create({
   },
   servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   serviceCard: {
-    width: '30.6%', padding: 12, alignItems: 'center',
+    width: '30.6%',
+    padding: 12,
+    alignItems: 'center',
   },
   serviceIconWrap: {
-    width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.18)',
-    justifyContent: 'center', alignItems: 'center', marginBottom: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   serviceIcon: { fontSize: 24 },
-  serviceLabel: { fontSize: 12, fontWeight: '800', lineHeight: 17, color: '#FFFFFF', textAlign: 'center' },
+  serviceLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    lineHeight: 17,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
   serviceFooter: { marginTop: 'auto', paddingTop: 12, alignSelf: 'stretch' },
-  serviceDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.15)', marginBottom: 8 },
-  serviceFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  serviceHint: { fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 0.5 },
-  serviceArrow: { width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
+  serviceDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    marginBottom: 8,
+  },
+  serviceFooterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  serviceHint: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.45)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  serviceArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   serviceArrowText: { fontSize: 14, fontWeight: '800', color: '#FFFFFF' },
   drawerRoot: {
     flex: 1,

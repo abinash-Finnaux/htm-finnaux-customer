@@ -26,10 +26,7 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior="padding"
-      >
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <ScrollView
           style={styles.flex}
           contentContainerStyle={[
@@ -71,7 +68,7 @@ export default function LoginScreen({ navigation }: Props) {
             ]}
           >
             <Text style={[styles.formTitle, { color: colors.text }]}>
-              Welcome Back
+              Welcome
             </Text>
             <Text
               style={[
@@ -178,8 +175,10 @@ export default function LoginScreen({ navigation }: Props) {
             >
               Don't have an account?{' '}
             </Text>
-            <Pressable>
-              <Text style={{ color: colors.primary, fontSize: typography.body }}>
+            <Pressable onPress={() => navigation.navigate('SignUp')}>
+              <Text
+                style={{ color: colors.primary, fontSize: typography.body }}
+              >
                 Sign Up
               </Text>
             </Pressable>
@@ -190,7 +189,10 @@ export default function LoginScreen({ navigation }: Props) {
             style={styles.skipRow}
           >
             <Text
-              style={{ color: colors.textSecondary, fontSize: typography.caption }}
+              style={{
+                color: colors.textSecondary,
+                fontSize: typography.caption,
+              }}
             >
               Skip for now →
             </Text>
