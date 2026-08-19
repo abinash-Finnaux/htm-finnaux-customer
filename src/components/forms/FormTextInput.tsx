@@ -6,6 +6,7 @@ import {
   type FieldValues,
   type RegisterOptions,
 } from 'react-hook-form';
+import type { TextInputProps } from 'react-native';
 import GlobalInputText from '../inputTexts/GlobalInputText';
 
 type Props<T extends FieldValues> = {
@@ -14,7 +15,15 @@ type Props<T extends FieldValues> = {
   label: string;
   placeholder?: string;
   rules?: RegisterOptions<T>;
-};
+  formatText?: (text: string) => string;
+} & Pick<
+  TextInputProps,
+  | 'keyboardType'
+  | 'maxLength'
+  | 'autoComplete'
+  | 'autoCapitalize'
+  | 'secureTextEntry'
+>;
 
 export default function FormTextInput<T extends FieldValues>({
   control,
@@ -22,6 +31,12 @@ export default function FormTextInput<T extends FieldValues>({
   label,
   placeholder,
   rules,
+  formatText,
+  keyboardType,
+  maxLength,
+  autoComplete,
+  autoCapitalize,
+  secureTextEntry,
 }: Props<T>) {
   return (
     <Controller
@@ -36,9 +51,14 @@ export default function FormTextInput<T extends FieldValues>({
           label={label}
           placeholder={placeholder}
           onBlur={onBlur}
-          onChangeText={onChange}
+          onChangeText={(text) => onChange(formatText ? formatText(text) : text)}
           value={value}
           error={error?.message}
+          keyboardType={keyboardType}
+          maxLength={maxLength}
+          autoComplete={autoComplete}
+          autoCapitalize={autoCapitalize}
+          secureTextEntry={secureTextEntry}
         />
       )}
     />

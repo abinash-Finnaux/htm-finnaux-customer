@@ -23,7 +23,7 @@ export default function GlobalInputText({
   const { colors, spacing, radius } = theme;
 
   return (
-    <View style={[styles.container, { marginTop: spacing.lg }]}>
+    <View style={[styles.container, { marginTop: spacing.md }]}>
       <Text style={[styles.label, { color: colors.textSecondary }]}>
         {label}
       </Text>

@@ -17,7 +17,7 @@ import HelpSupportScreen from './src/screens/HelpSupportScreen';
 import ApplyLoanScreen from './src/screens/ApplyLoanScreen';
 import AppliedLoansScreen from './src/screens/AppliedLoansScreen';
 import RepaymentScheduleScreen from './src/screens/RepaymentScheduleScreen';
-import SignUpScreen from './src/screens/SignUpScreen';
+import SignUpScreen from './src/screens/signup/SignUpScreen';
 
 export type RootStackParamList = {
   Splash: undefined;

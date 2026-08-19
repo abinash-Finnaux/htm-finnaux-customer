@@ -3,7 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 type Props = {
   label?: string;
@@ -21,7 +21,7 @@ function formatDate(date: Date): string {
   return `${day}/${month}/${year}`;
 }
 
-export default function DateOfBirthInput({
+export default function GlobalDateOfBirthInput({
   label = 'Date of Birth',
   value,
   onChange,
@@ -30,7 +30,7 @@ export default function DateOfBirthInput({
   minimumDate,
 }: Props) {
   const { theme } = useTheme();
-  const { colors, radius } = theme;
+  const { colors, spacing, radius } = theme;
   const [show, setShow] = useState(false);
 
   const handleChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -45,7 +45,7 @@ export default function DateOfBirthInput({
   const displayValue = value ? formatDate(value) : '';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { marginTop: spacing.md }]}>
       <Text style={[styles.label, { color: colors.textSecondary }]}>
         {label}
       </Text>
@@ -57,6 +57,7 @@ export default function DateOfBirthInput({
             backgroundColor: colors.surface,
             borderColor: error ? colors.error : colors.border,
             borderRadius: radius.md,
+            marginTop: spacing.sm,
           },
         ]}
       >
@@ -107,8 +108,11 @@ export default function DateOfBirthInput({
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: '600' },
+  container: {},
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
   input: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -116,16 +120,26 @@ const styles = StyleSheet.create({
     height: 48,
     borderWidth: 1,
     paddingHorizontal: 16,
-    marginTop: 8,
   },
-  inputText: { fontSize: 15 },
-  calendarIcon: { fontSize: 18 },
-  errorText: { fontSize: 11, fontWeight: '500', marginTop: 6 },
+  inputText: {
+    fontSize: 15,
+  },
+  calendarIcon: {
+    fontSize: 18,
+  },
+  errorText: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 6,
+  },
   doneBtn: {
     alignSelf: 'flex-end',
     paddingHorizontal: 20,
     paddingVertical: 10,
     marginTop: 8,
   },
-  doneBtnText: { fontSize: 14, fontWeight: '600' },
+  doneBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
 });
