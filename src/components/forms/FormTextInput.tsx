@@ -16,7 +16,7 @@ type Props<T extends FieldValues> = {
   rules?: RegisterOptions<T>;
 };
 
-export default function FormInput<T extends FieldValues>({
+export default function FormTextInput<T extends FieldValues>({
   control,
   name,
   label,
