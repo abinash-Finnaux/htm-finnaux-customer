@@ -6,7 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import SplashScreen from './src/screens/SplashScreen';
 import PermissionScreen from './src/screens/PermissionScreen';
-import LoginScreen from './src/screens/LoginScreen';
+import LoginScreen from './src/screens/login/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
@@ -56,12 +56,18 @@ function AppContent() {
           <Stack.Screen name="Service" component={ServiceScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="MyLoans" component={MyLoansScreen} />
-          <Stack.Screen name="PaymentHistory" component={PaymentHistoryScreen} />
+          <Stack.Screen
+            name="PaymentHistory"
+            component={PaymentHistoryScreen}
+          />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
           <Stack.Screen name="ApplyLoan" component={ApplyLoanScreen} />
           <Stack.Screen name="AppliedLoans" component={AppliedLoansScreen} />
-          <Stack.Screen name="RepaymentSchedule" component={RepaymentScheduleScreen} />
+          <Stack.Screen
+            name="RepaymentSchedule"
+            component={RepaymentScheduleScreen}
+          />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
         </Stack.Navigator>
       </NavigationContainer>
