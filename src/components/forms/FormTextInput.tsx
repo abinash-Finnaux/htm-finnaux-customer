@@ -23,6 +23,9 @@ type Props<T extends FieldValues> = {
   | 'autoComplete'
   | 'autoCapitalize'
   | 'secureTextEntry'
+  | 'multiline'
+  | 'textAlignVertical'
+  | 'numberOfLines'
 >;
 
 export default function FormTextInput<T extends FieldValues>({
@@ -37,6 +40,9 @@ export default function FormTextInput<T extends FieldValues>({
   autoComplete,
   autoCapitalize,
   secureTextEntry,
+  multiline,
+  textAlignVertical,
+  numberOfLines,
 }: Props<T>) {
   return (
     <Controller
@@ -59,6 +65,9 @@ export default function FormTextInput<T extends FieldValues>({
           autoComplete={autoComplete}
           autoCapitalize={autoCapitalize}
           secureTextEntry={secureTextEntry}
+          multiline={multiline}
+          textAlignVertical={textAlignVertical}
+          numberOfLines={numberOfLines}
         />
       )}
     />

@@ -25,7 +25,7 @@ export default function AuthFooter({
       {(message || linkLabel) && (
         <View style={themed.linkRow}>
           {message ? (
-            <Text style={themed.messageText}>{message}</Text>
+            <Text style={themed.messageText}>{message + ' '}</Text>
           ) : null}
           {linkLabel && onLinkPress ? (
             <Pressable onPress={onLinkPress}>
@@ -43,7 +43,10 @@ export default function AuthFooter({
   );
 }
 
-function createStyles({ colors, typography }: ReturnType<typeof useTheme>['theme']) {
+function createStyles({
+  colors,
+  typography,
+}: ReturnType<typeof useTheme>['theme']) {
   return StyleSheet.create({
     linkRow: {
       flexDirection: 'row',

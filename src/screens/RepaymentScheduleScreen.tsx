@@ -10,11 +10,20 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import type { RootStackParamList } from '../../App';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RepaymentSchedule'>;
+
+type PayForm = {
+  payAmount: string;
+  payMode: string;
+  prepayType: string;
+  prepayAmount: string;
+  prepayMode: string;
+};
 
 const SCHEDULE = [
   {
@@ -163,26 +172,37 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
   const [activeTab, setActiveTab] = useState<'pay' | 'prepay'>('pay');
 
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-  const [payAmount, setPayAmount] = useState('');
-  const [payMode, setPayMode] = useState('');
 
-  const [prepayType, setPrepayType] = useState('prepay');
-  const [prepayAmount, setPrepayAmount] = useState('');
-  const [prepayMode, setPrepayMode] = useState('');
+  const { control, watch, getValues, setValue } = useForm<PayForm>({
+    defaultValues: {
+      payAmount: '',
+      payMode: '',
+      prepayType: 'prepay',
+      prepayAmount: '',
+      prepayMode: '',
+    },
+  });
+
+  const payAmount = watch('payAmount');
+  const payMode = watch('payMode');
+  const prepayType = watch('prepayType');
+  const prepayAmount = watch('prepayAmount');
+  const prepayMode = watch('prepayMode');
 
   const handlePaySubmit = () => {
+    const { payAmount: pAmount, payMode: pMode } = getValues();
     if (!selectedMonth)
       return Alert.alert('Select EMI', 'Please select an EMI month to pay.');
-    if (!payAmount.trim())
+    if (!pAmount.trim())
       return Alert.alert('Amount', 'Please enter the payment amount.');
-    if (!payMode)
+    if (!pMode)
       return Alert.alert('Payment Mode', 'Please select a payment mode.');
     Alert.alert(
       'Confirm Payment',
-      `Pay ₹${Number(payAmount).toLocaleString(
+      `Pay ₹${Number(pAmount).toLocaleString(
         'en-IN',
       )} for EMI #${selectedMonth} via ${
-        PAYMENT_MODES.find(m => m.id === payMode)?.label
+        PAYMENT_MODES.find(m => m.id === pMode)?.label
       }?`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -193,8 +213,8 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
               { text: 'OK' },
             ]);
             setSelectedMonth(null);
-            setPayAmount('');
-            setPayMode('');
+            setValue('payAmount', '');
+            setValue('payMode', '');
           },
         },
       ],
@@ -202,14 +222,15 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
   };
 
   const handlePrepaySubmit = () => {
-    if (!prepayAmount.trim())
+    const { prepayAmount: pAmount, prepayMode: pMode, prepayType: pType } = getValues();
+    if (!pAmount.trim())
       return Alert.alert('Amount', 'Please enter the amount.');
-    if (!prepayMode)
+    if (!pMode)
       return Alert.alert('Payment Mode', 'Please select a payment mode.');
-    const label = prepayType === 'foreclose' ? 'foreclose' : 'prepay';
+    const label = pType === 'foreclose' ? 'foreclose' : 'prepay';
     Alert.alert(
       'Confirm',
-      `₹${Number(prepayAmount).toLocaleString(
+      `₹${Number(pAmount).toLocaleString(
         'en-IN',
       )} will be used to ${label} your loan. Continue?`,
       [
@@ -220,8 +241,8 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
             Alert.alert('Success', 'Request submitted successfully.', [
               { text: 'OK' },
             ]);
-            setPrepayAmount('');
-            setPrepayMode('');
+            setValue('prepayAmount', '');
+            setValue('prepayMode', '');
           },
         },
       ],
@@ -618,7 +639,7 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
                     return (
                       <Pressable
                         key={item.month}
-                        onPress={() => { setSelectedMonth(item.month); setPayAmount(String(item.emi)); }}
+                        onPress={() => { setSelectedMonth(item.month); setValue('payAmount', String(item.emi)); }}
                         style={({ pressed }) => [
                           styles.emiCard,
                           {
@@ -654,13 +675,20 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
                 <Text style={[styles.formSectionTitle, { color: colors.text }]}>Amount</Text>
                 <View style={[styles.amountInputWrapper, { backgroundColor: colors.surface, borderColor: selectedMonth ? headerBg + '40' : colors.border, borderRadius: radius.md }]}>
                   <Text style={[styles.amountPrefix, { color: colors.textSecondary }]}>₹</Text>
+                  <Controller
+                    control={control}
+                    name="payAmount"
+                    render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
                     style={[styles.amountInput, { color: colors.text }]}
                     placeholder="0"
                     placeholderTextColor={colors.textSecondary}
-                    value={payAmount}
-                    onChangeText={setPayAmount}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
                     keyboardType="number-pad"
+                  />
+                    )}
                   />
                 </View>
               </View>
@@ -668,13 +696,17 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
               {/* ── Payment Mode ── */}
               <View style={styles.formSection}>
                 <Text style={[styles.formSectionTitle, { color: colors.text }]}>Payment Method</Text>
+                <Controller
+                  control={control}
+                  name="payMode"
+                  render={({ field: { onChange, value } }) => (
                 <View style={styles.modeGrid}>
                   {PAYMENT_MODES.map(mode => {
-                    const selected = payMode === mode.id;
+                    const selected = value === mode.id;
                     return (
                       <Pressable
                         key={mode.id}
-                        onPress={() => setPayMode(mode.id)}
+                        onPress={() => onChange(mode.id)}
                         style={({ pressed }) => [
                           styles.modeCard,
                           {
@@ -696,6 +728,8 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
                     );
                   })}
                 </View>
+                  )}
+                />
               </View>
 
               {/* ── Submit ── */}
@@ -747,14 +781,18 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
               {/* ── Type Selection ── */}
               <View style={styles.formSection}>
                 <Text style={[styles.formSectionTitle, { color: colors.text }]}>Choose Action</Text>
+                <Controller
+                  control={control}
+                  name="prepayType"
+                  render={({ field: { onChange, value } }) => (
                 <View style={styles.typeGrid}>
                   {PREPAY_TYPES.map(t => {
-                    const selected = prepayType === t.id;
+                    const selected = value === t.id;
                     const accent = t.id === 'prepay' ? '#F59E0B' : '#22C55E';
                     return (
                       <Pressable
                         key={t.id}
-                        onPress={() => setPrepayType(t.id)}
+                        onPress={() => onChange(t.id)}
                         style={({ pressed }) => [
                           styles.typeCard,
                           {
@@ -774,6 +812,8 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
                     );
                   })}
                 </View>
+                  )}
+                />
               </View>
 
               {/* ── Amount ── */}
@@ -781,20 +821,27 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
                 <View style={styles.formSectionHeader}>
                   <Text style={[styles.formSectionTitle, { color: colors.text }]}>Amount</Text>
                   {prepayType === 'foreclose' && (
-                    <Pressable onPress={() => setPrepayAmount(String(outstandingBalance))}>
+                    <Pressable onPress={() => setValue('prepayAmount', String(outstandingBalance))}>
                       <Text style={[styles.fillMaxLink, { color: '#8B5CF6' }]}>Pay full amount</Text>
                     </Pressable>
                   )}
                 </View>
                 <View style={[styles.amountInputWrapper, { backgroundColor: colors.surface, borderColor: prepayAmount ? '#8B5CF640' : colors.border, borderRadius: radius.md }]}>
                   <Text style={[styles.amountPrefix, { color: colors.textSecondary }]}>₹</Text>
+                  <Controller
+                    control={control}
+                    name="prepayAmount"
+                    render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
                     style={[styles.amountInput, { color: colors.text }]}
                     placeholder="0"
                     placeholderTextColor={colors.textSecondary}
-                    value={prepayAmount}
-                    onChangeText={setPrepayAmount}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
                     keyboardType="number-pad"
+                  />
+                    )}
                   />
                 </View>
               </View>
@@ -802,13 +849,17 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
               {/* ── Payment Mode ── */}
               <View style={styles.formSection}>
                 <Text style={[styles.formSectionTitle, { color: colors.text }]}>Payment Method</Text>
+                <Controller
+                  control={control}
+                  name="prepayMode"
+                  render={({ field: { onChange, value } }) => (
                 <View style={styles.modeGrid}>
                   {PAYMENT_MODES.map(mode => {
-                    const selected = prepayMode === mode.id;
+                    const selected = value === mode.id;
                     return (
                       <Pressable
                         key={mode.id}
-                        onPress={() => setPrepayMode(mode.id)}
+                        onPress={() => onChange(mode.id)}
                         style={({ pressed }) => [
                           styles.modeCard,
                           {
@@ -825,11 +876,13 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
                           </View>
                         )}
                         <Text style={styles.modeCardIcon}>{mode.icon}</Text>
-                        <Text style={[styles.modeCardLabel, { color: selected ? '#FFFFFF' : colors.text }]}>{mode.label}</Text>
+                         <Text style={[styles.modeCardLabel, { color: selected ? '#FFFFFF' : colors.text }]}>{mode.label}</Text>
                       </Pressable>
                     );
                   })}
                 </View>
+                  )}
+                />
               </View>
 
               {/* ── Submit ── */}

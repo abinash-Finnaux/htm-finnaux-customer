@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import type { RootStackParamList } from '../../App';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
+
+type ProfileForm = {
+  fullName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  address1: string;
+  address2: string;
+};
 
 export default function ProfileScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
@@ -14,18 +24,20 @@ export default function ProfileScreen({ navigation }: Props) {
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
 
   const [editVisible, setEditVisible] = useState(false);
-  const [form, setForm] = useState({
-    fullName: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+91 98765 43210',
-    dob: '15 Jan 1990',
-    address1: '123, MG Road, Andheri West',
-    address2: 'Mumbai, Maharashtra - 400053',
+
+  const { control, watch } = useForm<ProfileForm>({
+    defaultValues: {
+      fullName: 'John Doe',
+      email: 'john.doe@email.com',
+      phone: '+91 98765 43210',
+      dob: '15 Jan 1990',
+      address1: '123, MG Road, Andheri West',
+      address2: 'Mumbai, Maharashtra - 400053',
+    },
   });
 
-  const updateField = (key: string, value: string) => {
-    setForm(prev => ({ ...prev, [key]: value }));
-  };
+  const formFullName = watch('fullName');
+  const formEmail = watch('email');
 
   const handleSave = () => {
     setEditVisible(false);
@@ -63,8 +75,8 @@ export default function ProfileScreen({ navigation }: Props) {
               <Text style={styles.avatarText}>JD</Text>
             </View>
           </View>
-          <Text style={styles.headerName}>{form.fullName}</Text>
-          <Text style={styles.headerEmail}>{form.email}</Text>
+          <Text style={styles.headerName}>{formFullName}</Text>
+          <Text style={styles.headerEmail}>{formEmail}</Text>
           <Text style={styles.headerSub}>Customer ID: HMT-2024-001</Text>
         </View>
       </View>
@@ -80,9 +92,9 @@ export default function ProfileScreen({ navigation }: Props) {
           </Text>
           <View style={[styles.card, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.lg }]}>
             {[
-              { label: 'Email', value: form.email, icon: '✉️' },
-              { label: 'Phone', value: form.phone, icon: '📱' },
-              { label: 'Date of Birth', value: form.dob, icon: '🎂' },
+              { label: 'Email', value: watch('email'), icon: '✉️' },
+              { label: 'Phone', value: watch('phone'), icon: '📱' },
+              { label: 'Date of Birth', value: watch('dob'), icon: '🎂' },
             ].map((item, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <View style={[styles.cardDivider, { backgroundColor: colors.border }]} />}
@@ -126,8 +138,8 @@ export default function ProfileScreen({ navigation }: Props) {
             <View style={styles.cardRow}>
               <Text style={styles.cardIcon}>📍</Text>
               <View style={styles.cardInfo}>
-                <Text style={[styles.cardValue, { color: colors.text }]}>{form.address1}</Text>
-                <Text style={[styles.cardValue, { color: colors.text, marginTop: 2 }]}>{form.address2}</Text>
+                <Text style={[styles.cardValue, { color: colors.text }]}>{watch('address1')}</Text>
+                <Text style={[styles.cardValue, { color: colors.text, marginTop: 2 }]}>{watch('address2')}</Text>
               </View>
             </View>
           </View> 
@@ -155,53 +167,95 @@ export default function ProfileScreen({ navigation }: Props) {
 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Full Name</Text>
+              <Controller
+                control={control}
+                name="fullName"
+                render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md }]}
-                value={form.fullName}
-                onChangeText={v => updateField('fullName', v)}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
                 placeholderTextColor={colors.textSecondary}
+              />
+                )}
               />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Email</Text>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md }]}
-                value={form.email}
-                onChangeText={v => updateField('email', v)}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
                 keyboardType="email-address"
                 placeholderTextColor={colors.textSecondary}
               />
+                )}
+              />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Phone</Text>
+              <Controller
+                control={control}
+                name="phone"
+                render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md }]}
-                value={form.phone}
-                onChangeText={v => updateField('phone', v)}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
                 keyboardType="phone-pad"
                 placeholderTextColor={colors.textSecondary}
               />
+                )}
+              />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Date of Birth</Text>
+              <Controller
+                control={control}
+                name="dob"
+                render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md }]}
-                value={form.dob}
-                onChangeText={v => updateField('dob', v)}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
                 placeholderTextColor={colors.textSecondary}
+              />
+                )}
               />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Address Line 1</Text>
+              <Controller
+                control={control}
+                name="address1"
+                render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md }]}
-                value={form.address1}
-                onChangeText={v => updateField('address1', v)}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
                 placeholderTextColor={colors.textSecondary}
+              />
+                )}
               />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Address Line 2</Text>
+              <Controller
+                control={control}
+                name="address2"
+                render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md }]}
-                value={form.address2}
-                onChangeText={v => updateField('address2', v)}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
                 placeholderTextColor={colors.textSecondary}
+              />
+                )}
               />
 
               <View style={{ height: 20 }} />

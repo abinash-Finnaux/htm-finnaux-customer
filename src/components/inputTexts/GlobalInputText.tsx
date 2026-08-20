@@ -17,6 +17,7 @@ export default function GlobalInputText({
   label,
   error,
   style,
+  multiline,
   ...rest
 }: Props) {
   const { theme } = useTheme();
@@ -31,18 +32,20 @@ export default function GlobalInputText({
         style={[
           styles.input,
           {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.surfaceElevated,
             borderColor: error ? colors.error : colors.border,
             color: colors.text,
             borderRadius: radius.md,
             paddingHorizontal: spacing.md,
             marginTop: spacing.sm,
           },
+          multiline && styles.inputMultiline,
           style,
         ]}
         placeholderTextColor={colors.textSecondary}
         autoCapitalize="none"
         autoCorrect={false}
+        multiline={multiline}
         {...rest}
       />
       {error ? (
@@ -62,6 +65,11 @@ const styles = StyleSheet.create({
     height: 48,
     borderWidth: 1,
     fontSize: 15,
+  },
+  inputMultiline: {
+    height: 'auto',
+    paddingTop: 12,
+    textAlignVertical: 'top',
   },
   errorText: {
     fontSize: 11,

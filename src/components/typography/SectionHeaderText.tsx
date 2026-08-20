@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 type Props = {
   title: string;
 };
 
-export default function SectionHeader({ title }: Props) {
+export default function SectionHeaderText({ title }: Props) {
   const { theme } = useTheme();
   const { colors, spacing } = theme;
 

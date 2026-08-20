@@ -14,7 +14,7 @@ import MyLoansScreen from './src/screens/MyLoansScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import HelpSupportScreen from './src/screens/HelpSupportScreen';
-import ApplyLoanScreen from './src/screens/ApplyLoanScreen';
+import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import AppliedLoansScreen from './src/screens/AppliedLoansScreen';
 import RepaymentScheduleScreen from './src/screens/RepaymentScheduleScreen';
 import SignUpScreen from './src/screens/signup/SignUpScreen';
