@@ -16,7 +16,7 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import HelpSupportScreen from './src/screens/HelpSupportScreen';
 import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import AppliedLoansScreen from './src/screens/AppliedLoansScreen';
-import RepaymentScheduleScreen from './src/screens/RepaymentScheduleScreen';
+import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
 import SignUpScreen from './src/screens/signup/SignUpScreen';
 
 export type RootStackParamList = {
