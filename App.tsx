@@ -7,7 +7,7 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import SplashScreen from './src/screens/SplashScreen';
 import PermissionScreen from './src/screens/PermissionScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
-import HomeScreen from './src/screens/HomeScreen';
+import HomeScreen from './src/screens/home/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import MyLoansScreen from './src/screens/MyLoansScreen';
