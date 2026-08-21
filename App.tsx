@@ -9,7 +9,6 @@ import PermissionScreen from './src/screens/PermissionScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
 import MyLoansScreen from './src/screens/MyLoansScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -18,6 +17,7 @@ import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import AppliedLoansScreen from './src/screens/AppliedLoansScreen';
 import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
 import SignUpScreen from './src/screens/signup/SignUpScreen';
+import ProfileScreen from './src/screens/sidebar/profile/ProfileScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
