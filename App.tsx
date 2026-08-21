@@ -12,12 +12,13 @@ import ServiceScreen from './src/screens/ServiceScreen';
 import MyLoansScreen from './src/screens/MyLoansScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
 import HelpSupportScreen from './src/screens/HelpSupportScreen';
-import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
-import AppliedLoansScreen from './src/screens/AppliedLoansScreen';
+// import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
+import AppliedLoansScreen from './src/screens/sidebar/appliedLoan/AppliedLoansScreen';
 import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
 import SignUpScreen from './src/screens/signup/SignUpScreen';
 import ProfileScreen from './src/screens/sidebar/profile/ProfileScreen';
 import SettingsScreen from './src/screens/sidebar/settings/SettingsScreen';
+import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
