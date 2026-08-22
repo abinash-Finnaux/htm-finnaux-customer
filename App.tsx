@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+
 import SplashScreen from './src/screens/SplashScreen';
 import PermissionScreen from './src/screens/PermissionScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
@@ -11,14 +12,13 @@ import HomeScreen from './src/screens/home/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
 import MyLoansScreen from './src/screens/sidebar/myLoans/MyLoansScreen';
 import PaymentHistoryScreen from './src/screens/sidebar/paymentHistory/PaymentHistoryScreen';
-import HelpSupportScreen from './src/screens/HelpSupportScreen';
-// import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import AppliedLoansScreen from './src/screens/sidebar/appliedLoan/AppliedLoansScreen';
 import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
 import SignUpScreen from './src/screens/signup/SignUpScreen';
 import ProfileScreen from './src/screens/sidebar/profile/ProfileScreen';
 import SettingsScreen from './src/screens/sidebar/settings/SettingsScreen';
 import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
+import HelpSupportScreen from './src/screens/helpSupport/HelpSupportScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
