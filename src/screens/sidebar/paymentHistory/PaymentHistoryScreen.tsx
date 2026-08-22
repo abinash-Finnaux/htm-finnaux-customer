@@ -1,8 +1,8 @@
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useTheme } from '../../context/ThemeContext';
-import type { RootStackParamList } from '../../../App';
+import { useTheme } from '../../../context/ThemeContext';
+import type { RootStackParamList } from '../../../../App';
 
 import { createStyles } from './styles';
 import PaymentCard, { type Payment } from './_components/PaymentCard';
@@ -10,12 +10,54 @@ import PaymentCard, { type Payment } from './_components/PaymentCard';
 type Props = NativeStackScreenProps<RootStackParamList, 'PaymentHistory'>;
 
 const PAYMENTS: Payment[] = [
-  { id: 'PAY-001', date: '01 Aug 2026', loan: 'Personal Loan', amount: '₹12,500', status: 'Paid', statusColor: '#22C55E' },
-  { id: 'PAY-002', date: '01 Jul 2026', loan: 'Personal Loan', amount: '₹12,500', status: 'Paid', statusColor: '#22C55E' },
-  { id: 'PAY-003', date: '01 Jul 2026', loan: 'Home Loan', amount: '₹28,000', status: 'Paid', statusColor: '#22C55E' },
-  { id: 'PAY-004', date: '01 Jun 2026', loan: 'Personal Loan', amount: '₹12,500', status: 'Paid', statusColor: '#22C55E' },
-  { id: 'PAY-005', date: '01 Jun 2026', loan: 'Home Loan', amount: '₹28,000', status: 'Paid', statusColor: '#22C55E' },
-  { id: 'PAY-006', date: '15 May 2026', loan: 'Home Loan', amount: '₹28,000', status: 'Late', statusColor: '#EF4444' },
+  {
+    id: 'PAY-001',
+    date: '01 Aug 2026',
+    loan: 'Personal Loan',
+    amount: '₹12,500',
+    status: 'Paid',
+    statusColor: '#22C55E',
+  },
+  {
+    id: 'PAY-002',
+    date: '01 Jul 2026',
+    loan: 'Personal Loan',
+    amount: '₹12,500',
+    status: 'Paid',
+    statusColor: '#22C55E',
+  },
+  {
+    id: 'PAY-003',
+    date: '01 Jul 2026',
+    loan: 'Home Loan',
+    amount: '₹28,000',
+    status: 'Paid',
+    statusColor: '#22C55E',
+  },
+  {
+    id: 'PAY-004',
+    date: '01 Jun 2026',
+    loan: 'Personal Loan',
+    amount: '₹12,500',
+    status: 'Paid',
+    statusColor: '#22C55E',
+  },
+  {
+    id: 'PAY-005',
+    date: '01 Jun 2026',
+    loan: 'Home Loan',
+    amount: '₹28,000',
+    status: 'Paid',
+    statusColor: '#22C55E',
+  },
+  {
+    id: 'PAY-006',
+    date: '15 May 2026',
+    loan: 'Home Loan',
+    amount: '₹28,000',
+    status: 'Late',
+    statusColor: '#EF4444',
+  },
 ];
 
 export default function PaymentHistoryScreen({ navigation }: Props) {

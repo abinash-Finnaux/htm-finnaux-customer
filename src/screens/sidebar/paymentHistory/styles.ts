@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import type { AppTheme } from '../../constants/themes';
+import type { AppTheme } from '../../../constants/themes';
 
 export function createStyles(
   colors: AppTheme['colors'],
