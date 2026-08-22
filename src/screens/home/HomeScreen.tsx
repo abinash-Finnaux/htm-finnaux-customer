@@ -173,6 +173,8 @@ export default function HomeScreen({ navigation }: Props) {
                     navigation.navigate('EmiDetails');
                   } else if (index === 3) {
                     navigation.navigate('EmiDeposit');
+                  } else if (index === 4) {
+                    navigation.navigate('CloserStatement');
                   } else {
                     navigation.navigate('Service', {
                       title: service.title,

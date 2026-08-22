@@ -21,6 +21,7 @@ import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
 import EmiDetailsScreen from './src/screens/emiDetails/emiDetailsScreen';
 import EmiDepositScreen from './src/screens/emiDeposit/emiDepositScreen';
+import CloserStatementScreen from './src/screens/closerStatement/closerStatementScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -39,6 +40,7 @@ export type RootStackParamList = {
   RepaymentSchedule: undefined;
   EmiDetails: undefined;
   EmiDeposit: undefined;
+  CloserStatement: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -76,6 +78,10 @@ function AppContent() {
           />
           <Stack.Screen name="EmiDetails" component={EmiDetailsScreen} />
           <Stack.Screen name="EmiDeposit" component={EmiDepositScreen} />
+          <Stack.Screen
+            name="CloserStatement"
+            component={CloserStatementScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </>
