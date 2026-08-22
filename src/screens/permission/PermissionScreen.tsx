@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  Animated,
+  View,
+  Text,
   Image,
-  PermissionsAndroid,
+  Animated,
   Platform,
   Pressable,
-  StyleSheet,
-  Text,
-  View,
+  ActivityIndicator,
+  PermissionsAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { useTheme } from '../context/ThemeContext';
-import logo from '../assets/images/logo.png';
+import { useTheme } from '../../context/ThemeContext';
+import logo from '../../assets/images/logo.png';
+
+import { createStyles } from './styles';
 
 const STORAGE_KEY = '@finnaux_permissions';
 
@@ -220,6 +221,8 @@ export default function PermissionScreen({ navigation }: any) {
   const { theme } = useTheme();
 
   const { colors, spacing, radius, typography } = theme;
+
+  const themed = createStyles(colors, spacing, radius, typography);
 
   const [loading, setLoading] = useState(true);
 
@@ -570,14 +573,7 @@ export default function PermissionScreen({ navigation }: any) {
 
   if (loading) {
     return (
-      <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={themed.container}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -591,18 +587,11 @@ export default function PermissionScreen({ navigation }: any) {
 
   if (phase === 'intro') {
     return (
-      <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
-        <View style={styles.introWrapper}>
+      <View style={themed.container}>
+        <View style={themed.introWrapper}>
           <Animated.View
             style={[
-              styles.introContent,
+              themed.introContent,
               {
                 opacity: fadeAnim,
                 transform: [
@@ -617,47 +606,21 @@ export default function PermissionScreen({ navigation }: any) {
             ]}
           >
             {/* Logo */}
-            <View
-              style={[
-                styles.iconCircle,
-                {
-                  backgroundColor: colors.primary + '15',
-                  marginBottom: spacing.xl,
-                },
-              ]}
-            >
-              <Image source={logo} style={styles.logo} resizeMode="contain" />
+            <View style={themed.introIconCircle}>
+              <Image source={logo} style={themed.logo} resizeMode="contain" />
             </View>
 
             {/* Title */}
-            <Text
-              style={[
-                styles.introTitle,
-                {
-                  color: colors.text,
-                  marginBottom: spacing.sm,
-                },
-              ]}
-            >
-              Enable Permissions
-            </Text>
+            <Text style={themed.introTitle}>Enable Permissions</Text>
 
             {/* Description */}
-            <Text
-              style={[
-                styles.introDescription,
-                {
-                  color: colors.textSecondary,
-                  marginBottom: spacing.xxl,
-                },
-              ]}
-            >
+            <Text style={themed.introDescription}>
               To provide you with the best experience, we need access to a few
               device features. You can change these anytime in Settings.
             </Text>
 
             {/* Permission chips */}
-            <View style={styles.featureGrid}>
+            <View style={themed.featureGrid}>
               {PERMISSIONS.map(permission => {
                 const isGranted = granted[permission.key];
 
@@ -665,30 +628,20 @@ export default function PermissionScreen({ navigation }: any) {
                   <View
                     key={permission.key}
                     style={[
-                      styles.featureChip,
-                      {
-                        backgroundColor: isGranted
-                          ? colors.success + '12'
-                          : colors.surface,
-
-                        borderColor: isGranted ? colors.success : colors.border,
-
-                        borderRadius: radius.md,
-                      },
+                      themed.featureChip,
+                      isGranted ? themed.chipGranted : themed.chipPending,
                     ]}
                   >
-                    <Text style={styles.featureChipIcon}>
+                    <Text style={themed.featureChipIcon}>
                       {isGranted ? '✅' : permission.icon}
                     </Text>
 
                     <Text
                       style={[
-                        styles.featureChipLabel,
-                        {
-                          color: isGranted ? colors.success : colors.text,
-
-                          fontSize: typography.small,
-                        },
+                        themed.featureChipLabel,
+                        isGranted
+                          ? themed.chipLabelGranted
+                          : themed.chipLabelPending,
                       ]}
                     >
                       {permission.title}
@@ -702,27 +655,11 @@ export default function PermissionScreen({ navigation }: any) {
             <Pressable
               onPress={handleAgree}
               style={({ pressed }) => [
-                styles.agreeButton,
-                {
-                  backgroundColor: colors.primary,
-
-                  borderRadius: radius.pill,
-
-                  marginTop: spacing.xxl,
-
-                  opacity: pressed ? 0.85 : 1,
-                },
+                themed.agreeButton,
+                { opacity: pressed ? 0.85 : 1 },
               ]}
             >
-              <Text
-                style={[
-                  styles.agreeButtonText,
-                  {
-                    color: colors.onPrimary,
-                    fontSize: typography.body,
-                  },
-                ]}
-              >
+              <Text style={themed.agreeButtonText}>
                 {totalCount === PERMISSIONS.length
                   ? 'I Agree'
                   : `Allow Remaining (${totalCount})`}
@@ -733,22 +670,11 @@ export default function PermissionScreen({ navigation }: any) {
             <Pressable
               onPress={handleDisagree}
               style={({ pressed }) => [
-                styles.disagreeButton,
-                {
-                  borderRadius: radius.pill,
-                  marginTop: spacing.md,
-                  opacity: pressed ? 0.6 : 1,
-                },
+                themed.disagreeButton,
+                { opacity: pressed ? 0.6 : 1 },
               ]}
             >
-              <Text
-                style={{
-                  color: colors.textSecondary,
-                  fontSize: typography.caption,
-                }}
-              >
-                I'll do it later
-              </Text>
+              <Text style={themed.disagreeText}>I'll do it later</Text>
             </Pressable>
           </Animated.View>
         </View>
@@ -764,18 +690,11 @@ export default function PermissionScreen({ navigation }: any) {
 
   if (phase === 'done') {
     return (
-      <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
-        <View style={styles.introWrapper}>
+      <View style={themed.container}>
+        <View style={themed.introWrapper}>
           <Animated.View
             style={[
-              styles.introContent,
+              themed.introContent,
               {
                 opacity: fadeAnim,
 
@@ -787,38 +706,13 @@ export default function PermissionScreen({ navigation }: any) {
               },
             ]}
           >
-            <View
-              style={[
-                styles.iconCircle,
-                {
-                  backgroundColor: colors.success + '15',
-                },
-              ]}
-            >
-              <Text style={styles.doneCheck}>✓</Text>
+            <View style={themed.doneIconCircle}>
+              <Text style={themed.doneCheck}>✓</Text>
             </View>
 
-            <Text
-              style={[
-                styles.introTitle,
-                {
-                  color: colors.text,
-                  marginTop: spacing.lg,
-                },
-              ]}
-            >
-              All Set!
-            </Text>
+            <Text style={themed.doneTitle}>All Set!</Text>
 
-            <Text
-              style={[
-                styles.introDescription,
-                {
-                  color: colors.textSecondary,
-                  marginTop: spacing.sm,
-                },
-              ]}
-            >
+            <Text style={themed.doneDescription}>
               Permissions configured successfully. Let's get started.
             </Text>
           </Animated.View>
@@ -842,14 +736,7 @@ export default function PermissionScreen({ navigation }: any) {
 
   if (!perm) {
     return (
-      <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={themed.container}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -862,18 +749,11 @@ export default function PermissionScreen({ navigation }: any) {
    */
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
-      <View style={styles.permWrapper}>
+    <View style={themed.container}>
+      <View style={themed.permWrapper}>
         <Animated.View
           style={[
-            styles.permContent,
+            themed.permContent,
             {
               opacity: fadeAnim,
 
@@ -889,41 +769,18 @@ export default function PermissionScreen({ navigation }: any) {
           ]}
         >
           {/* Counter */}
-          <View style={styles.permHeader}>
-            <Text
-              style={[
-                styles.permCounter,
-                {
-                  color: colors.textSecondary,
-                  fontSize: typography.small,
-                },
-              ]}
-            >
+          <View style={themed.permHeader}>
+            <Text style={themed.permCounter}>
               {safeIndex + 1} of {totalCount}
             </Text>
           </View>
 
           {/* Progress bar */}
-          <View
-            style={[
-              styles.progressBarTrack,
-              {
-                backgroundColor: colors.border,
-
-                borderRadius: radius.pill,
-
-                marginTop: spacing.sm,
-              },
-            ]}
-          >
+          <View style={themed.progressBarTrack}>
             <Animated.View
               style={[
-                styles.progressBarFill,
+                themed.progressBarFill,
                 {
-                  backgroundColor: colors.primary,
-
-                  borderRadius: radius.pill,
-
                   width: progressAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: ['0%', '100%'],
@@ -934,288 +791,52 @@ export default function PermissionScreen({ navigation }: any) {
           </View>
 
           {/* Dots */}
-          <View style={styles.dotsRow}>
+          <View style={themed.dotsRow}>
             {pendingPermissions.map((permission, index) => (
               <View
                 key={permission.key}
                 style={[
-                  styles.dot,
-                  {
-                    backgroundColor:
-                      index <= safeIndex ? colors.primary : colors.border,
-
-                    borderRadius: radius.pill,
-                  },
+                  themed.dot,
+                  index <= safeIndex ? themed.dotActive : themed.dotInactive,
                 ]}
               />
             ))}
           </View>
 
           {/* Permission icon */}
-          <View
-            style={[
-              styles.permIconCircle,
-              {
-                backgroundColor: colors.primary + '12',
-
-                marginTop: spacing.xxl,
-
-                marginBottom: spacing.xl,
-              },
-            ]}
-          >
-            <Text style={styles.permIcon}>{perm.icon}</Text>
+          <View style={themed.permIconCircle}>
+            <Text style={themed.permIcon}>{perm.icon}</Text>
           </View>
 
           {/* Permission title */}
-          <Text
-            style={[
-              styles.permTitle,
-              {
-                color: colors.text,
-                marginBottom: spacing.sm,
-              },
-            ]}
-          >
-            {perm.title}
-          </Text>
+          <Text style={themed.permTitle}>{perm.title}</Text>
 
           {/* Description */}
-          <Text
-            style={[
-              styles.permDescription,
-              {
-                color: colors.textSecondary,
-                marginBottom: spacing.xxl,
-              },
-            ]}
-          >
-            {perm.description}
-          </Text>
+          <Text style={themed.permDescription}>{perm.description}</Text>
 
           {/* Allow */}
           <Pressable
             onPress={handleAllow}
             style={({ pressed }) => [
-              styles.approveButton,
-              {
-                backgroundColor: colors.primary,
-
-                borderRadius: radius.pill,
-
-                opacity: pressed ? 0.85 : 1,
-              },
+              themed.approveButton,
+              { opacity: pressed ? 0.85 : 1 },
             ]}
           >
-            <Text
-              style={[
-                styles.approveButtonText,
-                {
-                  color: colors.onPrimary,
-
-                  fontSize: typography.body,
-                },
-              ]}
-            >
-              Allow
-            </Text>
+            <Text style={themed.approveButtonText}>Allow</Text>
           </Pressable>
 
           {/* Skip */}
           <Pressable
             onPress={handleSkip}
             style={({ pressed }) => [
-              styles.skipButton,
-              {
-                borderRadius: radius.pill,
-
-                marginTop: spacing.md,
-
-                opacity: pressed ? 0.6 : 1,
-              },
+              themed.skipButton,
+              { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text
-              style={{
-                color: colors.textSecondary,
-
-                fontSize: typography.caption,
-              }}
-            >
-              Skip for now
-            </Text>
+            <Text style={themed.skipText}>Skip for now</Text>
           </Pressable>
         </Animated.View>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  introWrapper: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    paddingHorizontal: 28,
-  },
-
-  introContent: {
-    alignItems: 'center',
-  },
-
-  iconCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  logo: {
-    width: 70,
-    height: 70,
-  },
-
-  introTitle: {
-    fontSize: 26,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-
-  introDescription: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 8,
-  },
-
-  featureGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 10,
-  },
-
-  featureChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    gap: 8,
-  },
-
-  featureChipIcon: {
-    fontSize: 18,
-  },
-
-  featureChipLabel: {
-    fontWeight: '500',
-  },
-
-  agreeButton: {
-    alignItems: 'center',
-    paddingVertical: 16,
-    width: '100%',
-  },
-
-  agreeButtonText: {
-    fontWeight: '700',
-  },
-
-  disagreeButton: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-
-  permWrapper: {
-    flex: 1,
-    width: '100%',
-    paddingHorizontal: 28,
-    justifyContent: 'center',
-  },
-
-  permContent: {
-    alignItems: 'center',
-  },
-
-  permHeader: {
-    alignSelf: 'flex-end',
-  },
-
-  permCounter: {
-    fontWeight: '600',
-  },
-
-  progressBarTrack: {
-    height: 4,
-    width: '100%',
-  },
-
-  progressBarFill: {
-    height: 4,
-  },
-
-  dotsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
-  },
-
-  dot: {
-    width: 8,
-    height: 8,
-  },
-
-  permIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  permIcon: {
-    fontSize: 44,
-  },
-
-  permTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-
-  permDescription: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 8,
-  },
-
-  approveButton: {
-    alignItems: 'center',
-    paddingVertical: 16,
-    width: '100%',
-  },
-
-  approveButtonText: {
-    fontWeight: '700',
-  },
-
-  skipButton: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-
-  doneCheck: {
-    fontSize: 44,
-    color: '#22C55E',
-    fontWeight: '700',
-  },
-});

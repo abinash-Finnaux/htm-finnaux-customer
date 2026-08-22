@@ -6,7 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 import SplashScreen from './src/screens/splash/SplashScreen';
-import PermissionScreen from './src/screens/PermissionScreen';
+import PermissionScreen from './src/screens/permission/PermissionScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
