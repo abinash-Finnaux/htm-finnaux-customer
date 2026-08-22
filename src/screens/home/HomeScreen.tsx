@@ -169,6 +169,8 @@ export default function HomeScreen({ navigation }: Props) {
                     navigation.navigate('ApplyLoan');
                   } else if (index === 1) {
                     navigation.navigate('RepaymentSchedule');
+                  } else if (index === 2) {
+                    navigation.navigate('EmiDetails');
                   } else {
                     navigation.navigate('Service', {
                       title: service.title,

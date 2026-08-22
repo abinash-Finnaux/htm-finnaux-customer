@@ -8,33 +8,35 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import SplashScreen from './src/screens/splash/SplashScreen';
 import PermissionScreen from './src/screens/permission/PermissionScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
+import SignUpScreen from './src/screens/signup/SignUpScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
+import ProfileScreen from './src/screens/sidebar/profile/ProfileScreen';
+import AppliedLoansScreen from './src/screens/sidebar/appliedLoan/AppliedLoansScreen';
 import MyLoansScreen from './src/screens/sidebar/myLoans/MyLoansScreen';
 import PaymentHistoryScreen from './src/screens/sidebar/paymentHistory/PaymentHistoryScreen';
-import AppliedLoansScreen from './src/screens/sidebar/appliedLoan/AppliedLoansScreen';
-import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
-import SignUpScreen from './src/screens/signup/SignUpScreen';
-import ProfileScreen from './src/screens/sidebar/profile/ProfileScreen';
 import SettingsScreen from './src/screens/sidebar/settings/SettingsScreen';
-import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import HelpSupportScreen from './src/screens/helpSupport/HelpSupportScreen';
+import EmiDetailsScreen from './src/screens/emiDetails/emiDetailsScreen';
+import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
+import RepaymentScheduleScreen from './src/screens/repaymentSchedule/RepaymentScheduleScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
   Permission: undefined;
   Login: undefined;
+  SignUp: undefined;
   Home: undefined;
   Service: { title: string; icon: string; description: string };
   Profile: undefined;
+  AppliedLoans: undefined;
   MyLoans: undefined;
   PaymentHistory: undefined;
   Settings: undefined;
   HelpSupport: undefined;
   ApplyLoan: undefined;
-  AppliedLoans: undefined;
   RepaymentSchedule: undefined;
-  SignUp: undefined;
+  EmiDetails: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,9 +55,11 @@ function AppContent() {
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Permission" component={PermissionScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Service" component={ServiceScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="AppliedLoans" component={AppliedLoansScreen} />
           <Stack.Screen name="MyLoans" component={MyLoansScreen} />
           <Stack.Screen
             name="PaymentHistory"
@@ -64,12 +68,11 @@ function AppContent() {
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
           <Stack.Screen name="ApplyLoan" component={ApplyLoanScreen} />
-          <Stack.Screen name="AppliedLoans" component={AppliedLoansScreen} />
           <Stack.Screen
             name="RepaymentSchedule"
             component={RepaymentScheduleScreen}
           />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="EmiDetails" component={EmiDetailsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
