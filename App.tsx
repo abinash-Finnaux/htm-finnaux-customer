@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
-import SplashScreen from './src/screens/SplashScreen';
+import SplashScreen from './src/screens/splash/SplashScreen';
 import PermissionScreen from './src/screens/PermissionScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
