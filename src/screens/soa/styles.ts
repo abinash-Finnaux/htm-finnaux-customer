@@ -1,0 +1,354 @@
+import { StyleSheet } from 'react-native';
+import type { AppTheme } from '../../constants/themes';
+
+export function createStyles(
+  colors: AppTheme['colors'],
+  spacing: AppTheme['spacing'],
+  radius: AppTheme['radius'],
+  headerBg: string,
+  decorBg: string,
+) {
+  return StyleSheet.create({
+    root: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingTop: 56,
+      paddingBottom: 28,
+      paddingHorizontal: 24,
+      borderBottomLeftRadius: 32,
+      borderBottomRightRadius: 32,
+      backgroundColor: headerBg,
+      overflow: 'hidden',
+    },
+    decor1: {
+      position: 'absolute',
+      top: -40,
+      right: -30,
+      width: 140,
+      height: 140,
+      borderRadius: 70,
+      backgroundColor: decorBg,
+    },
+    decor2: {
+      position: 'absolute',
+      bottom: 10,
+      left: -40,
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: decorBg,
+    },
+    topBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    backBtn: {
+      width: 40,
+      height: 40,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    backBtnText: {
+      color: '#FFFFFF',
+      fontSize: 20,
+      fontWeight: '600',
+    },
+    topTitle: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    topSpacer: {
+      width: 40,
+    },
+    headerBody: {
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    headerIcon: {
+      fontSize: 36,
+    },
+    headerLabel: {
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontWeight: '700',
+      marginTop: 10,
+    },
+    headerSub: {
+      color: 'rgba(255,255,255,0.75)',
+      fontSize: 12,
+      fontWeight: '500',
+      marginTop: 4,
+    },
+    flex: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+      paddingBottom: 20,
+    },
+    sectionLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      color: colors.textSecondary,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+
+    /* Loan account rows */
+    loanRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1.5,
+      padding: spacing.md,
+      borderRadius: radius.md,
+      gap: 12,
+    },
+    loanIconCircle: {
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.primary + '15',
+    },
+    loanIconText: {
+      fontSize: 20,
+    },
+    loanMiddle: {
+      flex: 1,
+    },
+    loanType: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    loanId: {
+      fontSize: 11,
+      fontWeight: '500',
+      marginTop: 2,
+      color: colors.textSecondary,
+    },
+    loanOutWrap: {
+      alignItems: 'flex-end',
+    },
+    loanOutLabel: {
+      fontSize: 9,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+      color: colors.textSecondary,
+    },
+    loanOutValue: {
+      fontSize: 13,
+      fontWeight: '800',
+      marginTop: 2,
+      color: colors.text,
+    },
+    radio: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: colors.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    radioDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.primary,
+    },
+
+    /* Period chips */
+    periodRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    periodChip: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderWidth: 1,
+      borderRadius: radius.pill,
+    },
+    periodChipText: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    periodChipTextActive: {
+      fontWeight: '700',
+      color: colors.primary,
+    },
+
+    /* Summary card */
+    summaryCard: {
+      borderWidth: 1,
+      padding: spacing.lg,
+      backgroundColor: colors.primary + '08',
+      borderColor: colors.primary + '20',
+      borderRadius: radius.lg,
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 6,
+    },
+    summaryLabel: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    summaryValue: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    summaryDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: 6,
+    },
+    summaryTotalLabel: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    summaryTotalValue: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: colors.primary,
+    },
+
+    /* Ledger card */
+    ledgerCard: {
+      borderWidth: 1,
+      overflow: 'hidden',
+      backgroundColor: colors.surfaceElevated,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+    },
+    ledgerHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      padding: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    ledgerIconCircle: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.primary + '15',
+    },
+    ledgerIconText: {
+      fontSize: 18,
+    },
+    ledgerTitleWrap: {
+      flex: 1,
+    },
+    ledgerTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    ledgerSub: {
+      fontSize: 11,
+      fontWeight: '500',
+      marginTop: 2,
+      color: colors.textSecondary,
+    },
+    entriesCount: {
+      fontSize: 11,
+      fontWeight: '600',
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: radius.pill,
+      backgroundColor: colors.primary + '15',
+      color: colors.primary,
+      overflow: 'hidden',
+    },
+
+    /* Empty state */
+    emptyState: {
+      alignItems: 'center',
+      paddingVertical: 32,
+      gap: 8,
+    },
+    emptyIcon: {
+      fontSize: 32,
+    },
+    emptyText: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+
+    /* Pinned footer */
+    footer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.background,
+      gap: spacing.md,
+    },
+    footerTotalWrap: {
+      flex: 1,
+    },
+    footerTotalLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+      color: colors.textSecondary,
+    },
+    footerTotalValue: {
+      fontSize: 20,
+      fontWeight: '800',
+      color: colors.text,
+      marginTop: 2,
+    },
+    footerSub: {
+      fontSize: 10,
+      fontWeight: '500',
+      marginTop: 2,
+      color: colors.textSecondary,
+    },
+    downloadBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+      backgroundColor: colors.primary,
+      borderRadius: radius.pill,
+    },
+    downloadBtnPressed: {
+      opacity: 0.85,
+    },
+    downloadBtnIcon: {
+      fontSize: 16,
+    },
+    downloadBtnText: {
+      color: colors.onPrimary,
+      fontSize: 14,
+      fontWeight: '700',
+    },
+  });
+}
