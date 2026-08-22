@@ -10,7 +10,7 @@ import LoginScreen from './src/screens/login/LoginScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
 import MyLoansScreen from './src/screens/sidebar/myLoans/MyLoansScreen';
-import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
+import PaymentHistoryScreen from './src/screens/payment-history/PaymentHistoryScreen';
 import HelpSupportScreen from './src/screens/HelpSupportScreen';
 // import ApplyLoanScreen from './src/screens/applyLoans/ApplyLoanScreen';
 import AppliedLoansScreen from './src/screens/sidebar/appliedLoan/AppliedLoansScreen';
