@@ -5,10 +5,12 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../../App';
 
+import DownloadButton from '../../components/buttons/DownloadButton';
 import { createStyles } from './styles';
 import TransactionRow, {
   type SoaEntry,
 } from './_component/TransactionRow';
+import PeriodChip from './_component/PeriodChip';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SOA'>;
 
@@ -17,6 +19,7 @@ type PeriodKey = '3M' | '6M' | '1Y' | 'ALL';
 type LoanAccount = {
   id: string;
   type: string;
+  icon: string;
   outstanding: number;
 };
 
@@ -26,11 +29,13 @@ const LOANS: LoanAccount[] = [
   {
     id: 'LA-2024-88321',
     type: 'Personal Loan',
+    icon: '💼',
     outstanding: 286940,
   },
   {
     id: 'LA-2024-77410',
     type: 'Home Loan',
+    icon: '🏠',
     outstanding: 2627840,
   },
 ];
@@ -99,7 +104,7 @@ const getDisplayDate = (daysBack: number) => {
 
 export default function SOAScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
-  const { colors, spacing } = theme;
+  const { colors } = theme;
 
   const headerBg = isDark ? '#1E293B' : colors.primary;
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
@@ -199,12 +204,19 @@ export default function SOAScreen({ navigation }: Props) {
           <Text style={themed.topTitle}>Statement of Account</Text>
           <View style={themed.topSpacer} />
         </View>
-        <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>🧾</Text>
-          <Text style={themed.headerLabel}>Loan Account Statement</Text>
-          <Text style={themed.headerSub}>
-            Track every debit & credit on your loan
-          </Text>
+        <View style={themed.heroRow}>
+          <View style={themed.heroLeft}>
+            <Text style={themed.heroLabel}>Closing Outstanding</Text>
+            <Text style={themed.heroAmount}>{formatINR(summary.closing)}</Text>
+            <View style={themed.heroBadge}>
+              <Text style={themed.heroBadgeText}>
+                🧾 {filteredEntries.length} entries • Last {activePeriodLabel}
+              </Text>
+            </View>
+          </View>
+          <View style={themed.heroIconWrap}>
+            <Text style={themed.heroIcon}>🧾</Text>
+          </View>
         </View>
       </View>
 
@@ -213,9 +225,10 @@ export default function SOAScreen({ navigation }: Props) {
         contentContainerStyle={themed.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Loan account */}
-        <Text style={themed.sectionLabel}>Select Loan Account</Text>
-        <View style={{ gap: spacing.sm }}>
+        <View style={[themed.titleRow, themed.titleRowFirst]}>
+          <Text style={themed.title}>Loan Account</Text>
+        </View>
+        <View style={themed.loanPillsRow}>
           {LOANS.map(item => {
             const selected = item.id === loanId;
             return (
@@ -223,121 +236,101 @@ export default function SOAScreen({ navigation }: Props) {
                 key={item.id}
                 onPress={() => setLoanId(item.id)}
                 style={({ pressed }) => [
-                  themed.loanRow,
-                  {
-                    borderColor: selected ? colors.primary : colors.border,
-                    backgroundColor: selected
-                      ? colors.primary + '08'
-                      : 'transparent',
-                    opacity: pressed ? 0.85 : 1,
-                  },
+                  themed.loanPill,
+                  selected && themed.loanPillActive,
+                  { opacity: pressed ? 0.85 : 1 },
                 ]}
               >
-                <View style={themed.loanIconCircle}>
-                  <Text style={themed.loanIconText}>🏦</Text>
-                </View>
-                <View style={themed.loanMiddle}>
-                  <Text style={themed.loanType}>{item.type}</Text>
-                  <Text style={themed.loanId}>{item.id}</Text>
-                </View>
-                <View style={themed.loanOutWrap}>
-                  <Text style={themed.loanOutLabel}>Outstanding</Text>
-                  <Text style={themed.loanOutValue}>
-                    {formatINR(item.outstanding)}
+                <Text style={themed.loanPillIcon}>{item.icon}</Text>
+                <View>
+                  <Text
+                    style={[
+                      themed.loanPillType,
+                      selected && themed.loanPillTypeActive,
+                    ]}
+                  >
+                    {item.type}
+                  </Text>
+                  <Text
+                    style={[
+                      themed.loanPillId,
+                      selected && themed.loanPillIdActive,
+                    ]}
+                  >
+                    {item.id}
                   </Text>
                 </View>
-                <View
-                  style={[
-                    themed.radio,
-                    selected && { borderColor: colors.primary },
-                  ]}
-                >
-                  {selected && <View style={themed.radioDot} />}
-                </View>
               </Pressable>
             );
           })}
         </View>
-
-        {/* Period filter */}
-        <Text style={themed.sectionLabel}>Statement Period</Text>
-        <View style={themed.periodRow}>
-          {PERIODS.map(item => {
-            const selected = item.key === period;
-            return (
-              <Pressable
-                key={item.key}
-                onPress={() => setPeriod(item.key)}
-                style={({ pressed }) => [
-                  themed.periodChip,
-                  {
-                    borderColor: selected ? colors.primary : colors.border,
-                    backgroundColor: selected
-                      ? colors.primary + '15'
-                      : 'transparent',
-                    opacity: pressed ? 0.8 : 1,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    themed.periodChipText,
-                    selected && themed.periodChipTextActive,
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* Summary */}
-        <Text style={themed.sectionLabel}>Summary</Text>
-        <View style={themed.summaryCard}>
-          <View style={themed.summaryRow}>
-            <Text style={themed.summaryLabel}>Opening Balance</Text>
-            <Text style={themed.summaryValue}>{formatINR(summary.opening)}</Text>
+        <View style={themed.accountStrip}>
+          <View style={themed.stripIconCircle}>
+            <Text style={themed.stripIconText}>🏦</Text>
           </View>
-          <View style={themed.summaryRow}>
-            <Text style={themed.summaryLabel}>Total Debits (+)</Text>
-            <Text style={themed.summaryValue}>
+          <View style={themed.stripMiddle}>
+            <Text style={themed.stripType}>{loan.type}</Text>
+            <Text style={themed.stripId}>{loan.id}</Text>
+          </View>
+          <View>
+            <Text style={themed.stripOutLabel}>Outstanding</Text>
+            <Text style={themed.stripOutValue}>
+              {formatINR(loan.outstanding)}
+            </Text>
+          </View>
+        </View>
+
+        <View style={themed.titleRow}>
+          <Text style={themed.title}>Statement Period</Text>
+        </View>
+        <View style={themed.periodRow}>
+          {PERIODS.map(item => (
+            <PeriodChip
+              key={item.key}
+              label={item.label}
+              selected={item.key === period}
+              onPress={() => setPeriod(item.key)}
+            />
+          ))}
+        </View>
+
+        <View style={themed.titleRow}>
+          <Text style={themed.title}>Summary</Text>
+        </View>
+        <View style={themed.statGrid}>
+          <View style={themed.statBox}>
+            <Text style={themed.statLabel}>Opening Balance</Text>
+            <Text style={themed.statValue}>{formatINR(summary.opening)}</Text>
+          </View>
+          <View style={themed.statBox}>
+            <Text style={themed.statLabel}>Total Debits (+)</Text>
+            <Text style={themed.statValue}>
               {formatINR(summary.totalDebit)}
             </Text>
           </View>
-          <View style={themed.summaryRow}>
-            <Text style={themed.summaryLabel}>Total Credits (-)</Text>
-            <Text style={themed.summaryValue}>
+          <View style={themed.statBox}>
+            <Text style={themed.statLabel}>Total Credits (-)</Text>
+            <Text style={themed.statValue}>
               {formatINR(summary.totalCredit)}
             </Text>
           </View>
-          <View style={themed.summaryDivider} />
-          <View style={themed.summaryRow}>
-            <Text style={themed.summaryTotalLabel}>Closing Outstanding</Text>
-            <Text style={themed.summaryTotalValue}>
+          <View style={[themed.statBox, themed.statBoxHighlight]}>
+            <Text style={themed.statLabel}>Closing Outstanding</Text>
+            <Text style={[themed.statValue, themed.statValueHighlight]}>
               {formatINR(summary.closing)}
             </Text>
           </View>
         </View>
 
-        {/* Ledger */}
-        <Text style={themed.sectionLabel}>Transaction Ledger</Text>
-        <View style={themed.ledgerCard}>
-          <View style={themed.ledgerHeader}>
-            <View style={themed.ledgerIconCircle}>
-              <Text style={themed.ledgerIconText}>📒</Text>
-            </View>
-            <View style={themed.ledgerTitleWrap}>
-              <Text style={themed.ledgerTitle}>{loan.type} Ledger</Text>
-              <Text style={themed.ledgerSub}>
-                {loan.id} • Last {activePeriodLabel}
-              </Text>
-            </View>
-            <Text style={themed.entriesCount}>
+        <View style={themed.titleRow}>
+          <Text style={themed.title}>Transaction Ledger</Text>
+          <View style={themed.countChip}>
+            <Text style={themed.countChipText}>
               {filteredEntries.length} entries
             </Text>
           </View>
-
+        </View>
+        <View style={themed.ledgerWrap}>
           {filteredEntries.length === 0 ? (
             <View style={themed.emptyState}>
               <Text style={themed.emptyIcon}>📄</Text>
@@ -357,7 +350,6 @@ export default function SOAScreen({ navigation }: Props) {
         </View>
       </ScrollView>
 
-      {/* Pinned footer */}
       <View style={themed.footer}>
         <View style={themed.footerTotalWrap}>
           <Text style={themed.footerTotalLabel}>Closing Outstanding</Text>
@@ -368,16 +360,7 @@ export default function SOAScreen({ navigation }: Props) {
             {loan.id} • Last {activePeriodLabel}
           </Text>
         </View>
-        <Pressable
-          onPress={handleDownload}
-          style={({ pressed }) => [
-            themed.downloadBtn,
-            pressed && themed.downloadBtnPressed,
-          ]}
-        >
-          <Text style={themed.downloadBtnIcon}>⬇️</Text>
-          <Text style={themed.downloadBtnText}>Download</Text>
-        </Pressable>
+        <DownloadButton onPress={handleDownload} />
       </View>
     </View>
   );

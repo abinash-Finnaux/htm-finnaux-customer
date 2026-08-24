@@ -9,7 +9,7 @@ import { createStyles } from './styles';
 import SectionCard from './_components/SectionCard';
 import DetailItem from './_components/DetailItem';
 import BreakupRow from './_components/BreakupRow';
-import StatBox from './_components/StatBox';
+import DuoStatPanel from './_components/DuoStatPanel';
 import NextEmiCard from './_components/NextEmiCard';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EmiDetails'>;
@@ -45,12 +45,12 @@ const PROGRESS = {
 const formatINR = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
 const LOAN_OVERVIEW = [
-  { label: 'Loan Amount', value: formatINR(LOAN.principal) },
-  { label: 'Interest Rate', value: `${LOAN.interestRate}% p.a.` },
-  { label: 'Tenure', value: `${LOAN.tenureMonths} Months` },
-  { label: 'Start Date', value: LOAN.startDate },
-  { label: 'Frequency', value: LOAN.frequency },
-  { label: 'Loan Type', value: LOAN.type },
+  { icon: '💰', label: 'Loan Amount', value: formatINR(LOAN.principal) },
+  { icon: '📈', label: 'Interest Rate', value: `${LOAN.interestRate}% p.a.` },
+  { icon: '⏳', label: 'Tenure', value: `${LOAN.tenureMonths} Months` },
+  { icon: '📅', label: 'Start Date', value: LOAN.startDate },
+  { icon: '🔁', label: 'Frequency', value: LOAN.frequency },
+  { icon: '🏦', label: 'Loan Type', value: LOAN.type },
 ];
 
 export default function EmiDetailsScreen({ navigation }: Props) {
@@ -104,12 +104,21 @@ export default function EmiDetailsScreen({ navigation }: Props) {
           <Text style={themed.topTitle}>EMI Details</Text>
           <View style={themed.topSpacer} />
         </View>
-        <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>📊</Text>
-          <Text style={themed.headerLabel}>Complete EMI Breakup</Text>
-          <Text
-            style={themed.headerSub}
-          >{`${LOAN.type} • ${LOAN.accountNo}`}</Text>
+        <View style={themed.heroRow}>
+          <View style={themed.heroLeft}>
+            <Text style={themed.heroLabel}>Outstanding Balance</Text>
+            <Text style={themed.heroAmount}>
+              {formatINR(PROGRESS.outstanding)}
+            </Text>
+            <View style={themed.heroBadge}>
+              <Text style={themed.heroBadgeText}>
+                📊 {PROGRESS.paidCount} of {LOAN.tenureMonths} EMIs paid
+              </Text>
+            </View>
+          </View>
+          <View style={themed.heroIconWrap}>
+            <Text style={themed.heroIcon}>📊</Text>
+          </View>
         </View>
       </View>
 
@@ -129,15 +138,15 @@ export default function EmiDetailsScreen({ navigation }: Props) {
 
         {/* Loan overview */}
         <SectionCard title="Loan Overview">
-          <View style={themed.detailGrid}>
-            {LOAN_OVERVIEW.map(item => (
-              <DetailItem
-                key={item.label}
-                label={item.label}
-                value={item.value}
-              />
-            ))}
-          </View>
+          {LOAN_OVERVIEW.map((item, index) => (
+            <DetailItem
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              value={item.value}
+              isLast={index === LOAN_OVERVIEW.length - 1}
+            />
+          ))}
         </SectionCard>
 
         {/* EMI breakup */}
@@ -150,12 +159,11 @@ export default function EmiDetailsScreen({ navigation }: Props) {
             label="Interest Component"
             value={formatINR(NEXT_EMI.interest)}
           />
-          <View style={[themed.breakupDivider, { marginVertical: 8 }]} />
-          <BreakupRow
-            label="Total EMI"
-            value={formatINR(NEXT_EMI.amount)}
-            highlight
-          />
+          <View style={themed.breakupDividerSpaced} />
+          <View style={themed.totalRow}>
+            <Text style={themed.totalLabel}>Total EMI</Text>
+            <Text style={themed.totalValue}>{formatINR(NEXT_EMI.amount)}</Text>
+          </View>
 
           <View style={themed.shareTrack}>
             <View
@@ -183,31 +191,47 @@ export default function EmiDetailsScreen({ navigation }: Props) {
 
         {/* Payment progress */}
         <SectionCard title="Payment Progress">
-          <BreakupRow
-            label="EMIs Paid"
-            value={`${PROGRESS.paidCount} of ${LOAN.tenureMonths}`}
-          />
-          <View style={themed.progressBarTrack}>
-            <View
-              style={[themed.progressBarFill, { width: `${paidShare}%` }]}
-            />
+          <View style={themed.progressTopRow}>
+            <Text style={themed.progressLabel}>EMIs Paid</Text>
+            <Text style={themed.progressValue}>
+              {PROGRESS.paidCount} / {LOAN.tenureMonths}
+            </Text>
+          </View>
+          <View style={themed.segments}>
+            {Array.from({ length: LOAN.tenureMonths }).map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  themed.segment,
+                  index < PROGRESS.paidCount && themed.segmentPaid,
+                  index === PROGRESS.paidCount && themed.segmentCurrent,
+                ]}
+              />
+            ))}
           </View>
           <View style={themed.progressRow}>
-            <Text style={themed.progressText}>
-              {paidShare.toFixed(1)}% completed
-            </Text>
-            <Text style={themed.progressText}>
-              {LOAN.tenureMonths - PROGRESS.paidCount} EMIs left
-            </Text>
+            <View style={themed.captionItem}>
+              <View style={themed.captionDot} />
+              <Text style={themed.progressText}>
+                {paidShare.toFixed(1)}% completed
+              </Text>
+            </View>
+            <View style={themed.captionItem}>
+              <View style={themed.captionDotCurrent} />
+              <Text style={themed.progressText}>
+                Next EMI #{NEXT_EMI.number} • {NEXT_EMI.dueDate}
+              </Text>
+            </View>
           </View>
 
-          <View style={themed.statRow}>
-            <StatBox label="Total Paid" value={formatINR(PROGRESS.totalPaid)} />
-            <StatBox
-              label="Outstanding"
-              value={formatINR(PROGRESS.outstanding)}
-            />
-          </View>
+          <DuoStatPanel
+            paidLabel="Total Paid"
+            paidValue={formatINR(PROGRESS.totalPaid)}
+            paidSub={`${PROGRESS.paidCount} EMIs cleared`}
+            dueLabel="Outstanding"
+            dueValue={formatINR(PROGRESS.outstanding)}
+            dueSub={`${LOAN.tenureMonths - PROGRESS.paidCount} EMIs remaining`}
+          />
         </SectionCard>
       </ScrollView>
     </View>

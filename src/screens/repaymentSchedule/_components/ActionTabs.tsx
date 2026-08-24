@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, View, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -18,26 +18,26 @@ export default function ActionTabs({
   const { theme } = useTheme();
   const { colors, spacing, radius } = theme;
 
-  const themed = createStyles(colors, spacing, radius);
+  const themed = useMemo(
+    () => createStyles(colors, spacing, radius),
+    [colors, spacing, radius],
+  );
 
   return (
     <View style={themed.container}>
       <Pressable
         onPress={() => onTabChange('pay')}
-        style={[
+        style={({ pressed }) => [
           themed.tab,
-          {
-            backgroundColor:
-              activeTab === 'pay' ? colors.primary : colors.surfaceElevated,
-            borderColor: activeTab === 'pay' ? colors.primary : colors.border,
-          },
+          activeTab === 'pay' && themed.tabSelected,
+          { opacity: pressed ? 0.85 : 1 },
         ]}
       >
         <Text style={themed.tabIcon}>💳</Text>
         <Text
           style={[
             themed.tabLabel,
-            { color: activeTab === 'pay' ? '#FFFFFF' : colors.text },
+            activeTab === 'pay' && themed.tabLabelSelected,
           ]}
         >
           Pay EMI
@@ -48,20 +48,17 @@ export default function ActionTabs({
       </Pressable>
       <Pressable
         onPress={() => onTabChange('prepay')}
-        style={[
+        style={({ pressed }) => [
           themed.tab,
-          {
-            backgroundColor:
-              activeTab === 'prepay' ? '#8B5CF6' : colors.surfaceElevated,
-            borderColor: activeTab === 'prepay' ? '#8B5CF6' : colors.border,
-          },
+          activeTab === 'prepay' && themed.tabSelected,
+          { opacity: pressed ? 0.85 : 1 },
         ]}
       >
         <Text style={themed.tabIcon}>⚡</Text>
         <Text
           style={[
             themed.tabLabel,
-            { color: activeTab === 'prepay' ? '#FFFFFF' : colors.text },
+            activeTab === 'prepay' && themed.tabLabelSelected,
           ]}
         >
           Prepay
@@ -89,10 +86,16 @@ function createStyles(
     },
     tab: {
       flex: 1,
-      borderWidth: 1,
+      borderWidth: 1.5,
       padding: 16,
       alignItems: 'center',
       borderRadius: radius.lg,
+      backgroundColor: colors.surfaceElevated,
+      borderColor: colors.border,
+    },
+    tabSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     tabIcon: {
       fontSize: 24,
@@ -101,6 +104,10 @@ function createStyles(
     tabLabel: {
       fontSize: 15,
       fontWeight: '700',
+      color: colors.text,
+    },
+    tabLabelSelected: {
+      color: '#FFFFFF',
     },
     tabCount: {
       fontSize: 11,

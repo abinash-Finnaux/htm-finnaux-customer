@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -18,88 +18,71 @@ type Props = {
   accentColor: string;
 };
 
-export default function ScheduleCard({ item, isLast, accentColor }: Props) {
+function ScheduleCard({ item, isLast, accentColor }: Props) {
   const { theme } = useTheme();
   const { colors, radius } = theme;
 
-  const themed = createStyles(colors, radius);
+  const themed = useMemo(
+    () => createStyles(colors, radius),
+    [colors, radius],
+  );
 
   return (
     <View
-      style={[
-        themed.outer,
-        {
-          borderLeftColor: accentColor,
-          shadowColor: accentColor,
-          marginBottom: isLast ? 0 : 10,
-          borderRadius: radius.lg,
-        },
-      ]}
+      style={[themed.card, !isLast && themed.cardGap]}
     >
-      <View style={[themed.card, { borderColor: accentColor + '15' }]}>
-        <View style={themed.topRow}>
-          <View style={themed.monthBlock}>
-            <View
-              style={[
-                themed.monthBadge,
-                { backgroundColor: accentColor + '18' },
-              ]}
-            >
-              <Text style={[themed.monthNum, { color: accentColor }]}>
-                {String(item.month).padStart(2, '0')}
-              </Text>
-            </View>
-            <View>
-              <Text style={themed.date}>{item.date}</Text>
-              <Text style={themed.emiLabel}>EMI #{item.month}</Text>
-            </View>
-          </View>
-          <View
-            style={[
-              themed.statusBadge,
-              { backgroundColor: accentColor + '18' },
-            ]}
-          >
-            <View
-              style={[themed.statusDot, { backgroundColor: accentColor }]}
-            />
-            <Text style={[themed.statusText, { color: accentColor }]}>
-              {item.status}
-            </Text>
-          </View>
-        </View>
-
-        <View style={themed.divider} />
-
-        <View style={themed.bottomRow}>
-          <View style={themed.amountBlock}>
-            <Text style={themed.amountLabel}>Principal</Text>
-            <Text style={themed.amountValue}>
-              ₹{item.principal.toLocaleString('en-IN')}
-            </Text>
-          </View>
-          <View style={themed.amountDivider} />
-          <View style={themed.amountBlock}>
-            <Text style={themed.amountLabel}>Interest</Text>
-            <Text style={themed.amountValue}>
-              ₹{item.interest.toLocaleString('en-IN')}
-            </Text>
-          </View>
-          <View style={themed.amountDivider} />
-          <View style={themed.amountBlock}>
-            <Text style={themed.amountLabel}>EMI</Text>
-            <Text style={[themed.amountValueBold, { color: accentColor }]}>
-              ₹{item.emi.toLocaleString('en-IN')}
-            </Text>
-          </View>
-        </View>
-
-        <View style={themed.balanceRow}>
-          <Text style={themed.balanceLabel}>Outstanding Balance</Text>
-          <Text style={themed.balanceValue}>
-            ₹{item.balance.toLocaleString('en-IN')}
+      <View style={themed.topRow}>
+        <View
+          style={[themed.monthBadge, { backgroundColor: accentColor + '18' }]}
+        >
+          <Text style={[themed.monthNum, { color: accentColor }]}>
+            {String(item.month).padStart(2, '0')}
           </Text>
         </View>
+        <View style={themed.titleWrap}>
+          <Text style={themed.date}>{item.date}</Text>
+          <Text style={themed.emiLabel}>EMI #{item.month}</Text>
+        </View>
+        <View
+          style={[themed.statusBadge, { backgroundColor: accentColor + '18' }]}
+        >
+          <View style={[themed.statusDot, { backgroundColor: accentColor }]} />
+          <Text style={[themed.statusText, { color: accentColor }]}>
+            {item.status}
+          </Text>
+        </View>
+      </View>
+
+      <View style={themed.divider} />
+
+      <View style={themed.bottomRow}>
+        <View style={themed.amountBlock}>
+          <Text style={themed.amountLabel}>Principal</Text>
+          <Text style={themed.amountValue}>
+            ₹{item.principal.toLocaleString('en-IN')}
+          </Text>
+        </View>
+        <View style={themed.amountDivider} />
+        <View style={themed.amountBlock}>
+          <Text style={themed.amountLabel}>Interest</Text>
+          <Text style={themed.amountValue}>
+            ₹{item.interest.toLocaleString('en-IN')}
+          </Text>
+        </View>
+        <View style={themed.amountDivider} />
+        <View style={themed.amountBlock}>
+          <Text style={themed.amountLabel}>EMI</Text>
+          <Text style={[themed.amountValueBold, { color: accentColor }]}>
+            ₹{item.emi.toLocaleString('en-IN')}
+          </Text>
+        </View>
+      </View>
+
+      <View style={themed.balanceRow}>
+        <Text style={themed.balanceLabel}>Outstanding Balance</Text>
+        <Text style={themed.balanceValue}>
+          ₹{item.balance.toLocaleString('en-IN')}
+        </Text>
       </View>
     </View>
   );
@@ -110,24 +93,21 @@ function createStyles(
   radius: ReturnType<typeof useTheme>['theme']['radius'],
 ) {
   return StyleSheet.create({
-    outer: {
-      borderLeftWidth: 4,
-    },
     card: {
       borderWidth: 1,
       backgroundColor: colors.surfaceElevated,
+      borderColor: colors.border,
       borderRadius: radius.lg,
+      overflow: 'hidden',
+    },
+    cardGap: {
+      marginBottom: 10,
     },
     topRow: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: 14,
-    },
-    monthBlock: {
-      flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
+      padding: 14,
     },
     monthBadge: {
       width: 40,
@@ -139,6 +119,9 @@ function createStyles(
     monthNum: {
       fontSize: 14,
       fontWeight: '800',
+    },
+    titleWrap: {
+      flex: 1,
     },
     date: {
       fontSize: 14,
@@ -169,7 +152,7 @@ function createStyles(
       fontWeight: '700',
     },
     divider: {
-      height: 1,
+      height: StyleSheet.hairlineWidth,
       marginHorizontal: 14,
       backgroundColor: colors.border,
     },
@@ -211,8 +194,6 @@ function createStyles(
       alignItems: 'center',
       paddingHorizontal: 14,
       paddingVertical: 10,
-      borderBottomLeftRadius: 12,
-      borderBottomRightRadius: 12,
       backgroundColor: colors.surface,
     },
     balanceLabel: {
@@ -227,3 +208,5 @@ function createStyles(
     },
   });
 }
+
+export default React.memo(ScheduleCard);

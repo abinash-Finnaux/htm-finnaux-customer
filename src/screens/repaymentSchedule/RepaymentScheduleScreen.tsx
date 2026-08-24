@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   Text,
   View,
@@ -11,6 +16,8 @@ import {
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
+
+import { scheduleIdleTask } from '../../utils/scheduleIdleTask';
 
 import type { RootStackParamList } from '../../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -149,6 +156,8 @@ const STATUS_COLORS = {
   Overdue: '#EF4444',
 };
 
+const SCHEDULE_BATCH_SIZE = 4;
+
 const PAYMENT_MODES = [
   { id: 'upi', label: 'UPI' },
   { id: 'netbanking', label: 'Net Banking' },
@@ -162,21 +171,46 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
   const headerBg = isDark ? '#1E293B' : colors.primary;
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
 
-  const themed = createStyles(colors, spacing, headerBg, decorBg);
+  const themed = useMemo(
+    () => createStyles(colors, spacing, headerBg, decorBg),
+    [colors, spacing, headerBg, decorBg],
+  );
 
-  const paidCount = SCHEDULE.filter(s => s.status === 'Paid').length;
-  const totalPaid = SCHEDULE.filter(s => s.status === 'Paid').reduce(
-    (sum, s) => sum + s.emi,
-    0,
+  const paidCount = useMemo(
+    () => SCHEDULE.filter(s => s.status === 'Paid').length,
+    [],
+  );
+  const totalPaid = useMemo(
+    () =>
+      SCHEDULE.filter(s => s.status === 'Paid').reduce(
+        (sum, s) => sum + s.emi,
+        0,
+      ),
+    [],
   );
   const outstandingBalance = SCHEDULE[SCHEDULE.length - 1].balance;
-  const upcomingEmis = SCHEDULE.filter(s => s.status === 'Upcoming');
+  const upcomingEmis = useMemo(
+    () => SCHEDULE.filter(s => s.status === 'Upcoming'),
+    [],
+  );
 
   const [activeTab, setActiveTab] = useState<'pay' | 'prepay'>('pay');
 
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
-  const { control, watch, getValues, setValue } = useForm<PayForm>({
+  const [visibleCount, setVisibleCount] = useState(SCHEDULE_BATCH_SIZE);
+
+  useEffect(() => {
+    if (visibleCount >= SCHEDULE.length) {
+      return;
+    }
+    const cancel = scheduleIdleTask(() => {
+      setVisibleCount(c => Math.min(c + SCHEDULE_BATCH_SIZE, SCHEDULE.length));
+    });
+    return cancel;
+  }, [visibleCount]);
+
+  const { control, getValues, setValue } = useForm<PayForm>({
     defaultValues: {
       payAmount: '',
       payMode: '',
@@ -186,9 +220,17 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
     },
   });
 
-  const payAmount = watch('payAmount');
-  const prepayType = watch('prepayType');
-  const prepayAmount = watch('prepayAmount');
+  const onSelectMonth = useCallback(
+    (month: number, emi: number) => {
+      setSelectedMonth(month);
+      setValue('payAmount', String(emi));
+    },
+    [setValue],
+  );
+
+  const onFillMax = useCallback(() => {
+    setValue('prepayAmount', String(outstandingBalance));
+  }, [setValue, outstandingBalance]);
 
   const handlePaySubmit = () => {
     const { payAmount: pAmount, payMode: pMode } = getValues();
@@ -200,9 +242,7 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
       return Alert.alert('Payment Mode', 'Please select a payment mode.');
     Alert.alert(
       'Confirm Payment',
-      `Pay ₹${Number(pAmount).toLocaleString(
-        'en-IN',
-      )} for EMI #${selectedMonth} via ${
+      `Pay ₹${Number(pAmount).toLocaleString('en-IN')} for EMI #${selectedMonth} via ${
         PAYMENT_MODES.find(m => m.id === pMode)?.label
       }?`,
       [
@@ -254,6 +294,19 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
     );
   };
 
+  const scheduleList = useMemo(
+    () =>
+      SCHEDULE.map((item, index) => (
+        <ScheduleCard
+          key={item.month}
+          item={item}
+          isLast={index === SCHEDULE.length - 1}
+          accentColor={STATUS_COLORS[item.status]}
+        />
+      )),
+    [],
+  );
+
   return (
     <View style={themed.root}>
       <View style={themed.header}>
@@ -272,10 +325,21 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
           <Text style={themed.topTitle}>Repayment Schedule</Text>
           <View style={themed.topSpacer} />
         </View>
-        <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>📅</Text>
-          <Text style={themed.headerLabel}>HMT-PL-001</Text>
-          <Text style={themed.headerSub}>Personal Loan • ₹12,500/mo</Text>
+        <View style={themed.heroRow}>
+          <View style={themed.heroLeft}>
+            <Text style={themed.heroLabel}>Outstanding Balance</Text>
+            <Text style={themed.heroAmount}>
+              ₹{outstandingBalance.toLocaleString('en-IN')}
+            </Text>
+            <View style={themed.heroBadge}>
+              <Text style={themed.heroBadgeText}>
+                📅 {paidCount} of {SCHEDULE.length} EMIs paid
+              </Text>
+            </View>
+          </View>
+          <View style={themed.heroIconWrap}>
+            <Text style={themed.heroIcon}>📅</Text>
+          </View>
         </View>
       </View>
 
@@ -290,7 +354,6 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* ── Summary Cards ── */}
           <SummaryCards
             paidCount={paidCount}
             totalCount={SCHEDULE.length}
@@ -298,50 +361,37 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
             totalLoanAmount={500000}
           />
 
-          {/* ── Monthly Schedule ── */}
           <SectionHeaderText title="Monthly Schedule" />
-          {SCHEDULE.map((item, index) => (
-            <ScheduleCard
-              key={index}
-              item={item}
-              isLast={index === SCHEDULE.length - 1}
-              accentColor={STATUS_COLORS[item.status]}
-            />
-          ))}
-          {/* ── Action Tabs ── */}
+          {scheduleList.slice(0, visibleCount)}
+          {visibleCount < SCHEDULE.length && (
+            <View style={themed.listPlaceholder} />
+          )}
+
           <ActionTabs
             activeTab={activeTab}
             onTabChange={setActiveTab}
             upcomingCount={upcomingEmis.length}
             outstandingBalance={outstandingBalance}
           />
-          {/* ── Make Payment Form ── */}
+
           {activeTab === 'pay' && (
             <PayEmiForm
               control={control}
               upcomingEmis={upcomingEmis}
               selectedMonth={selectedMonth}
-              onSelectMonth={(month, emi) => {
-                setSelectedMonth(month);
-                setValue('payAmount', String(emi));
-              }}
-              payAmount={payAmount}
+              onSelectMonth={onSelectMonth}
               onSubmit={handlePaySubmit}
             />
           )}
-          {/* ── Prepay / Foreclose Form ── */}
+
           {activeTab === 'prepay' && (
             <PrepayForm
               control={control}
               outstandingBalance={outstandingBalance}
               paidCount={paidCount}
               totalCount={SCHEDULE.length}
-              prepayType={prepayType}
-              prepayAmount={prepayAmount}
               onSubmit={handlePrepaySubmit}
-              onFillMax={() =>
-                setValue('prepayAmount', String(outstandingBalance))
-              }
+              onFillMax={onFillMax}
             />
           )}
         </ScrollView>
@@ -363,10 +413,10 @@ function createStyles(
     },
     header: {
       paddingTop: 56,
-      paddingBottom: 28,
+      paddingBottom: 26,
       paddingHorizontal: 24,
-      borderBottomLeftRadius: 32,
-      borderBottomRightRadius: 32,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
       backgroundColor: headerBg,
       overflow: 'hidden',
     },
@@ -393,9 +443,6 @@ function createStyles(
       alignItems: 'center',
       justifyContent: 'space-between',
     },
-    topSpacer: {
-      width: 40,
-    },
     backBtn: {
       width: 40,
       height: 40,
@@ -410,28 +457,60 @@ function createStyles(
       fontWeight: '600',
     },
     topTitle: {
-      color: 'rgba(255,255,255,0.8)',
+      color: '#FFFFFF',
       fontSize: 16,
       fontWeight: '600',
     },
-    headerBody: {
+    topSpacer: {
+      width: 40,
+    },
+    heroRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 20,
+      justifyContent: 'space-between',
+      marginTop: 22,
     },
-    headerIcon: {
-      fontSize: 36,
+    heroLeft: {
+      flex: 1,
     },
-    headerLabel: {
+    heroLabel: {
+      color: 'rgba(255,255,255,0.72)',
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    heroAmount: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '700',
-      marginTop: 10,
+      fontSize: 30,
+      fontWeight: '800',
+      marginTop: 6,
+      letterSpacing: 0.3,
     },
-    headerSub: {
-      color: 'rgba(255,255,255,0.7)',
-      fontSize: 13,
-      fontWeight: '500',
-      marginTop: 4,
+    heroBadge: {
+      alignSelf: 'flex-start',
+      marginTop: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 999,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+    },
+    heroBadgeText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '600',
+    },
+    heroIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
+    },
+    heroIcon: {
+      fontSize: 30,
     },
     flex: {
       flex: 1,
@@ -439,6 +518,9 @@ function createStyles(
     content: {
       padding: spacing.lg,
       paddingBottom: 20,
+    },
+    listPlaceholder: {
+      height: 120,
     },
     bottomSpacer: {
       height: 100,

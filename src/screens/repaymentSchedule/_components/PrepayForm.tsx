@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Text,
   View,
@@ -6,7 +6,7 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
-import { Controller, type Control } from 'react-hook-form';
+import { Controller, useWatch, type Control } from 'react-hook-form';
 import { useTheme } from '../../../context/ThemeContext';
 
 type PayForm = {
@@ -24,8 +24,18 @@ const PAYMENT_MODES = [
 ];
 
 const PREPAY_TYPES = [
-  { id: 'prepay', label: 'Part Payment', icon: '💰' },
-  { id: 'foreclose', label: 'Foreclose Loan', icon: '✅' },
+  {
+    id: 'prepay',
+    label: 'Part Payment',
+    icon: '💰',
+    desc: 'Pay extra toward principal',
+  },
+  {
+    id: 'foreclose',
+    label: 'Foreclose Loan',
+    icon: '🏁',
+    desc: 'Close loan in full',
+  },
 ];
 
 type Props = {
@@ -33,8 +43,6 @@ type Props = {
   outstandingBalance: number;
   paidCount: number;
   totalCount: number;
-  prepayType: string;
-  prepayAmount: string;
   onSubmit: () => void;
   onFillMax: () => void;
 };
@@ -44,19 +52,21 @@ export default function PrepayForm({
   outstandingBalance,
   paidCount,
   totalCount,
-  prepayType,
-  prepayAmount,
   onSubmit,
   onFillMax,
 }: Props) {
   const { theme } = useTheme();
   const { colors, radius } = theme;
 
-  const themed = createStyles(colors, radius);
+  const themed = useMemo(
+    () => createStyles(colors, radius),
+    [colors, radius],
+  );
+
+  const prepayType = useWatch({ control, name: 'prepayType' });
 
   return (
     <View style={themed.card}>
-      {/* Header */}
       <View style={themed.header}>
         <View style={themed.headerIconBg}>
           <Text style={themed.headerIconText}>⚡</Text>
@@ -67,7 +77,6 @@ export default function PrepayForm({
         </View>
       </View>
 
-      {/* Outstanding Banner */}
       <View style={themed.outstandingBanner}>
         <Text style={themed.outstandingLabel}>Outstanding Balance</Text>
         <Text style={themed.outstandingValue}>
@@ -89,7 +98,6 @@ export default function PrepayForm({
         </View>
       </View>
 
-      {/* Type Selection */}
       <View style={themed.section}>
         <Text style={themed.sectionTitle}>Choose Action</Text>
         <Controller
@@ -99,35 +107,32 @@ export default function PrepayForm({
             <View style={themed.typeGrid}>
               {PREPAY_TYPES.map(t => {
                 const selected = value === t.id;
-                const accent = t.id === 'prepay' ? '#F59E0B' : '#22C55E';
                 return (
                   <Pressable
                     key={t.id}
                     onPress={() => onChange(t.id)}
                     style={({ pressed }) => [
                       themed.typeCard,
-                      {
-                        backgroundColor: selected
-                          ? accent + '15'
-                          : colors.surface,
-                        borderColor: selected ? accent : colors.border,
-                        opacity: pressed ? 0.85 : 1,
-                      },
+                      selected && themed.typeCardSelected,
+                      { opacity: pressed ? 0.85 : 1 },
                     ]}
                   >
                     <Text style={themed.typeCardIcon}>{t.icon}</Text>
                     <Text
                       style={[
                         themed.typeCardLabel,
-                        { color: selected ? accent : colors.text },
+                        selected && themed.typeCardLabelSelected,
                       ]}
                     >
                       {t.label}
                     </Text>
-                    <Text style={themed.typeCardDesc}>
-                      {t.id === 'prepay'
-                        ? 'Pay extra toward principal'
-                        : 'Close loan in full'}
+                    <Text
+                      style={[
+                        themed.typeCardDesc,
+                        selected && themed.typeCardDescSelected,
+                      ]}
+                    >
+                      {t.desc}
                     </Text>
                   </Pressable>
                 );
@@ -137,7 +142,6 @@ export default function PrepayForm({
         />
       </View>
 
-      {/* Amount */}
       <View style={themed.section}>
         <View style={themed.sectionHeader}>
           <Text style={themed.sectionTitle}>Amount</Text>
@@ -147,14 +151,7 @@ export default function PrepayForm({
             </Pressable>
           )}
         </View>
-        <View
-          style={[
-            themed.amountInputWrapper,
-            {
-              borderColor: prepayAmount ? '#8B5CF640' : colors.border,
-            },
-          ]}
-        >
+        <View style={themed.amountInputWrapper}>
           <Text style={themed.amountPrefix}>₹</Text>
           <Controller
             control={control}
@@ -174,7 +171,6 @@ export default function PrepayForm({
         </View>
       </View>
 
-      {/* Payment Mode */}
       <View style={themed.section}>
         <Text style={themed.sectionTitle}>Payment Method</Text>
         <Controller
@@ -190,25 +186,15 @@ export default function PrepayForm({
                     onPress={() => onChange(mode.id)}
                     style={({ pressed }) => [
                       themed.modeCard,
-                      {
-                        backgroundColor: selected
-                          ? '#8B5CF6'
-                          : colors.surface,
-                        borderColor: selected ? '#8B5CF6' : colors.border,
-                        opacity: pressed ? 0.85 : 1,
-                      },
+                      selected && themed.modeCardSelected,
+                      { opacity: pressed ? 0.85 : 1 },
                     ]}
                   >
-                    {selected && (
-                      <View style={themed.modeCardTick}>
-                        <Text style={themed.modeCardTickText}>✓</Text>
-                      </View>
-                    )}
                     <Text style={themed.modeCardIcon}>{mode.icon}</Text>
                     <Text
                       style={[
                         themed.modeCardLabel,
-                        { color: selected ? '#FFFFFF' : colors.text },
+                        selected && themed.modeCardLabelSelected,
                       ]}
                     >
                       {mode.label}
@@ -221,7 +207,6 @@ export default function PrepayForm({
         />
       </View>
 
-      {/* Submit */}
       <Pressable
         onPress={onSubmit}
         style={({ pressed }) => [
@@ -249,6 +234,7 @@ function createStyles(
       borderWidth: 1,
       overflow: 'hidden',
       backgroundColor: colors.surfaceElevated,
+      borderColor: colors.border,
       borderRadius: radius.lg,
       marginTop: 16,
     },
@@ -266,7 +252,7 @@ function createStyles(
       borderRadius: 12,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#8B5CF615',
+      backgroundColor: colors.primary + '15',
     },
     headerIconText: {
       fontSize: 20,
@@ -286,7 +272,7 @@ function createStyles(
       margin: 18,
       padding: 18,
       alignItems: 'center',
-      backgroundColor: '#8B5CF610',
+      backgroundColor: colors.primary + '10',
       borderRadius: radius.md,
     },
     outstandingLabel: {
@@ -298,13 +284,13 @@ function createStyles(
       fontSize: 28,
       fontWeight: '800',
       marginTop: 4,
-      color: '#8B5CF6',
+      color: colors.primary,
     },
     outstandingDivider: {
       height: 1,
       width: '60%',
       marginVertical: 14,
-      backgroundColor: '#8B5CF620',
+      backgroundColor: colors.primary + '20',
     },
     outstandingRow: {
       flexDirection: 'row',
@@ -334,7 +320,7 @@ function createStyles(
     outstandingStatDivider: {
       width: 1,
       height: 28,
-      backgroundColor: '#8B5CF620',
+      backgroundColor: colors.primary + '20',
     },
     section: {
       padding: 18,
@@ -359,16 +345,28 @@ function createStyles(
       flex: 1,
       borderWidth: 1.5,
       paddingVertical: 16,
+      paddingHorizontal: 8,
       alignItems: 'center',
       borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+    typeCardSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     typeCardIcon: {
       fontSize: 24,
       marginBottom: 6,
     },
     typeCardLabel: {
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: '700',
+      textAlign: 'center',
+      color: colors.text,
+    },
+    typeCardLabelSelected: {
+      color: '#FFFFFF',
     },
     typeCardDesc: {
       fontSize: 10,
@@ -377,10 +375,13 @@ function createStyles(
       textAlign: 'center',
       color: colors.textSecondary,
     },
+    typeCardDescSelected: {
+      color: 'rgba(255,255,255,0.7)',
+    },
     fillMaxLink: {
       fontSize: 12,
       fontWeight: '700',
-      color: '#8B5CF6',
+      color: colors.primary,
     },
     amountInputWrapper: {
       flexDirection: 'row',
@@ -390,6 +391,7 @@ function createStyles(
       paddingHorizontal: 14,
       backgroundColor: colors.surface,
       borderRadius: radius.md,
+      borderColor: colors.border,
     },
     amountPrefix: {
       fontSize: 18,
@@ -415,23 +417,12 @@ function createStyles(
       alignItems: 'center',
       gap: 6,
       borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
     },
-    modeCardTick: {
-      position: 'absolute',
-      top: 5,
-      right: 5,
-      width: 16,
-      height: 16,
-      borderRadius: 8,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1,
-    },
-    modeCardTickText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: '#1E293B',
+    modeCardSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     modeCardIcon: {
       fontSize: 22,
@@ -439,6 +430,10 @@ function createStyles(
     modeCardLabel: {
       fontSize: 12,
       fontWeight: '700',
+      color: colors.text,
+    },
+    modeCardLabelSelected: {
+      color: '#FFFFFF',
     },
     payBtn: {
       flexDirection: 'row',
@@ -447,7 +442,7 @@ function createStyles(
       margin: 18,
       paddingVertical: 16,
       gap: 8,
-      backgroundColor: '#8B5CF6',
+      backgroundColor: colors.primary,
       borderRadius: radius.md,
     },
     payBtnText: {

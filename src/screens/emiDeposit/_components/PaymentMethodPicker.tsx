@@ -32,25 +32,12 @@ export default function PaymentMethodPicker({
             onPress={() => onChange(mode.id)}
             style={({ pressed }) => [
               themed.card,
-              {
-                backgroundColor: selected ? theme.colors.primary : theme.colors.surface,
-                borderColor: selected ? theme.colors.primary : theme.colors.border,
-                opacity: pressed ? 0.85 : 1,
-              },
+              selected && themed.cardSelected,
+              { opacity: pressed ? 0.85 : 1 },
             ]}
           >
-            {selected && (
-              <View style={themed.tick}>
-                <Text style={themed.tickText}>✓</Text>
-              </View>
-            )}
             <Text style={themed.icon}>{mode.icon}</Text>
-            <Text
-              style={[
-                themed.label,
-                { color: selected ? '#FFFFFF' : theme.colors.text },
-              ]}
-            >
+            <Text style={[themed.label, selected && themed.labelSelected]}>
               {mode.label}
             </Text>
           </Pressable>
@@ -61,7 +48,7 @@ export default function PaymentMethodPicker({
 }
 
 function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
-  const { radius } = theme;
+  const { colors, radius } = theme;
 
   return StyleSheet.create({
     grid: {
@@ -75,23 +62,12 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       alignItems: 'center',
       gap: 6,
       borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
     },
-    tick: {
-      position: 'absolute',
-      top: 5,
-      right: 5,
-      width: 16,
-      height: 16,
-      borderRadius: 8,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1,
-    },
-    tickText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: '#1E293B',
+    cardSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     icon: {
       fontSize: 22,
@@ -99,6 +75,10 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     label: {
       fontSize: 12,
       fontWeight: '700',
+      color: colors.text,
+    },
+    labelSelected: {
+      color: '#FFFFFF',
     },
   });
 }

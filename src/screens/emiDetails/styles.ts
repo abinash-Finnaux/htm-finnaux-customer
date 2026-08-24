@@ -15,10 +15,10 @@ export function createStyles(
     },
     header: {
       paddingTop: 56,
-      paddingBottom: 28,
+      paddingBottom: 26,
       paddingHorizontal: 24,
-      borderBottomLeftRadius: 32,
-      borderBottomRightRadius: 32,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
       backgroundColor: headerBg,
       overflow: 'hidden',
     },
@@ -66,24 +66,53 @@ export function createStyles(
     topSpacer: {
       width: 40,
     },
-    headerBody: {
+    heroRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 20,
+      justifyContent: 'space-between',
+      marginTop: 22,
     },
-    headerIcon: {
-      fontSize: 36,
+    heroLeft: {
+      flex: 1,
     },
-    headerLabel: {
+    heroLabel: {
+      color: 'rgba(255,255,255,0.72)',
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    heroAmount: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '700',
-      marginTop: 10,
+      fontSize: 30,
+      fontWeight: '800',
+      marginTop: 6,
+      letterSpacing: 0.3,
     },
-    headerSub: {
-      color: 'rgba(255,255,255,0.75)',
-      fontSize: 12,
-      fontWeight: '500',
-      marginTop: 4,
+    heroBadge: {
+      alignSelf: 'flex-start',
+      marginTop: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: radius.pill,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+    },
+    heroBadgeText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '600',
+    },
+    heroIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
+    },
+    heroIcon: {
+      fontSize: 30,
     },
     flex: {
       flex: 1,
@@ -92,14 +121,34 @@ export function createStyles(
       padding: spacing.lg,
       paddingBottom: 40,
     },
-    detailGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing.md,
-    },
     breakupDivider: {
       height: 1,
       backgroundColor: colors.border,
+    },
+    breakupDividerSpaced: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: 8,
+    },
+    totalRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.primary + '10',
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 12,
+      marginTop: 4,
+    },
+    totalLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    totalValue: {
+      fontSize: 18,
+      fontWeight: '800',
+      color: colors.primary,
     },
     shareTrack: {
       flexDirection: 'row',
@@ -139,32 +188,64 @@ export function createStyles(
       fontWeight: '500',
       color: colors.textSecondary,
     },
-    progressBarTrack: {
-      height: 8,
-      overflow: 'hidden',
-      marginTop: spacing.xs,
-      borderRadius: radius.pill,
+    segments: {
+      flexDirection: 'row',
+      gap: 2,
+      marginTop: spacing.sm,
+    },
+    segment: {
+      flex: 1,
+      height: 9,
+      borderRadius: 2,
       backgroundColor: colors.border,
     },
-    progressBarFill: {
-      height: '100%',
-      borderRadius: radius.pill,
+    segmentPaid: {
       backgroundColor: colors.primary,
+    },
+    segmentCurrent: {
+      backgroundColor: colors.warning,
+    },
+    progressTopRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+    },
+    progressLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      color: colors.textSecondary,
+    },
+    progressValue: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: colors.text,
     },
     progressRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
       marginTop: spacing.sm,
+    },
+    captionItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    captionDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.success,
+    },
+    captionDotCurrent: {
+      backgroundColor: colors.warning,
     },
     progressText: {
       fontSize: 12,
       fontWeight: '600',
       color: colors.textSecondary,
-    },
-    statRow: {
-      flexDirection: 'row',
-      gap: spacing.md,
-      marginTop: spacing.md,
     },
   });
 }

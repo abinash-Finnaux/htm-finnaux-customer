@@ -13,12 +13,14 @@ export function createStyles(
       flex: 1,
       backgroundColor: colors.background,
     },
+
+    /* Header */
     header: {
       paddingTop: 56,
-      paddingBottom: 28,
+      paddingBottom: 26,
       paddingHorizontal: 24,
-      borderBottomLeftRadius: 32,
-      borderBottomRightRadius: 32,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
       backgroundColor: headerBg,
       overflow: 'hidden',
     },
@@ -66,158 +68,149 @@ export function createStyles(
     topSpacer: {
       width: 40,
     },
-    headerBody: {
+    heroRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 20,
+      justifyContent: 'space-between',
+      marginTop: 22,
     },
-    headerIcon: {
-      fontSize: 36,
+    heroLeft: {
+      flex: 1,
     },
-    headerLabel: {
+    heroLabel: {
+      color: 'rgba(255,255,255,0.72)',
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    heroAmount: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '700',
-      marginTop: 10,
+      fontSize: 30,
+      fontWeight: '800',
+      marginTop: 6,
+      letterSpacing: 0.3,
     },
-    headerSub: {
-      color: 'rgba(255,255,255,0.75)',
-      fontSize: 12,
-      fontWeight: '500',
-      marginTop: 4,
+    heroBadge: {
+      alignSelf: 'flex-start',
+      marginTop: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: radius.pill,
+      backgroundColor: 'rgba(255,255,255,0.16)',
     },
+    heroBadgeText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '600',
+    },
+    heroIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
+    },
+    heroIcon: {
+      fontSize: 30,
+    },
+
     flex: {
       flex: 1,
     },
     scrollContent: {
-      padding: spacing.lg,
-      paddingBottom: 20,
-    },
-    sectionLabel: {
-      fontSize: 12,
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      color: colors.textSecondary,
-      marginTop: spacing.lg,
-      marginBottom: spacing.sm,
+      paddingBottom: 24,
     },
 
-    /* Loan account rows */
-    loanRow: {
+    /* Section titles */
+    sectionRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      borderWidth: 1.5,
-      padding: spacing.md,
-      borderRadius: radius.md,
-      gap: 12,
+      gap: 8,
+      marginTop: spacing.xl,
+      marginBottom: spacing.sm + 2,
+      paddingHorizontal: spacing.lg,
     },
-    loanIconCircle: {
-      width: 42,
-      height: 42,
-      borderRadius: 21,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '15',
-    },
-    loanIconText: {
-      fontSize: 20,
-    },
-    loanMiddle: {
-      flex: 1,
-    },
-    loanType: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    loanId: {
-      fontSize: 11,
-      fontWeight: '500',
-      marginTop: 2,
-      color: colors.textSecondary,
-    },
-    loanOutWrap: {
-      alignItems: 'flex-end',
-    },
-    loanOutLabel: {
-      fontSize: 9,
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      letterSpacing: 0.4,
-      color: colors.textSecondary,
-    },
-    loanOutValue: {
-      fontSize: 13,
-      fontWeight: '800',
-      marginTop: 2,
-      color: colors.text,
-    },
-    radio: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      borderWidth: 2,
-      borderColor: colors.border,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    radioDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
+    sectionBar: {
+      width: 4,
+      height: 16,
+      borderRadius: 2,
       backgroundColor: colors.primary,
     },
-
-    /* Quote card */
-    quoteCard: {
-      borderWidth: 1,
-      padding: spacing.lg,
-      backgroundColor: colors.surfaceElevated,
-      borderColor: colors.border,
-      borderRadius: radius.lg,
-    },
-    quoteHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: spacing.sm,
-    },
-    quoteTitle: {
+    sectionTitle: {
       fontSize: 15,
       fontWeight: '700',
       color: colors.text,
     },
-    asOfBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: radius.pill,
-      backgroundColor: colors.primary + '15',
+
+    /* Horizontal loan cards */
+    loanScroller: {
+      paddingHorizontal: spacing.lg,
+      gap: spacing.sm,
+      paddingRight: spacing.lg,
     },
-    asOfText: {
-      fontSize: 11,
-      fontWeight: '600',
-      color: colors.primary,
+
+    /* Breakup receipt card */
+    breakupCard: {
+      marginHorizontal: spacing.lg,
+      borderWidth: 1,
+      borderLeftWidth: 4,
+      borderColor: colors.border,
+      borderLeftColor: colors.primary,
+      borderRadius: radius.md,
+      backgroundColor: colors.surfaceElevated,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 6,
     },
     breakupRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 8,
+      paddingVertical: 13,
+    },
+    breakupLabelWrap: {
+      flex: 1,
+      paddingRight: 12,
     },
     breakupLabel: {
       fontSize: 13,
       fontWeight: '500',
       color: colors.textSecondary,
     },
+    breakupChip: {
+      alignSelf: 'flex-start',
+      marginTop: 3,
+      paddingHorizontal: 7,
+      paddingVertical: 2,
+      borderRadius: radius.sm,
+      backgroundColor: colors.warning + '18',
+    },
+    breakupChipText: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: colors.warning,
+    },
     breakupValue: {
       fontSize: 14,
       fontWeight: '700',
       color: colors.text,
     },
-    divider: {
+    breakupDivider: {
       height: 1,
       backgroundColor: colors.border,
-      marginVertical: 6,
+    },
+    breakupDashDivider: {
+      borderTopWidth: 1,
+      borderStyle: 'dashed',
+      borderColor: colors.border,
+    },
+    breakupTotalRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 14,
     },
     totalLabel: {
       fontSize: 14,
@@ -225,21 +218,22 @@ export function createStyles(
       color: colors.text,
     },
     totalValue: {
-      fontSize: 17,
+      fontSize: 19,
       fontWeight: '800',
       color: colors.primary,
     },
 
-    /* Validity + info banners */
+    /* Validity banner */
     validityBanner: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 10,
-      marginTop: spacing.md,
+      marginHorizontal: spacing.lg,
+      marginTop: spacing.lg,
       padding: spacing.md,
       borderWidth: 1,
-      backgroundColor: colors.warning ? colors.warning + '12' : '#F59E0B12',
-      borderColor: colors.warning ? colors.warning + '35' : '#F59E0B35',
+      backgroundColor: colors.warning + '12',
+      borderColor: colors.warning + '38',
       borderRadius: radius.md,
     },
     validityIcon: {
@@ -252,81 +246,76 @@ export function createStyles(
       lineHeight: 18,
       color: colors.text,
     },
-    infoBanner: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 10,
-      marginTop: spacing.sm,
-      padding: spacing.md,
+
+    /* After payment steps */
+    stepsCard: {
+      marginHorizontal: spacing.lg,
       borderWidth: 1,
-      backgroundColor: colors.primary + '08',
-      borderColor: colors.primary + '20',
-      borderRadius: radius.md,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surfaceElevated,
+      padding: spacing.lg,
+      gap: 16,
     },
-    infoIcon: {
-      fontSize: 14,
+    stepItem: {
+      flexDirection: 'row',
+      gap: 12,
     },
-    infoText: {
+    stepNumCircle: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: colors.primary + '15',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    stepNumText: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: colors.primary,
+    },
+    stepContent: {
       flex: 1,
+    },
+    stepTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    stepDesc: {
       fontSize: 12,
       fontWeight: '500',
-      lineHeight: 18,
+      lineHeight: 17,
       color: colors.textSecondary,
+      marginTop: 2,
     },
 
-    /* Pinned footer */
+    /* Flat footer */
     footer: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: spacing.lg,
-      paddingVertical: 16,
+      paddingVertical: 14,
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      backgroundColor: colors.background,
+      backgroundColor: colors.surfaceElevated,
       gap: spacing.md,
     },
-    footerTotalWrap: {
+    footerLeft: {
       flex: 1,
     },
-    footerTotalLabel: {
+    footerLabel: {
       fontSize: 11,
       fontWeight: '600',
       textTransform: 'uppercase',
       letterSpacing: 0.4,
       color: colors.textSecondary,
     },
-    footerTotalValue: {
+    footerAmount: {
       fontSize: 20,
       fontWeight: '800',
       color: colors.text,
       marginTop: 2,
-    },
-    footerSub: {
-      fontSize: 10,
-      fontWeight: '500',
-      marginTop: 2,
-      color: colors.textSecondary,
-    },
-    downloadBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      paddingVertical: 16,
-      paddingHorizontal: 24,
-      backgroundColor: colors.primary,
-      borderRadius: radius.pill,
-    },
-    downloadBtnPressed: {
-      opacity: 0.85,
-    },
-    downloadBtnIcon: {
-      fontSize: 16,
-    },
-    downloadBtnText: {
-      color: colors.onPrimary,
-      fontSize: 14,
-      fontWeight: '700',
     },
   });
 }

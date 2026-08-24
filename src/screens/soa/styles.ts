@@ -13,12 +13,14 @@ export function createStyles(
       flex: 1,
       backgroundColor: colors.background,
     },
+
+    /* Header */
     header: {
       paddingTop: 56,
-      paddingBottom: 28,
+      paddingBottom: 26,
       paddingHorizontal: 24,
-      borderBottomLeftRadius: 32,
-      borderBottomRightRadius: 32,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
       backgroundColor: headerBg,
       overflow: 'hidden',
     },
@@ -66,186 +68,148 @@ export function createStyles(
     topSpacer: {
       width: 40,
     },
-    headerBody: {
+    heroRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 20,
+      justifyContent: 'space-between',
+      marginTop: 22,
     },
-    headerIcon: {
-      fontSize: 36,
+    heroLeft: {
+      flex: 1,
     },
-    headerLabel: {
+    heroLabel: {
+      color: 'rgba(255,255,255,0.72)',
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    heroAmount: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '700',
-      marginTop: 10,
+      fontSize: 30,
+      fontWeight: '800',
+      marginTop: 6,
+      letterSpacing: 0.3,
     },
-    headerSub: {
-      color: 'rgba(255,255,255,0.75)',
-      fontSize: 12,
-      fontWeight: '500',
-      marginTop: 4,
+    heroBadge: {
+      alignSelf: 'flex-start',
+      marginTop: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: radius.pill,
+      backgroundColor: 'rgba(255,255,255,0.16)',
     },
+    heroBadgeText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '600',
+    },
+    heroIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
+    },
+    heroIcon: {
+      fontSize: 30,
+    },
+
     flex: {
       flex: 1,
     },
     scrollContent: {
       padding: spacing.lg,
-      paddingBottom: 20,
-    },
-    sectionLabel: {
-      fontSize: 12,
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      color: colors.textSecondary,
-      marginTop: spacing.lg,
-      marginBottom: spacing.sm,
+      paddingBottom: 24,
     },
 
-    /* Loan account rows */
-    loanRow: {
+    /* Section titles */
+    titleRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      borderWidth: 1.5,
-      padding: spacing.md,
-      borderRadius: radius.md,
-      gap: 12,
+      justifyContent: 'space-between',
+      marginTop: spacing.xl,
+      marginBottom: spacing.sm + 2,
     },
-    loanIconCircle: {
-      width: 42,
-      height: 42,
-      borderRadius: 21,
-      justifyContent: 'center',
-      alignItems: 'center',
+    titleRowFirst: {
+      marginTop: 0,
+    },
+    title: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: colors.text,
+    },
+    countChip: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: radius.pill,
       backgroundColor: colors.primary + '15',
     },
-    loanIconText: {
-      fontSize: 20,
-    },
-    loanMiddle: {
-      flex: 1,
-    },
-    loanType: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    loanId: {
+    countChipText: {
       fontSize: 11,
-      fontWeight: '500',
-      marginTop: 2,
-      color: colors.textSecondary,
-    },
-    loanOutWrap: {
-      alignItems: 'flex-end',
-    },
-    loanOutLabel: {
-      fontSize: 9,
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      letterSpacing: 0.4,
-      color: colors.textSecondary,
-    },
-    loanOutValue: {
-      fontSize: 13,
-      fontWeight: '800',
-      marginTop: 2,
-      color: colors.text,
-    },
-    radio: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      borderWidth: 2,
-      borderColor: colors.border,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    radioDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.primary,
+      fontWeight: '700',
+      color: colors.primary,
     },
 
-    /* Period chips */
-    periodRow: {
+    /* Loan pill chips */
+    loanPillsRow: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: spacing.sm,
     },
-    periodChip: {
-      flex: 1,
-      alignItems: 'center',
-      paddingVertical: 10,
-      borderWidth: 1,
-      borderRadius: radius.pill,
-    },
-    periodChipText: {
-      fontSize: 12,
-      fontWeight: '500',
-      color: colors.textSecondary,
-    },
-    periodChipTextActive: {
-      fontWeight: '700',
-      color: colors.primary,
-    },
-
-    /* Summary card */
-    summaryCard: {
-      borderWidth: 1,
-      padding: spacing.lg,
-      backgroundColor: colors.primary + '08',
-      borderColor: colors.primary + '20',
-      borderRadius: radius.lg,
-    },
-    summaryRow: {
+    loanPill: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingVertical: 6,
-    },
-    summaryLabel: {
-      fontSize: 13,
-      fontWeight: '500',
-      color: colors.textSecondary,
-    },
-    summaryValue: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    summaryDivider: {
-      height: 1,
-      backgroundColor: colors.border,
-      marginVertical: 6,
-    },
-    summaryTotalLabel: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    summaryTotalValue: {
-      fontSize: 16,
-      fontWeight: '800',
-      color: colors.primary,
-    },
-
-    /* Ledger card */
-    ledgerCard: {
-      borderWidth: 1,
-      overflow: 'hidden',
-      backgroundColor: colors.surfaceElevated,
+      alignItems: 'center',
+      gap: 10,
+      flexGrow: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderWidth: 1.5,
       borderColor: colors.border,
       borderRadius: radius.lg,
+      backgroundColor: colors.surfaceElevated,
     },
-    ledgerHeader: {
+    loanPillActive: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primary,
+    },
+    loanPillIcon: {
+      fontSize: 20,
+    },
+    loanPillType: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    loanPillTypeActive: {
+      color: '#FFFFFF',
+    },
+    loanPillId: {
+      fontSize: 10,
+      fontWeight: '500',
+      marginTop: 1,
+      color: colors.textSecondary,
+    },
+    loanPillIdActive: {
+      color: 'rgba(255,255,255,0.75)',
+    },
+
+    /* Selected account strip */
+    accountStrip: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
-      padding: 14,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      marginTop: spacing.sm,
+      paddingVertical: 12,
+      paddingHorizontal: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      backgroundColor: colors.surfaceElevated,
     },
-    ledgerIconCircle: {
+    stripIconCircle: {
       width: 38,
       height: 38,
       borderRadius: 12,
@@ -253,32 +217,84 @@ export function createStyles(
       alignItems: 'center',
       backgroundColor: colors.primary + '15',
     },
-    ledgerIconText: {
+    stripIconText: {
       fontSize: 18,
     },
-    ledgerTitleWrap: {
+    stripMiddle: {
       flex: 1,
     },
-    ledgerTitle: {
-      fontSize: 14,
+    stripType: {
+      fontSize: 13,
       fontWeight: '700',
       color: colors.text,
     },
-    ledgerSub: {
+    stripId: {
       fontSize: 11,
       fontWeight: '500',
       marginTop: 2,
       color: colors.textSecondary,
     },
-    entriesCount: {
-      fontSize: 11,
+    stripOutLabel: {
+      fontSize: 9,
       fontWeight: '600',
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      borderRadius: radius.pill,
-      backgroundColor: colors.primary + '15',
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+      color: colors.textSecondary,
+      textAlign: 'right',
+    },
+    stripOutValue: {
+      fontSize: 14,
+      fontWeight: '800',
+      marginTop: 2,
+      color: colors.text,
+    },
+
+    /* Period chips */
+    periodRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+
+    /* Summary stat grid */
+    statGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    statBox: {
+      flexGrow: 1,
+      flexBasis: '46%',
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      backgroundColor: colors.surfaceElevated,
+      padding: spacing.md,
+    },
+    statBoxHighlight: {
+      backgroundColor: colors.primary + '10',
+      borderColor: colors.primary + '30',
+    },
+    statLabel: {
+      fontSize: 10,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      color: colors.textSecondary,
+    },
+    statValue: {
+      fontSize: 16,
+      fontWeight: '800',
+      marginTop: 5,
+      color: colors.text,
+    },
+    statValueHighlight: {
+      fontSize: 17,
       color: colors.primary,
-      overflow: 'hidden',
+    },
+
+    /* Timeline ledger */
+    ledgerWrap: {
+      paddingTop: 4,
     },
 
     /* Empty state */
@@ -296,7 +312,7 @@ export function createStyles(
       color: colors.textSecondary,
     },
 
-    /* Pinned footer */
+    /* Footer band */
     footer: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -304,7 +320,7 @@ export function createStyles(
       paddingVertical: 16,
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       gap: spacing.md,
     },
     footerTotalWrap: {
@@ -328,27 +344,6 @@ export function createStyles(
       fontWeight: '500',
       marginTop: 2,
       color: colors.textSecondary,
-    },
-    downloadBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      paddingVertical: 16,
-      paddingHorizontal: 24,
-      backgroundColor: colors.primary,
-      borderRadius: radius.pill,
-    },
-    downloadBtnPressed: {
-      opacity: 0.85,
-    },
-    downloadBtnIcon: {
-      fontSize: 16,
-    },
-    downloadBtnText: {
-      color: colors.onPrimary,
-      fontSize: 14,
-      fontWeight: '700',
     },
   });
 }

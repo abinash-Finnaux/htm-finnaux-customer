@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Text,
   View,
   Pressable,
   StyleSheet,
 } from 'react-native';
-import { Controller, type Control } from 'react-hook-form';
+import { Controller, useWatch, type Control } from 'react-hook-form';
 import { useTheme } from '../../../context/ThemeContext';
 import GlobalInputText from '../../../components/inputTexts/GlobalInputText';
 
@@ -34,7 +34,6 @@ type Props = {
   upcomingEmis: ScheduleItem[];
   selectedMonth: number | null;
   onSelectMonth: (month: number, emi: number) => void;
-  payAmount: string;
   onSubmit: () => void;
 };
 
@@ -43,17 +42,20 @@ export default function PayEmiForm({
   upcomingEmis,
   selectedMonth,
   onSelectMonth,
-  payAmount,
   onSubmit,
 }: Props) {
   const { theme } = useTheme();
   const { colors, radius } = theme;
 
-  const themed = createStyles(colors, radius);
+  const themed = useMemo(
+    () => createStyles(colors, radius),
+    [colors, radius],
+  );
+
+  const payAmount = useWatch({ control, name: 'payAmount' });
 
   return (
     <View style={themed.card}>
-      {/* Header */}
       <View style={themed.header}>
         <View style={themed.headerIconBg}>
           <Text style={themed.headerIconText}>💳</Text>
@@ -64,7 +66,6 @@ export default function PayEmiForm({
         </View>
       </View>
 
-      {/* Select EMI */}
       <View style={themed.section}>
         <View style={themed.sectionHeader}>
           <Text style={themed.sectionTitle}>Select EMI</Text>
@@ -81,28 +82,14 @@ export default function PayEmiForm({
                 onPress={() => onSelectMonth(item.month, item.emi)}
                 style={({ pressed }) => [
                   themed.emiCard,
-                  {
-                    backgroundColor: selected
-                      ? colors.primary
-                      : colors.surface,
-                    borderColor: selected ? colors.primary : colors.border,
-                    opacity: pressed ? 0.85 : 1,
-                  },
+                  selected && themed.emiCardSelected,
+                  { opacity: pressed ? 0.85 : 1 },
                 ]}
               >
-                {selected && (
-                  <View style={themed.emiCardTick}>
-                    <Text style={themed.emiCardTickText}>✓</Text>
-                  </View>
-                )}
                 <Text
                   style={[
                     themed.emiCardMonth,
-                    {
-                      color: selected
-                        ? 'rgba(255,255,255,0.7)'
-                        : colors.textSecondary,
-                    },
+                    selected && themed.emiCardMonthSelected,
                   ]}
                 >
                   {item.date.split(' ')[0]} {item.date.split(' ')[1]}
@@ -110,7 +97,7 @@ export default function PayEmiForm({
                 <Text
                   style={[
                     themed.emiCardAmount,
-                    { color: selected ? '#FFFFFF' : colors.text },
+                    selected && themed.emiCardAmountSelected,
                   ]}
                 >
                   ₹{item.emi.toLocaleString('en-IN')}
@@ -118,11 +105,7 @@ export default function PayEmiForm({
                 <Text
                   style={[
                     themed.emiCardDate,
-                    {
-                      color: selected
-                        ? 'rgba(255,255,255,0.6)'
-                        : colors.textSecondary,
-                    },
+                    selected && themed.emiCardDateSelected,
                   ]}
                 >
                   {item.date.split(' ')[2]}
@@ -133,7 +116,6 @@ export default function PayEmiForm({
         </View>
       </View>
 
-      {/* Amount */}
       <View style={themed.section}>
         <Controller
           control={control}
@@ -151,7 +133,6 @@ export default function PayEmiForm({
         />
       </View>
 
-      {/* Payment Mode */}
       <View style={themed.section}>
         <Text style={themed.sectionTitle}>Payment Method</Text>
         <Controller
@@ -167,27 +148,15 @@ export default function PayEmiForm({
                     onPress={() => onChange(mode.id)}
                     style={({ pressed }) => [
                       themed.modeCard,
-                      {
-                        backgroundColor: selected
-                          ? colors.primary
-                          : colors.surface,
-                        borderColor: selected
-                          ? colors.primary
-                          : colors.border,
-                        opacity: pressed ? 0.85 : 1,
-                      },
+                      selected && themed.modeCardSelected,
+                      { opacity: pressed ? 0.85 : 1 },
                     ]}
                   >
-                    {selected && (
-                      <View style={themed.modeCardTick}>
-                        <Text style={themed.modeCardTickText}>✓</Text>
-                      </View>
-                    )}
                     <Text style={themed.modeCardIcon}>{mode.icon}</Text>
                     <Text
                       style={[
                         themed.modeCardLabel,
-                        { color: selected ? '#FFFFFF' : colors.text },
+                        selected && themed.modeCardLabelSelected,
                       ]}
                     >
                       {mode.label}
@@ -200,7 +169,6 @@ export default function PayEmiForm({
         />
       </View>
 
-      {/* Submit */}
       <Pressable
         onPress={onSubmit}
         style={({ pressed }) => [
@@ -227,6 +195,7 @@ function createStyles(
       borderWidth: 1,
       overflow: 'hidden',
       backgroundColor: colors.surfaceElevated,
+      borderColor: colors.border,
       borderRadius: radius.lg,
       marginTop: 16,
     },
@@ -290,45 +259,46 @@ function createStyles(
       gap: 10,
     },
     emiCard: {
-      borderWidth: 1,
+      borderWidth: 1.5,
       paddingVertical: 12,
       paddingHorizontal: 0,
       flex: 1,
       minWidth: '30%',
       alignItems: 'center',
       borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
     },
-    emiCardTick: {
-      position: 'absolute',
-      top: 5,
-      right: 5,
-      width: 16,
-      height: 16,
-      borderRadius: 8,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1,
-    },
-    emiCardTickText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: '#1E293B',
+    emiCardSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     emiCardMonth: {
       fontSize: 11,
       fontWeight: '600',
       textTransform: 'uppercase',
+      color: colors.textSecondary,
+    },
+    emiCardMonthSelected: {
+      color: 'rgba(255,255,255,0.7)',
     },
     emiCardAmount: {
       fontSize: 15,
       fontWeight: '800',
       marginTop: 4,
+      color: colors.text,
+    },
+    emiCardAmountSelected: {
+      color: '#FFFFFF',
     },
     emiCardDate: {
       fontSize: 10,
       fontWeight: '500',
       marginTop: 2,
+      color: colors.textSecondary,
+    },
+    emiCardDateSelected: {
+      color: 'rgba(255,255,255,0.6)',
     },
     modeGrid: {
       flexDirection: 'row',
@@ -341,23 +311,12 @@ function createStyles(
       alignItems: 'center',
       gap: 6,
       borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
     },
-    modeCardTick: {
-      position: 'absolute',
-      top: 5,
-      right: 5,
-      width: 16,
-      height: 16,
-      borderRadius: 8,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1,
-    },
-    modeCardTickText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: '#1E293B',
+    modeCardSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     modeCardIcon: {
       fontSize: 22,
@@ -365,6 +324,10 @@ function createStyles(
     modeCardLabel: {
       fontSize: 12,
       fontWeight: '700',
+      color: colors.text,
+    },
+    modeCardLabelSelected: {
+      color: '#FFFFFF',
     },
     payBtn: {
       flexDirection: 'row',

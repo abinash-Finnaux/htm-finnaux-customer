@@ -60,7 +60,7 @@ const formatINR = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
 export default function EmiDepositScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
-  const { colors, spacing } = theme;
+  const { colors } = theme;
 
   const headerBg = isDark ? '#1E293B' : colors.primary;
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
@@ -147,6 +147,15 @@ export default function EmiDepositScreen({ navigation }: Props) {
   const selectedModeLabel =
     PAYMENT_MODES.find(m => m.id === mode)?.label ?? '—';
 
+  const renderStepHeader = (step: number, title: string) => (
+    <View style={themed.stepRow}>
+      <View style={themed.stepBadge}>
+        <Text style={themed.stepBadgeText}>{step}</Text>
+      </View>
+      <Text style={themed.stepTitle}>{title}</Text>
+    </View>
+  );
+
   return (
     <View style={themed.root}>
       <View style={themed.header}>
@@ -165,12 +174,17 @@ export default function EmiDepositScreen({ navigation }: Props) {
           <Text style={themed.topTitle}>EMI Deposit</Text>
           <View style={themed.topSpacer} />
         </View>
-        <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>💳</Text>
-          <Text style={themed.headerLabel}>Make a Payment</Text>
-          <Text style={themed.headerSub}>
-            Pay your EMI dues quickly and securely
-          </Text>
+        <View style={themed.heroRow}>
+          <View style={themed.heroLeft}>
+            <Text style={themed.heroLabel}>Outstanding Balance</Text>
+            <Text style={themed.heroAmount}>{formatINR(loan.outstanding)}</Text>
+            <View style={themed.heroDueBadge}>
+              <Text style={themed.heroDueText}>📅 Next due {loan.dueDate}</Text>
+            </View>
+          </View>
+          <View style={themed.heroIconWrap}>
+            <Text style={themed.heroIcon}>💳</Text>
+          </View>
         </View>
       </View>
 
@@ -180,9 +194,8 @@ export default function EmiDepositScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Loan account */}
-        <Text style={themed.sectionLabel}>Select Loan Account</Text>
-        <View style={{ gap: spacing.sm }}>
+        {renderStepHeader(1, 'Select Loan Account')}
+        <View style={themed.loanStack}>
           {LOANS.map(item => {
             const selected = item.id === loanId;
             return (
@@ -191,43 +204,57 @@ export default function EmiDepositScreen({ navigation }: Props) {
                 onPress={() => handleLoanSelect(item.id)}
                 style={({ pressed }) => [
                   themed.loanRow,
-                  {
-                    borderColor: selected ? colors.primary : colors.border,
-                    backgroundColor: selected
-                      ? colors.primary + '08'
-                      : 'transparent',
-                    opacity: pressed ? 0.85 : 1,
-                  },
+                  selected && themed.loanRowSelected,
+                  { opacity: pressed ? 0.85 : 1 },
                 ]}
               >
-                <View style={themed.loanIconCircle}>
+                <View
+                  style={[
+                    themed.loanIconCircle,
+                    selected && themed.loanIconCircleSelected,
+                  ]}
+                >
                   <Text style={themed.loanIconText}>🏦</Text>
                 </View>
                 <View style={themed.loanMiddle}>
-                  <Text style={themed.loanType}>{item.type}</Text>
-                  <Text style={themed.loanId}>{item.id}</Text>
-                </View>
-                <View style={themed.loanOutWrap}>
-                  <Text style={themed.loanOutLabel}>Outstanding</Text>
-                  <Text style={themed.loanOutValue}>
-                    {formatINR(item.outstanding)}
+                  <Text
+                    style={[
+                      themed.loanType,
+                      selected && themed.loanTypeSelected,
+                    ]}
+                  >
+                    {item.type}
+                  </Text>
+                  <Text
+                    style={[themed.loanId, selected && themed.loanIdSelected]}
+                  >
+                    {item.id}
                   </Text>
                 </View>
-                <View
-                  style={[
-                    themed.radio,
-                    selected && { borderColor: colors.primary },
-                  ]}
-                >
-                  {selected && <View style={themed.radioDot} />}
+                <View style={themed.loanOutWrap}>
+                  <Text
+                    style={[
+                      themed.loanOutLabel,
+                      selected && themed.loanOutLabelSelected,
+                    ]}
+                  >
+                    Outstanding
+                  </Text>
+                  <Text
+                    style={[
+                      themed.loanOutValue,
+                      selected && themed.loanOutValueSelected,
+                    ]}
+                  >
+                    {formatINR(item.outstanding)}
+                  </Text>
                 </View>
               </Pressable>
             );
           })}
         </View>
 
-        {/* Upcoming EMIs */}
-        <Text style={themed.sectionLabel}>Select EMI</Text>
+        {renderStepHeader(2, 'Select EMI')}
         <View style={themed.dueGrid}>
           {UPCOMING_EMIS.map(emi => {
             const selected = selectedMonth === emi.month;
@@ -241,34 +268,14 @@ export default function EmiDepositScreen({ navigation }: Props) {
                 }}
                 style={({ pressed }) => [
                   themed.dueChip,
-                  {
-                    backgroundColor: selected
-                      ? colors.primary
-                      : colors.surfaceElevated,
-                    borderColor: selected ? colors.primary : colors.border,
-                    opacity: pressed ? 0.85 : 1,
-                  },
+                  selected && themed.dueChipSelected,
+                  { opacity: pressed ? 0.85 : 1 },
                 ]}
               >
-                {selected && (
-                  <View
-                    style={[themed.dueChipTick, { backgroundColor: '#FFFFFF' }]}
-                  >
-                    <Text
-                      style={[themed.dueChipTickText, { color: '#1E293B' }]}
-                    >
-                      ✓
-                    </Text>
-                  </View>
-                )}
                 <Text
                   style={[
                     themed.dueChipMonth,
-                    {
-                      color: selected
-                        ? 'rgba(255,255,255,0.7)'
-                        : colors.textSecondary,
-                    },
+                    selected && themed.dueChipMonthSelected,
                   ]}
                 >
                   {emi.date}
@@ -276,7 +283,7 @@ export default function EmiDepositScreen({ navigation }: Props) {
                 <Text
                   style={[
                     themed.dueChipAmount,
-                    { color: selected ? '#FFFFFF' : colors.text },
+                    selected && themed.dueChipAmountSelected,
                   ]}
                 >
                   {formatINR(emi.amount)}
@@ -284,11 +291,7 @@ export default function EmiDepositScreen({ navigation }: Props) {
                 <Text
                   style={[
                     themed.dueChipYear,
-                    {
-                      color: selected
-                        ? 'rgba(255,255,255,0.6)'
-                        : colors.textSecondary,
-                    },
+                    selected && themed.dueChipYearSelected,
                   ]}
                 >
                   {loan.dueDate.split(' ')[2]}
@@ -298,7 +301,6 @@ export default function EmiDepositScreen({ navigation }: Props) {
           })}
         </View>
 
-        {/* Custom amount */}
         <GlobalInputText
           label="Or Enter Custom Amount"
           placeholder="Leave empty to pay selected EMI"
@@ -308,16 +310,17 @@ export default function EmiDepositScreen({ navigation }: Props) {
           error={amountError}
         />
 
-        {/* Payment method */}
-        <Text style={themed.sectionLabel}>Payment Method</Text>
+        {renderStepHeader(3, 'Payment Method')}
         <PaymentMethodPicker
           modes={PAYMENT_MODES}
           value={mode}
           onChange={setMode}
         />
 
-        {/* Summary */}
         <View style={themed.summaryCard}>
+          <View style={themed.summaryTitleRow}>
+            <Text style={themed.summaryTitle}>Payment Summary</Text>
+          </View>
           <View style={themed.summaryRow}>
             <Text style={themed.summaryLabel}>{loan.type}</Text>
             <Text style={themed.summaryValue}>{loan.id}</Text>
@@ -337,16 +340,15 @@ export default function EmiDepositScreen({ navigation }: Props) {
             <Text style={themed.summaryValue}>{selectedModeLabel}</Text>
           </View>
           <View style={themed.summaryDivider} />
-          <View style={themed.summaryRow}>
-            <Text style={themed.footerTotalLabel}>Total Payable</Text>
-            <Text style={themed.summaryValue}>
+          <View style={themed.totalRow}>
+            <Text style={themed.totalLabel}>Total Payable</Text>
+            <Text style={themed.totalValue}>
               {formatINR(amount + CONVENIENCE_FEE)}
             </Text>
           </View>
         </View>
       </ScrollView>
 
-      {/* Pinned pay bar */}
       <View style={themed.footer}>
         <View style={themed.footerTotalWrap}>
           <Text style={themed.footerTotalLabel}>Total Payable</Text>
@@ -363,7 +365,11 @@ export default function EmiDepositScreen({ navigation }: Props) {
             canPay && pressed && themed.payBtnPressed,
           ]}
         >
-          <Text style={themed.payBtnText}>Pay Now →</Text>
+          <Text
+            style={[themed.payBtnText, !canPay && themed.payBtnTextDisabled]}
+          >
+            Pay Now →
+          </Text>
         </Pressable>
       </View>
     </View>

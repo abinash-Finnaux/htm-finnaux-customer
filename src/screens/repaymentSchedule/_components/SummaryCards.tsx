@@ -1,5 +1,5 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet } from 'react-native';
 import ProgressCard from '../../../components/cards/ProgressCard';
 import SummaryCard from '../../../components/cards/SummaryCard';
 
@@ -16,31 +16,54 @@ export default function SummaryCards({
   totalPaid,
   totalLoanAmount,
 }: Props) {
-  const percent = Math.round((paidCount / totalCount) * 100);
+  const styles = useMemo(() => createStyles(), []);
+
+  const summaryItems = useMemo(
+    () => [
+      { value: `${paidCount}/${totalCount}`, label: 'EMIs Paid' },
+      {
+        value: `₹${totalPaid.toLocaleString('en-IN')}`,
+        label: 'Total Paid',
+        color: '#22C55E',
+      },
+    ],
+    [paidCount, totalCount, totalPaid],
+  );
+
+  const percent = useMemo(
+    () => Math.round((paidCount / totalCount) * 100),
+    [paidCount, totalCount],
+  );
+
+  const paidLabel = useMemo(
+    () => `₹${totalPaid.toLocaleString('en-IN')} paid`,
+    [totalPaid],
+  );
+
+  const remainingLabel = useMemo(
+    () => `₹${(totalLoanAmount - totalPaid).toLocaleString('en-IN')} remaining`,
+    [totalLoanAmount, totalPaid],
+  );
 
   return (
     <>
-      <SummaryCard
-        items={[
-          { value: `${paidCount}/${totalCount}`, label: 'EMIs Paid' },
-          {
-            value: `₹${totalPaid.toLocaleString('en-IN')}`,
-            label: 'Total Paid',
-            color: '#22C55E',
-          },
-        ]}
-      />
-
-      <View style={{ marginTop: 12 }}>
+      <SummaryCard items={summaryItems} />
+      <View style={styles.progressWrap}>
         <ProgressCard
           title="Repayment Progress"
           percent={percent}
-          paidLabel={`₹${totalPaid.toLocaleString('en-IN')} paid`}
-          remainingLabel={`₹${(totalLoanAmount - totalPaid).toLocaleString(
-            'en-IN',
-          )} remaining`}
+          paidLabel={paidLabel}
+          remainingLabel={remainingLabel}
         />
       </View>
     </>
   );
+}
+
+function createStyles() {
+  return StyleSheet.create({
+    progressWrap: {
+      marginTop: 12,
+    },
+  });
 }

@@ -5,7 +5,9 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../../App';
 
+import DownloadButton from '../../components/buttons/DownloadButton';
 import { createStyles } from './styles';
+import LoanCard from './_components/LoanCard';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CloserStatement'>;
 
@@ -36,6 +38,21 @@ const LOANS: LoanAccount[] = [
   },
 ];
 
+const AFTER_PAYMENT_STEPS = [
+  {
+    title: 'Pay Closure Amount',
+    desc: 'Complete the full payment before the quote validity ends.',
+  },
+  {
+    title: 'NOC & Documents',
+    desc: 'NOC and original documents are dispatched within 15 working days.',
+  },
+  {
+    title: 'Loan Closed',
+    desc: 'No further interest or charges apply after full payment.',
+  },
+];
+
 const formatINR = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
 const getAsOfDate = () =>
@@ -57,7 +74,7 @@ const getValidTillDate = () => {
 
 export default function CloserStatementScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
-  const { colors, spacing } = theme;
+  const { colors } = theme;
 
   const headerBg = isDark ? '#1E293B' : colors.primary;
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
@@ -78,8 +95,7 @@ export default function CloserStatementScreen({ navigation }: Props) {
   );
 
   const foreclosureFee = Math.round(loan.outstanding * FORECLOSURE_RATE);
-  const totalClosure =
-    loan.outstanding + loan.accruedInterest + foreclosureFee;
+  const totalClosure = loan.outstanding + loan.accruedInterest + foreclosureFee;
 
   const handleDownload = () => {
     Alert.alert(
@@ -117,12 +133,19 @@ export default function CloserStatementScreen({ navigation }: Props) {
           <Text style={themed.topTitle}>Closer Statement</Text>
           <View style={themed.topSpacer} />
         </View>
-        <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>📑</Text>
-          <Text style={themed.headerLabel}>Loan Closure Quote</Text>
-          <Text style={themed.headerSub}>
-            Check the exact amount to close your loan early
-          </Text>
+        <View style={themed.heroRow}>
+          <View style={themed.heroLeft}>
+            <Text style={themed.heroLabel}>Total Closure Amount</Text>
+            <Text style={themed.heroAmount}>{formatINR(totalClosure)}</Text>
+            <View style={themed.heroBadge}>
+              <Text style={themed.heroBadgeText}>
+                ⏳ Valid till {getValidTillDate()}
+              </Text>
+            </View>
+          </View>
+          <View style={themed.heroIconWrap}>
+            <Text style={themed.heroIcon}>📑</Text>
+          </View>
         </View>
       </View>
 
@@ -131,129 +154,104 @@ export default function CloserStatementScreen({ navigation }: Props) {
         contentContainerStyle={themed.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Loan account */}
-        <Text style={themed.sectionLabel}>Select Loan Account</Text>
-        <View style={{ gap: spacing.sm }}>
-          {LOANS.map(item => {
-            const selected = item.id === loanId;
-            return (
-              <Pressable
-                key={item.id}
-                onPress={() => setLoanId(item.id)}
-                style={({ pressed }) => [
-                  themed.loanRow,
-                  {
-                    borderColor: selected ? colors.primary : colors.border,
-                    backgroundColor: selected
-                      ? colors.primary + '08'
-                      : 'transparent',
-                    opacity: pressed ? 0.85 : 1,
-                  },
-                ]}
-              >
-                <View style={themed.loanIconCircle}>
-                  <Text style={themed.loanIconText}>🏦</Text>
-                </View>
-                <View style={themed.loanMiddle}>
-                  <Text style={themed.loanType}>{item.type}</Text>
-                  <Text style={themed.loanId}>{item.id}</Text>
-                </View>
-                <View style={themed.loanOutWrap}>
-                  <Text style={themed.loanOutLabel}>Outstanding</Text>
-                  <Text style={themed.loanOutValue}>
-                    {formatINR(item.outstanding)}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    themed.radio,
-                    selected && { borderColor: colors.primary },
-                  ]}
-                >
-                  {selected && <View style={themed.radioDot} />}
-                </View>
-              </Pressable>
-            );
-          })}
+        <View style={themed.sectionRow}>
+          {/* <View style={themed.sectionBar} /> */}
+          <Text style={themed.sectionTitle}>Select Loan Account</Text>
         </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={themed.loanScroller}
+        >
+          {LOANS.map(item => (
+            <LoanCard
+              key={item.id}
+              type={item.type}
+              id={item.id}
+              outstanding={item.outstanding}
+              selected={item.id === loanId}
+              onPress={() => setLoanId(item.id)}
+            />
+          ))}
+        </ScrollView>
 
-        {/* Closure quote */}
-        <Text style={themed.sectionLabel}>Closure Breakup</Text>
-        <View style={themed.quoteCard}>
-          <View style={themed.quoteHeader}>
-            <Text style={themed.quoteTitle}>{loan.type} Closure</Text>
-            <View style={themed.asOfBadge}>
-              <Text style={themed.asOfText}>As of {getAsOfDate()}</Text>
-            </View>
-          </View>
-
+        <View style={themed.sectionRow}>
+          {/* <View style={themed.sectionBar} /> */}
+          <Text style={themed.sectionTitle}>Closure Breakup</Text>
+        </View>
+        <View style={themed.breakupCard}>
           <View style={themed.breakupRow}>
             <Text style={themed.breakupLabel}>Principal Outstanding</Text>
             <Text style={themed.breakupValue}>
               {formatINR(loan.outstanding)}
             </Text>
           </View>
+          <View style={themed.breakupDivider} />
           <View style={themed.breakupRow}>
-            <Text style={themed.breakupLabel}>
-              Interest Accrued ({loan.interestRate}% p.a.)
-            </Text>
+            <View style={themed.breakupLabelWrap}>
+              <Text style={themed.breakupLabel}>Interest Accrued</Text>
+              <View style={themed.breakupChip}>
+                <Text style={themed.breakupChipText}>
+                  {loan.interestRate}% p.a.
+                </Text>
+              </View>
+            </View>
             <Text style={themed.breakupValue}>
               {formatINR(loan.accruedInterest)}
             </Text>
           </View>
+          <View style={themed.breakupDivider} />
           <View style={themed.breakupRow}>
-            <Text style={themed.breakupLabel}>
-              Foreclosure Charges ({FORECLOSURE_RATE * 100}%)
-            </Text>
-            <Text style={themed.breakupValue}>
-              {formatINR(foreclosureFee)}
-            </Text>
+            <View style={themed.breakupLabelWrap}>
+              <Text style={themed.breakupLabel}>Foreclosure Charges</Text>
+              <View style={themed.breakupChip}>
+                <Text style={themed.breakupChipText}>
+                  {FORECLOSURE_RATE * 100}%
+                </Text>
+              </View>
+            </View>
+            <Text style={themed.breakupValue}>{formatINR(foreclosureFee)}</Text>
           </View>
-          <View style={themed.divider} />
-          <View style={themed.breakupRow}>
+          <View style={themed.breakupDashDivider} />
+          <View style={themed.breakupTotalRow}>
             <Text style={themed.totalLabel}>Total Closure Amount</Text>
             <Text style={themed.totalValue}>{formatINR(totalClosure)}</Text>
           </View>
         </View>
 
-        {/* Validity */}
         <View style={themed.validityBanner}>
           <Text style={themed.validityIcon}>⏳</Text>
           <Text style={themed.validityText}>
-            This quote is valid till {getValidTillDate()}. Amounts may change
-            after this date due to daily interest accrual.
+            Quote as of {getAsOfDate()} is valid till {getValidTillDate()}.
+            Amounts may change after this date due to daily interest accrual.
           </Text>
         </View>
 
-        {/* NOC info */}
-        <View style={themed.infoBanner}>
-          <Text style={themed.infoIcon}>📄</Text>
-          <Text style={themed.infoText}>
-            After full payment, your NOC and original documents will be
-            dispatched within 15 working days.
-          </Text>
+        <View style={themed.sectionRow}>
+          {/* <View style={themed.sectionBar} /> */}
+          <Text style={themed.sectionTitle}>After Full Payment</Text>
+        </View>
+        <View style={themed.stepsCard}>
+          {AFTER_PAYMENT_STEPS.map((step, index) => (
+            <View key={step.title} style={themed.stepItem}>
+              <View style={themed.stepNumCircle}>
+                <Text style={themed.stepNumText}>{index + 1}</Text>
+              </View>
+              <View style={themed.stepContent}>
+                <Text style={themed.stepTitle}>{step.title}</Text>
+                <Text style={themed.stepDesc}>{step.desc}</Text>
+              </View>
+            </View>
+          ))}
         </View>
       </ScrollView>
 
-      {/* Pinned footer */}
       <View style={themed.footer}>
-        <View style={themed.footerTotalWrap}>
-          <Text style={themed.footerTotalLabel}>Total Closure Amount</Text>
-          <Text style={themed.footerTotalValue}>
-            {formatINR(totalClosure)}
-          </Text>
-          <Text style={themed.footerSub}>Valid till {getValidTillDate()}</Text>
+        <View style={themed.footerLeft}>
+          <Text style={themed.footerLabel}>Total Closure Amount</Text>
+          <Text style={themed.footerAmount}>{formatINR(totalClosure)}</Text>
         </View>
-        <Pressable
-          onPress={handleDownload}
-          style={({ pressed }) => [
-            themed.downloadBtn,
-            pressed && themed.downloadBtnPressed,
-          ]}
-        >
-          <Text style={themed.downloadBtnIcon}>⬇️</Text>
-          <Text style={themed.downloadBtnText}>Download</Text>
-        </Pressable>
+        <DownloadButton onPress={handleDownload} />
       </View>
     </View>
   );

@@ -13,12 +13,14 @@ export function createStyles(
       flex: 1,
       backgroundColor: colors.background,
     },
+
+    /* Header */
     header: {
       paddingTop: 56,
-      paddingBottom: 28,
+      paddingBottom: 26,
       paddingHorizontal: 24,
-      borderBottomLeftRadius: 32,
-      borderBottomRightRadius: 32,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
       backgroundColor: headerBg,
       overflow: 'hidden',
     },
@@ -66,58 +68,125 @@ export function createStyles(
     topSpacer: {
       width: 40,
     },
-    headerBody: {
+    heroRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 20,
+      justifyContent: 'space-between',
+      marginTop: 22,
     },
-    headerIcon: {
-      fontSize: 36,
+    heroLeft: {
+      flex: 1,
     },
-    headerLabel: {
+    heroLabel: {
+      color: 'rgba(255,255,255,0.72)',
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    heroAmount: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '700',
-      marginTop: 10,
+      fontSize: 30,
+      fontWeight: '800',
+      marginTop: 6,
+      letterSpacing: 0.3,
     },
-    headerSub: {
-      color: 'rgba(255,255,255,0.75)',
-      fontSize: 12,
-      fontWeight: '500',
-      marginTop: 4,
+    heroDueBadge: {
+      alignSelf: 'flex-start',
+      marginTop: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: radius.pill,
+      backgroundColor: 'rgba(255,255,255,0.16)',
     },
+    heroDueText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '600',
+    },
+    heroIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
+    },
+    heroIcon: {
+      fontSize: 30,
+    },
+
     flex: {
       flex: 1,
     },
     scrollContent: {
       padding: spacing.lg,
-      paddingBottom: 20,
-    },
-    sectionLabel: {
-      fontSize: 12,
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      color: colors.textSecondary,
-      marginTop: spacing.lg,
-      marginBottom: spacing.sm,
+      paddingBottom: 24,
     },
 
-    /* Loan account rows */
+    /* Step headers */
+    stepRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginTop: spacing.xl,
+      marginBottom: spacing.sm + 2,
+    },
+    stepBadge: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: colors.primary + '15',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    stepBadgeText: {
+      fontSize: 11,
+      fontWeight: '800',
+      color: colors.primary,
+    },
+    stepTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.text,
+      letterSpacing: 0.3,
+      textTransform: 'uppercase',
+    },
+
+    /* Loan account cards */
+    loanStack: {
+      gap: spacing.sm,
+    },
     loanRow: {
       flexDirection: 'row',
       alignItems: 'center',
       borderWidth: 1.5,
-      padding: spacing.md,
-      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surfaceElevated,
       gap: 12,
+      shadowColor: '#0F172A',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      elevation: 2,
+    },
+    loanRowSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primary,
     },
     loanIconCircle: {
-      width: 42,
-      height: 42,
-      borderRadius: 21,
+      width: 44,
+      height: 44,
+      borderRadius: 15,
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: colors.primary + '15',
+    },
+    loanIconCircleSelected: {
+      backgroundColor: 'rgba(255,255,255,0.2)',
     },
     loanIconText: {
       fontSize: 20,
@@ -130,11 +199,17 @@ export function createStyles(
       fontWeight: '700',
       color: colors.text,
     },
+    loanTypeSelected: {
+      color: '#FFFFFF',
+    },
     loanId: {
       fontSize: 11,
       fontWeight: '500',
       marginTop: 2,
       color: colors.textSecondary,
+    },
+    loanIdSelected: {
+      color: 'rgba(255,255,255,0.75)',
     },
     loanOutWrap: {
       alignItems: 'flex-end',
@@ -146,26 +221,36 @@ export function createStyles(
       letterSpacing: 0.4,
       color: colors.textSecondary,
     },
+    loanOutLabelSelected: {
+      color: 'rgba(255,255,255,0.7)',
+    },
     loanOutValue: {
       fontSize: 13,
       fontWeight: '800',
       marginTop: 2,
       color: colors.text,
     },
-    radio: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+    loanOutValueSelected: {
+      color: '#FFFFFF',
+    },
+    checkCircle: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
       borderWidth: 2,
       borderColor: colors.border,
       justifyContent: 'center',
       alignItems: 'center',
     },
-    radioDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.primary,
+    checkCircleActive: {
+      borderColor: '#FFFFFF',
+      backgroundColor: '#FFFFFF',
+    },
+    checkMark: {
+      color: '#1E293B',
+      fontSize: 12,
+      fontWeight: '800',
+      lineHeight: 14,
     },
 
     /* Due EMI chips */
@@ -175,41 +260,44 @@ export function createStyles(
       gap: spacing.sm,
     },
     dueChip: {
-      borderWidth: 1,
+      borderWidth: 1.5,
       alignItems: 'center',
-      paddingVertical: 12,
+      paddingVertical: 16,
       flex: 1,
       minWidth: '30%',
-      borderRadius: radius.md,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surfaceElevated,
     },
-    dueChipTick: {
-      position: 'absolute',
-      top: 5,
-      right: 5,
-      width: 16,
-      height: 16,
-      borderRadius: 8,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    dueChipTickText: {
-      fontSize: 9,
-      fontWeight: '800',
+    dueChipSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     dueChipMonth: {
       fontSize: 11,
       fontWeight: '600',
       textTransform: 'uppercase',
+      color: colors.textSecondary,
+    },
+    dueChipMonthSelected: {
+      color: 'rgba(255,255,255,0.7)',
     },
     dueChipAmount: {
       fontSize: 15,
       fontWeight: '800',
       marginTop: 4,
+      color: colors.text,
+    },
+    dueChipAmountSelected: {
+      color: '#FFFFFF',
     },
     dueChipYear: {
       fontSize: 10,
       fontWeight: '500',
       marginTop: 2,
+      color: colors.textSecondary,
+    },
+    dueChipYearSelected: {
+      color: 'rgba(255,255,255,0.6)',
     },
 
     /* Summary */
@@ -217,14 +305,22 @@ export function createStyles(
       borderWidth: 1,
       padding: spacing.lg,
       marginTop: spacing.xl,
-      backgroundColor: colors.primary + '08',
-      borderColor: colors.primary + '20',
+      backgroundColor: colors.surfaceElevated,
+      borderColor: colors.border,
       borderRadius: radius.lg,
+    },
+    summaryTitleRow: {
+      marginBottom: 6,
+    },
+    summaryTitle: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: colors.text,
     },
     summaryRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      paddingVertical: 6,
+      paddingVertical: 7,
     },
     summaryLabel: {
       fontSize: 13,
@@ -239,19 +335,47 @@ export function createStyles(
     summaryDivider: {
       height: 1,
       backgroundColor: colors.border,
-      marginVertical: 6,
+      marginVertical: 8,
+    },
+    totalRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.primary + '10',
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 12,
+      marginTop: 6,
+    },
+    totalLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    totalValue: {
+      fontSize: 18,
+      fontWeight: '800',
+      color: colors.primary,
     },
 
-    /* Pinned footer */
+    /* Floating footer */
     footer: {
       flexDirection: 'row',
       alignItems: 'center',
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.md,
       paddingHorizontal: spacing.lg,
-      paddingVertical: 16,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      backgroundColor: colors.background,
+      paddingVertical: 14,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surfaceElevated,
       gap: spacing.md,
+      shadowColor: '#0F172A',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.1,
+      shadowRadius: 16,
+      elevation: 8,
     },
     footerTotalWrap: {
       flex: 1,
@@ -287,6 +411,9 @@ export function createStyles(
       color: colors.onPrimary,
       fontSize: 15,
       fontWeight: '700',
+    },
+    payBtnTextDisabled: {
+      color: colors.textSecondary,
     },
   });
 }
