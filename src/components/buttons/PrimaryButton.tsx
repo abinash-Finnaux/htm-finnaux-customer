@@ -13,6 +13,7 @@ type Props = {
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
+  suffix?: string;
   style?: ViewStyle;
 };
 
@@ -21,6 +22,7 @@ export default function PrimaryButton({
   onPress,
   disabled = false,
   loading = false,
+  suffix,
   style,
 }: Props) {
   const { theme } = useTheme();
@@ -43,7 +45,10 @@ export default function PrimaryButton({
       {loading ? (
         <ActivityIndicator color={colors.onPrimary} size="small" />
       ) : (
-        <Text style={[styles.text, { color: colors.onPrimary }]}>{title}</Text>
+        <Text style={[styles.text, { color: colors.onPrimary }]}>
+          {title}
+          {suffix ? ` ${suffix}` : ''}
+        </Text>
       )}
     </Pressable>
   );

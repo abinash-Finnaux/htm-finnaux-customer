@@ -16,6 +16,7 @@ type Props<T extends FieldValues> = {
   placeholder?: string;
   rules?: RegisterOptions<T>;
   formatText?: (text: string) => string;
+  backgroundColor?: string;
 } & Pick<
   TextInputProps,
   | 'keyboardType'
@@ -35,6 +36,7 @@ export default function FormTextInput<T extends FieldValues>({
   placeholder,
   rules,
   formatText,
+  backgroundColor,
   keyboardType,
   maxLength,
   autoComplete,
@@ -60,6 +62,7 @@ export default function FormTextInput<T extends FieldValues>({
           onChangeText={(text) => onChange(formatText ? formatText(text) : text)}
           value={value}
           error={error?.message}
+          backgroundColor={backgroundColor}
           keyboardType={keyboardType}
           maxLength={maxLength}
           autoComplete={autoComplete}

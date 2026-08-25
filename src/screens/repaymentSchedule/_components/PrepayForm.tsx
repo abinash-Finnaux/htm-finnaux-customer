@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { Controller, useWatch, type Control } from 'react-hook-form';
 import { useTheme } from '../../../context/ThemeContext';
+import FormPaymentModeSelect from '../../../components/forms/FormPaymentModeSelect';
+import PrimaryButton from '../../../components/buttons/PrimaryButton';
 
 type PayForm = {
   payAmount: string;
@@ -172,55 +174,22 @@ export default function PrepayForm({
       </View>
 
       <View style={themed.section}>
-        <Text style={themed.sectionTitle}>Payment Method</Text>
-        <Controller
+        <FormPaymentModeSelect
           control={control}
           name="prepayMode"
-          render={({ field: { onChange, value } }) => (
-            <View style={themed.modeGrid}>
-              {PAYMENT_MODES.map(mode => {
-                const selected = value === mode.id;
-                return (
-                  <Pressable
-                    key={mode.id}
-                    onPress={() => onChange(mode.id)}
-                    style={({ pressed }) => [
-                      themed.modeCard,
-                      selected && themed.modeCardSelected,
-                      { opacity: pressed ? 0.85 : 1 },
-                    ]}
-                  >
-                    <Text style={themed.modeCardIcon}>{mode.icon}</Text>
-                    <Text
-                      style={[
-                        themed.modeCardLabel,
-                        selected && themed.modeCardLabelSelected,
-                      ]}
-                    >
-                      {mode.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
+          label="Payment Method"
+          options={PAYMENT_MODES}
         />
       </View>
 
-      <Pressable
+      <PrimaryButton
+        title={
+          prepayType === 'foreclose' ? 'Foreclose Loan' : 'Submit Prepayment'
+        }
+        suffix="→"
         onPress={onSubmit}
-        style={({ pressed }) => [
-          themed.payBtn,
-          { opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <Text style={themed.payBtnText}>
-          {prepayType === 'foreclose'
-            ? 'Foreclose Loan'
-            : 'Submit Prepayment'}
-        </Text>
-        <Text style={themed.payBtnArrow}>→</Text>
-      </Pressable>
+        style={{ margin: 18 }}
+      />
     </View>
   );
 }
@@ -406,35 +375,6 @@ function createStyles(
       padding: 0,
       color: colors.text,
     },
-    modeGrid: {
-      flexDirection: 'row',
-      gap: 10,
-    },
-    modeCard: {
-      flex: 1,
-      borderWidth: 1,
-      paddingVertical: 14,
-      alignItems: 'center',
-      gap: 6,
-      borderRadius: radius.md,
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-    },
-    modeCardSelected: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    },
-    modeCardIcon: {
-      fontSize: 22,
-    },
-    modeCardLabel: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    modeCardLabelSelected: {
-      color: '#FFFFFF',
-    },
     payBtn: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -444,16 +384,6 @@ function createStyles(
       gap: 8,
       backgroundColor: colors.primary,
       borderRadius: radius.md,
-    },
-    payBtnText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-      fontWeight: '700',
-    },
-    payBtnArrow: {
-      color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '600',
     },
   });
 }

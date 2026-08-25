@@ -5,9 +5,11 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
-import { Controller, useWatch, type Control } from 'react-hook-form';
+import { useWatch, type Control } from 'react-hook-form';
 import { useTheme } from '../../../context/ThemeContext';
-import GlobalInputText from '../../../components/inputTexts/GlobalInputText';
+import FormTextInput from '../../../components/forms/FormTextInput';
+import FormPaymentModeSelect from '../../../components/forms/FormPaymentModeSelect';
+import PrimaryButton from '../../../components/buttons/PrimaryButton';
 
 type ScheduleItem = {
   month: number;
@@ -117,71 +119,31 @@ export default function PayEmiForm({
       </View>
 
       <View style={themed.section}>
-        <Controller
+        <FormTextInput
           control={control}
           name="payAmount"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <GlobalInputText
-              label="Amount"
-              placeholder="0"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              keyboardType="number-pad"
-            />
-          )}
+          label="Amount"
+          placeholder="0"
+          keyboardType="number-pad"
+          backgroundColor={colors.surface}
         />
       </View>
 
       <View style={themed.section}>
-        <Text style={themed.sectionTitle}>Payment Method</Text>
-        <Controller
+        <FormPaymentModeSelect
           control={control}
           name="payMode"
-          render={({ field: { onChange, value } }) => (
-            <View style={themed.modeGrid}>
-              {PAYMENT_MODES.map(mode => {
-                const selected = value === mode.id;
-                return (
-                  <Pressable
-                    key={mode.id}
-                    onPress={() => onChange(mode.id)}
-                    style={({ pressed }) => [
-                      themed.modeCard,
-                      selected && themed.modeCardSelected,
-                      { opacity: pressed ? 0.85 : 1 },
-                    ]}
-                  >
-                    <Text style={themed.modeCardIcon}>{mode.icon}</Text>
-                    <Text
-                      style={[
-                        themed.modeCardLabel,
-                        selected && themed.modeCardLabelSelected,
-                      ]}
-                    >
-                      {mode.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
+          label="Payment Method"
+          options={PAYMENT_MODES}
         />
       </View>
 
-      <Pressable
+      <PrimaryButton
+        title={`Pay ₹${payAmount ? Number(payAmount).toLocaleString('en-IN') : '0'}`}
+        suffix="→"
         onPress={onSubmit}
-        style={({ pressed }) => [
-          themed.payBtn,
-          { opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <Text style={themed.payBtnText}>
-          Pay ₹
-          {payAmount ? Number(payAmount).toLocaleString('en-IN') : '0'}
-        </Text>
-        <Text style={themed.payBtnArrow}>→</Text>
-      </Pressable>
+        style={{ margin: 18 }}
+      />
     </View>
   );
 }
@@ -300,35 +262,6 @@ function createStyles(
     emiCardDateSelected: {
       color: 'rgba(255,255,255,0.6)',
     },
-    modeGrid: {
-      flexDirection: 'row',
-      gap: 10,
-    },
-    modeCard: {
-      flex: 1,
-      borderWidth: 1,
-      paddingVertical: 14,
-      alignItems: 'center',
-      gap: 6,
-      borderRadius: radius.md,
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-    },
-    modeCardSelected: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    },
-    modeCardIcon: {
-      fontSize: 22,
-    },
-    modeCardLabel: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    modeCardLabelSelected: {
-      color: '#FFFFFF',
-    },
     payBtn: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -338,16 +271,6 @@ function createStyles(
       gap: 8,
       backgroundColor: colors.primary,
       borderRadius: radius.md,
-    },
-    payBtnText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-      fontWeight: '700',
-    },
-    payBtnArrow: {
-      color: '#FFFFFF',
-      fontSize: 18,
-      fontWeight: '600',
     },
   });
 }

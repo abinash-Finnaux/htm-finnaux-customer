@@ -11,6 +11,7 @@ import { useTheme } from '../../context/ThemeContext';
 type Props = TextInputProps & {
   label: string;
   error?: string;
+  backgroundColor?: string;
 };
 
 export default function GlobalInputText({
@@ -18,6 +19,7 @@ export default function GlobalInputText({
   error,
   style,
   multiline,
+  backgroundColor,
   ...rest
 }: Props) {
   const { theme } = useTheme();
@@ -32,7 +34,7 @@ export default function GlobalInputText({
         style={[
           styles.input,
           {
-            backgroundColor: colors.surfaceElevated,
+            backgroundColor: backgroundColor ?? colors.surfaceElevated,
             borderColor: error ? colors.error : colors.border,
             color: colors.text,
             borderRadius: radius.md,
