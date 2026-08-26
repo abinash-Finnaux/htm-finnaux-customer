@@ -7,10 +7,9 @@ import type { RootStackParamList } from '../../../App';
 
 import DownloadButton from '../../components/buttons/DownloadButton';
 import { createStyles } from './styles';
-import TransactionRow, {
-  type SoaEntry,
-} from './_component/TransactionRow';
+import TransactionRow, { type SoaEntry } from './_component/TransactionRow';
 import PeriodChip from './_component/PeriodChip';
+import { generateSoaPdf } from '../../utils/generatePdf';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SOA'>;
 
@@ -48,41 +47,265 @@ const PERIODS: { key: PeriodKey; label: string; months?: number }[] = [
 ];
 
 const PERSONAL_LOAN_ENTRIES: SoaRecord[] = [
-  { daysAgo: 420, date: '', particulars: 'Loan Disbursement', type: 'debit', amount: 450000, balance: 450000 },
-  { daysAgo: 400, date: '', particulars: 'Processing Fee', type: 'debit', amount: 6750, balance: 456750 },
-  { daysAgo: 380, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 442550 },
-  { daysAgo: 350, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 428350 },
-  { daysAgo: 320, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 414150 },
-  { daysAgo: 290, date: '', particulars: 'Late Payment Charges', type: 'debit', amount: 590, balance: 414740 },
-  { daysAgo: 260, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 400540 },
-  { daysAgo: 230, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 386340 },
-  { daysAgo: 200, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 372140 },
-  { daysAgo: 170, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 357940 },
-  { daysAgo: 140, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 343740 },
-  { daysAgo: 110, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 329540 },
-  { daysAgo: 80, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 315340 },
-  { daysAgo: 50, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 301140 },
-  { daysAgo: 20, date: '', particulars: 'EMI Received', type: 'credit', amount: 14200, balance: 286940 },
+  {
+    daysAgo: 420,
+    date: '',
+    particulars: 'Loan Disbursement',
+    type: 'debit',
+    amount: 450000,
+    balance: 450000,
+  },
+  {
+    daysAgo: 400,
+    date: '',
+    particulars: 'Processing Fee',
+    type: 'debit',
+    amount: 6750,
+    balance: 456750,
+  },
+  {
+    daysAgo: 380,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 442550,
+  },
+  {
+    daysAgo: 350,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 428350,
+  },
+  {
+    daysAgo: 320,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 414150,
+  },
+  {
+    daysAgo: 290,
+    date: '',
+    particulars: 'Late Payment Charges',
+    type: 'debit',
+    amount: 590,
+    balance: 414740,
+  },
+  {
+    daysAgo: 260,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 400540,
+  },
+  {
+    daysAgo: 230,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 386340,
+  },
+  {
+    daysAgo: 200,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 372140,
+  },
+  {
+    daysAgo: 170,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 357940,
+  },
+  {
+    daysAgo: 140,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 343740,
+  },
+  {
+    daysAgo: 110,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 329540,
+  },
+  {
+    daysAgo: 80,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 315340,
+  },
+  {
+    daysAgo: 50,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 301140,
+  },
+  {
+    daysAgo: 20,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 14200,
+    balance: 286940,
+  },
 ];
 
 const HOME_LOAN_ENTRIES: SoaRecord[] = [
-  { daysAgo: 500, date: '', particulars: 'Loan Disbursement', type: 'debit', amount: 3000000, balance: 3000000 },
-  { daysAgo: 460, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2973500 },
-  { daysAgo: 430, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2947000 },
-  { daysAgo: 400, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2920500 },
-  { daysAgo: 370, date: '', particulars: 'Interest Reversal', type: 'credit', amount: 1250, balance: 2919250 },
-  { daysAgo: 340, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2892750 },
-  { daysAgo: 310, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2866000 },
-  { daysAgo: 280, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2839250 },
-  { daysAgo: 250, date: '', particulars: 'Cheque Bounce Charges', type: 'debit', amount: 590, balance: 2839840 },
-  { daysAgo: 220, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2813340 },
-  { daysAgo: 190, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2786840 },
-  { daysAgo: 160, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2760340 },
-  { daysAgo: 130, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2733840 },
-  { daysAgo: 100, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2707340 },
-  { daysAgo: 70, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2680840 },
-  { daysAgo: 40, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2654340 },
-  { daysAgo: 10, date: '', particulars: 'EMI Received', type: 'credit', amount: 26500, balance: 2627840 },
+  {
+    daysAgo: 500,
+    date: '',
+    particulars: 'Loan Disbursement',
+    type: 'debit',
+    amount: 3000000,
+    balance: 3000000,
+  },
+  {
+    daysAgo: 460,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2973500,
+  },
+  {
+    daysAgo: 430,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2947000,
+  },
+  {
+    daysAgo: 400,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2920500,
+  },
+  {
+    daysAgo: 370,
+    date: '',
+    particulars: 'Interest Reversal',
+    type: 'credit',
+    amount: 1250,
+    balance: 2919250,
+  },
+  {
+    daysAgo: 340,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2892750,
+  },
+  {
+    daysAgo: 310,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2866000,
+  },
+  {
+    daysAgo: 280,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2839250,
+  },
+  {
+    daysAgo: 250,
+    date: '',
+    particulars: 'Cheque Bounce Charges',
+    type: 'debit',
+    amount: 590,
+    balance: 2839840,
+  },
+  {
+    daysAgo: 220,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2813340,
+  },
+  {
+    daysAgo: 190,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2786840,
+  },
+  {
+    daysAgo: 160,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2760340,
+  },
+  {
+    daysAgo: 130,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2733840,
+  },
+  {
+    daysAgo: 100,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2707340,
+  },
+  {
+    daysAgo: 70,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2680840,
+  },
+  {
+    daysAgo: 40,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2654340,
+  },
+  {
+    daysAgo: 10,
+    date: '',
+    particulars: 'EMI Received',
+    type: 'credit',
+    amount: 26500,
+    balance: 2627840,
+  },
 ];
 
 const ENTRIES_BY_LOAN: Record<string, SoaRecord[]> = {
@@ -168,7 +391,7 @@ export default function SOAScreen({ navigation }: Props) {
   const activePeriodLabel =
     PERIODS.find(item => item.key === period)?.label ?? 'All';
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     Alert.alert(
       'Download Statement',
       `Statement of account for ${loan.type} (${loan.id}) — ${activePeriodLabel} will be downloaded as PDF.`,
@@ -176,11 +399,21 @@ export default function SOAScreen({ navigation }: Props) {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Download',
-          onPress: () =>
-            Alert.alert(
-              'Statement Ready',
-              `SOA generated successfully with ${filteredEntries.length} transactions.`,
-            ),
+          onPress: async () => {
+            await generateSoaPdf({
+              loanType: loan.type,
+              loanId: loan.id,
+              period: activePeriodLabel,
+              entries: filteredEntries.map(e => ({
+                date: e.date,
+                particulars: e.particulars,
+                type: e.type,
+                amount: e.amount,
+                balance: e.balance,
+              })),
+              summary,
+            });
+          },
         },
       ],
     );

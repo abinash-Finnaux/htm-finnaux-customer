@@ -8,6 +8,7 @@ import type { RootStackParamList } from '../../../App';
 import DownloadButton from '../../components/buttons/DownloadButton';
 import { createStyles } from './styles';
 import LoanCard from './_components/LoanCard';
+import { generateCloserPdf } from '../../utils/generatePdf';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CloserStatement'>;
 
@@ -97,7 +98,7 @@ export default function CloserStatementScreen({ navigation }: Props) {
   const foreclosureFee = Math.round(loan.outstanding * FORECLOSURE_RATE);
   const totalClosure = loan.outstanding + loan.accruedInterest + foreclosureFee;
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     Alert.alert(
       'Download Statement',
       `Closure statement for ${loan.type} (${loan.id}) will be downloaded as PDF.`,
@@ -105,11 +106,20 @@ export default function CloserStatementScreen({ navigation }: Props) {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Download',
-          onPress: () =>
-            Alert.alert(
-              'Statement Ready',
-              `Closer statement generated successfully. Valid till ${getValidTillDate()}.`,
-            ),
+          onPress: async () => {
+            await generateCloserPdf({
+              loanType: loan.type,
+              loanId: loan.id,
+              outstanding: loan.outstanding,
+              interestRate: loan.interestRate,
+              accruedInterest: loan.accruedInterest,
+              foreclosureRate: FORECLOSURE_RATE * 100,
+              foreclosureFee,
+              totalClosure,
+              validTill: getValidTillDate(),
+              asOfDate: getAsOfDate(),
+            });
+          },
         },
       ],
     );
