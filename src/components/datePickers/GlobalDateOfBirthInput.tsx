@@ -54,7 +54,7 @@ export default function GlobalDateOfBirthInput({
         style={[
           styles.input,
           {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.surfaceElevated,
             borderColor: error ? colors.error : colors.border,
             borderRadius: radius.md,
             marginTop: spacing.sm,

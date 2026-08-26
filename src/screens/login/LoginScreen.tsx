@@ -69,6 +69,7 @@ export default function LoginScreen({ navigation }: Props) {
                 label="Customer ID"
                 placeholder="Enter your customer ID"
                 rules={{ required: 'Customer ID is required' }}
+                backgroundColor={colors.surface}
               />
 
               <FormPasswordInput

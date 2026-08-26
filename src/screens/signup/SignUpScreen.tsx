@@ -893,13 +893,8 @@ export default function SignUpScreen({ navigation }: Props) {
               disabled={!canProceed()}
               style={({ pressed }) => [
                 themed.nextBtn,
-                {
-                  backgroundColor: canProceed()
-                    ? pressed
-                      ? colors.primaryDark
-                      : headerBg
-                    : colors.border,
-                },
+                canProceed() ? themed.nextBtnEnabled : themed.nextBtnDisabled,
+                { opacity: pressed ? 0.9 : 1 },
               ]}
             >
               <Text
@@ -917,13 +912,10 @@ export default function SignUpScreen({ navigation }: Props) {
               disabled={!canProceed()}
               style={({ pressed }) => [
                 themed.nextBtn,
-                {
-                  backgroundColor: canProceed()
-                    ? pressed
-                      ? '#16A34A'
-                      : '#22C55E'
-                    : colors.border,
-                },
+                canProceed()
+                  ? { backgroundColor: '#22C55E' }
+                  : themed.nextBtnDisabled,
+                { opacity: pressed ? 0.9 : 1 },
               ]}
             >
               <Text

@@ -169,13 +169,19 @@ export function createStyles(
       paddingHorizontal: 24,
       paddingVertical: 16,
       borderTopWidth: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       borderTopColor: colors.border,
     },
     nextBtn: {
       alignItems: 'center',
       paddingVertical: 16,
       borderRadius: radius.pill,
+    },
+    nextBtnEnabled: {
+      backgroundColor: colors.primary,
+    },
+    nextBtnDisabled: {
+      backgroundColor: colors.border,
     },
     nextBtnText: {
       fontSize: 16,
