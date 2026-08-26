@@ -7,15 +7,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
-import { useForm } from 'react-hook-form';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useTheme } from '../../context/ThemeContext';
-import type { RootStackParamList } from '../../../App';
 import { createStyles } from './styles';
+import { useForm } from 'react-hook-form';
+import { useTheme } from '../../context/ThemeContext';
+import type { ApplyLoanForm } from './types';
+import type { RootStackParamList } from '../../../App';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import LoanTypeStep from './_components/LoanTypeStep';
 import LoanAmountStep from './_components/LoanAmountStep';
 import EmploymentStep from './_components/EmploymentStep';
-import type { ApplyLoanForm } from './types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ApplyLoan'>;
 

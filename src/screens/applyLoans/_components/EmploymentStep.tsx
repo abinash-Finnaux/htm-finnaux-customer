@@ -44,6 +44,7 @@ export default function EmploymentStep({
         label="Monthly Income *"
         placeholder="Enter your monthly income"
         rules={{ required: 'Monthly income is required' }}
+        keyboardType="numeric"
       />
 
       <FormSelectOption

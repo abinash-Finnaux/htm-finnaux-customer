@@ -15,9 +15,8 @@ export default function GlobalChipSelect({
   onChange,
   suffix,
 }: Props) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const { colors } = theme;
-  const selectedBg = isDark ? '#1E293B' : colors.primary;
 
   return (
     <View style={styles.row}>
@@ -30,21 +29,16 @@ export default function GlobalChipSelect({
             style={({ pressed }) => [
               styles.chip,
               {
-                backgroundColor: selected ? selectedBg : colors.surfaceElevated,
-                borderColor: selected ? selectedBg : colors.border,
+                backgroundColor: selected ? colors.primary + '12' : colors.surfaceElevated,
+                borderColor: selected ? colors.primary : colors.border,
                 opacity: pressed ? 0.85 : 1,
               },
             ]}
           >
-            {selected && (
-              <View style={styles.tick}>
-                <Text style={styles.tickText}>✓</Text>
-              </View>
-            )}
             <Text
               style={[
                 styles.chipValue,
-                { color: selected ? '#FFFFFF' : colors.text },
+                { color: selected ? colors.primary : colors.text },
               ]}
             >
               {opt}
@@ -55,7 +49,7 @@ export default function GlobalChipSelect({
                   styles.chipSuffix,
                   {
                     color: selected
-                      ? 'rgba(255,255,255,0.7)'
+                      ? colors.primary
                       : colors.textSecondary,
                   },
                 ]}
@@ -94,22 +88,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '500',
     marginTop: 2,
-  },
-  tick: {
-    position: 'absolute',
-    top: 3,
-    right: 3,
-    width: 14,
-    height: 14,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    zIndex: 1,
-  },
-  tickText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#1E293B',
   },
 });

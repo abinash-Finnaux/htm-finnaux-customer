@@ -135,12 +135,12 @@ export function createStyles(
       borderRadius: radius.lg,
     },
     loanCardSelected: {
-      backgroundColor: headerBg,
-      borderColor: colors.border,
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     loanCardUnselected: {
       backgroundColor: colors.surfaceElevated,
-      borderColor: headerBg,
+      borderColor: colors.border,
     },
     loanCardPressed: {
       backgroundColor: headerBgLight,
@@ -181,7 +181,7 @@ export function createStyles(
     cardTickText: {
       fontSize: 9,
       fontWeight: '800',
-      color: '#1E293B',
+      color: colors.primary,
     },
     inputCard: {
       flexDirection: 'row',
@@ -221,7 +221,7 @@ export function createStyles(
     chipTickTextSmall: {
       fontSize: 9,
       fontWeight: '800',
-      color: '#1E293B',
+      color: colors.primary,
     },
     employmentRow: {
       flexDirection: 'row',
@@ -236,8 +236,8 @@ export function createStyles(
       borderRadius: radius.md,
     },
     employmentChipSelected: {
-      backgroundColor: headerBg,
-      borderColor: headerBg,
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     employmentChipUnselected: {
       backgroundColor: colors.surfaceElevated,
@@ -290,8 +290,8 @@ export function createStyles(
       paddingHorizontal: 24,
       paddingVertical: 16,
       borderTopWidth: 1,
-      backgroundColor: colors.background,
       borderTopColor: colors.border,
+      backgroundColor: colors.surface,
     },
     nextBtn: {
       alignItems: 'center',
@@ -299,7 +299,7 @@ export function createStyles(
       borderRadius: radius.pill,
     },
     nextBtnEnabled: {
-      backgroundColor: headerBg,
+      backgroundColor: colors.primary,
     },
     nextBtnDisabled: {
       backgroundColor: colors.border,

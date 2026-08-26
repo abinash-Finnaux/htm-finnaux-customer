@@ -13,9 +13,8 @@ export default function GlobalSelectOption({
   value,
   onChange,
 }: Props) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const { colors } = theme;
-  const selectedBg = isDark ? '#1E293B' : colors.primary;
 
   return (
     <View style={styles.row}>
@@ -28,21 +27,16 @@ export default function GlobalSelectOption({
             style={({ pressed }) => [
               styles.chip,
               {
-                backgroundColor: selected ? selectedBg : colors.surface,
-                borderColor: selected ? selectedBg : colors.border,
+                backgroundColor: selected ? colors.primary + '12' : colors.surfaceElevated,
+                borderColor: selected ? colors.primary : colors.border,
                 opacity: pressed ? 0.8 : 1,
               },
             ]}
           >
-            {selected && (
-              <View style={styles.tick}>
-                <Text style={[styles.tickText, { color: selectedBg }]}>✓</Text>
-              </View>
-            )}
             <Text
               style={[
                 styles.chipText,
-                { color: selected ? '#FFFFFF' : colors.text },
+                { color: selected ? colors.primary : colors.text },
               ]}
             >
               {opt}
@@ -71,21 +65,5 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 13,
     fontWeight: '600',
-  },
-  tick: {
-    position: 'absolute',
-    top: 3,
-    right: 3,
-    width: 12,
-    height: 12,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    zIndex: 1,
-  },
-  tickText: {
-    fontSize: 9,
-    fontWeight: '800',
   },
 });

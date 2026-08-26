@@ -37,11 +37,11 @@ export default function LoanTypeSelector({ value, onChange, themed }: Props) {
                 : themed.loanCardUnselected,
             ]}
           >
-            {selected && (
+            {/* {selected && (
               <View style={themed.cardTick}>
                 <Text style={themed.cardTickText}>✓</Text>
               </View>
-            )}
+            )} */}
             <View
               style={[
                 themed.loanIconWrap,
