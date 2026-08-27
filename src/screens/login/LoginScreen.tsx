@@ -6,9 +6,11 @@ import {
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { RootStackParamList } from '../../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -18,6 +20,8 @@ import LogoHeader from './_components/LogoHeader';
 import AuthFooter from './_components/AuthFooter';
 import FormTextInput from '../../components/forms/FormTextInput';
 import FormPasswordInput from '../../components/forms/FormPasswordInput';
+import { apiService } from '../../api';
+import { API_ENDPOINTS } from '../../api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -26,19 +30,50 @@ type LoginForm = {
   password: string;
 };
 
+type LoginResponse = {
+  token: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+};
+
 export default function LoginScreen({ navigation }: Props) {
   const { theme } = useTheme();
   const { colors, spacing, radius } = theme;
 
-  const { control, handleSubmit } = useForm<LoginForm>({
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<LoginForm>({
     defaultValues: {
       customerId: '',
       password: '',
     },
   });
 
-  const onSubmit = (data: LoginForm) => {
-    console.log('Login:', data);
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      const response = await apiService.post<LoginResponse>(
+        API_ENDPOINTS.AUTH.LOGIN,
+        {
+          customerId: data.customerId,
+          password: data.password,
+        },
+      );
+
+      await AsyncStorage.setItem('@finnaux_token', response.data.token);
+      await AsyncStorage.setItem('@finnaux_refresh_token', response.data.refreshToken);
+
+      navigation.replace('Home');
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || 'Login failed. Please try again.';
+      Alert.alert('Login Failed', message);
+    }
   };
 
   const themed = createStyles(colors, spacing, radius);
@@ -87,6 +122,8 @@ export default function LoginScreen({ navigation }: Props) {
               <PrimaryButton
                 title="Sign In"
                 onPress={handleSubmit(onSubmit)}
+                loading={isSubmitting}
+                disabled={isSubmitting}
                 style={themed.submitButton}
               />
             </View>
