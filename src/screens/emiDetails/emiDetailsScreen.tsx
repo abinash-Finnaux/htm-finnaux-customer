@@ -1,8 +1,9 @@
 import React from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '../../context/ThemeContext';
+import { toast } from '../../components/toast/ToastProvider';
 import type { RootStackParamList } from '../../../App';
 
 import { createStyles } from './styles';
@@ -73,17 +74,11 @@ export default function EmiDetailsScreen({ navigation }: Props) {
   const interestShare = 100 - principalShare;
 
   const handlePayNow = () => {
-    Alert.alert(
-      'Pay EMI',
-      `Pay ${formatINR(NEXT_EMI.amount)} for EMI #${NEXT_EMI.number} due ${NEXT_EMI.dueDate}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Proceed',
-          onPress: () => navigation.navigate('RepaymentSchedule'),
-        },
-      ],
+    toast.show(
+      `Redirecting to payment for EMI #${NEXT_EMI.number} due ${NEXT_EMI.dueDate}.`,
+      'info',
     );
+    navigation.navigate('RepaymentSchedule');
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '../../context/ThemeContext';
@@ -99,30 +99,18 @@ export default function CloserStatementScreen({ navigation }: Props) {
   const totalClosure = loan.outstanding + loan.accruedInterest + foreclosureFee;
 
   const handleDownload = async () => {
-    Alert.alert(
-      'Download Statement',
-      `Closure statement for ${loan.type} (${loan.id}) will be downloaded as PDF.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Download',
-          onPress: async () => {
-            await generateCloserPdf({
-              loanType: loan.type,
-              loanId: loan.id,
-              outstanding: loan.outstanding,
-              interestRate: loan.interestRate,
-              accruedInterest: loan.accruedInterest,
-              foreclosureRate: FORECLOSURE_RATE * 100,
-              foreclosureFee,
-              totalClosure,
-              validTill: getValidTillDate(),
-              asOfDate: getAsOfDate(),
-            });
-          },
-        },
-      ],
-    );
+    await generateCloserPdf({
+      loanType: loan.type,
+      loanId: loan.id,
+      outstanding: loan.outstanding,
+      interestRate: loan.interestRate,
+      accruedInterest: loan.accruedInterest,
+      foreclosureRate: FORECLOSURE_RATE * 100,
+      foreclosureFee,
+      totalClosure,
+      validTill: getValidTillDate(),
+      asOfDate: getAsOfDate(),
+    });
   };
 
   return (

@@ -7,7 +7,6 @@ import React, {
 import {
   Text,
   View,
-  Alert,
   Platform,
   Pressable,
   StyleSheet,
@@ -16,6 +15,7 @@ import {
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
+import { toast } from '../../components/toast/ToastProvider';
 
 import { scheduleIdleTask } from '../../utils/scheduleIdleTask';
 
@@ -158,12 +158,6 @@ const STATUS_COLORS = {
 
 const SCHEDULE_BATCH_SIZE = 4;
 
-const PAYMENT_MODES = [
-  { id: 'upi', label: 'UPI' },
-  { id: 'netbanking', label: 'Net Banking' },
-  { id: 'card', label: 'Card' },
-];
-
 export default function RepaymentScheduleScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
   const { colors, spacing } = theme;
@@ -234,32 +228,27 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
 
   const handlePaySubmit = () => {
     const { payAmount: pAmount, payMode: pMode } = getValues();
-    if (!selectedMonth)
-      return Alert.alert('Select EMI', 'Please select an EMI month to pay.');
-    if (!pAmount.trim())
-      return Alert.alert('Amount', 'Please enter the payment amount.');
-    if (!pMode)
-      return Alert.alert('Payment Mode', 'Please select a payment mode.');
-    Alert.alert(
-      'Confirm Payment',
-      `Pay ₹${Number(pAmount).toLocaleString('en-IN')} for EMI #${selectedMonth} via ${
-        PAYMENT_MODES.find(m => m.id === pMode)?.label
-      }?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Pay',
-          onPress: () => {
-            Alert.alert('Success', 'Payment initiated successfully.', [
-              { text: 'OK' },
-            ]);
-            setSelectedMonth(null);
-            setValue('payAmount', '');
-            setValue('payMode', '');
-          },
-        },
-      ],
+    if (!selectedMonth) {
+      toast.show('Please select an EMI month to pay.', 'error');
+      return;
+    }
+    if (!pAmount.trim()) {
+      toast.show('Please enter the payment amount.', 'error');
+      return;
+    }
+    if (!pMode) {
+      toast.show('Please select a payment mode.', 'error');
+      return;
+    }
+    toast.show(
+      `Payment of ₹${Number(pAmount).toLocaleString(
+        'en-IN',
+      )} for EMI #${selectedMonth} initiated successfully.`,
+      'success',
     );
+    setSelectedMonth(null);
+    setValue('payAmount', '');
+    setValue('payMode', '');
   };
 
   const handlePrepaySubmit = () => {
@@ -268,30 +257,21 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
       prepayMode: pMode,
       prepayType: pType,
     } = getValues();
-    if (!pAmount.trim())
-      return Alert.alert('Amount', 'Please enter the amount.');
-    if (!pMode)
-      return Alert.alert('Payment Mode', 'Please select a payment mode.');
+    if (!pAmount.trim()) {
+      toast.show('Please enter the amount.', 'error');
+      return;
+    }
+    if (!pMode) {
+      toast.show('Please select a payment mode.', 'error');
+      return;
+    }
     const label = pType === 'foreclose' ? 'foreclose' : 'prepay';
-    Alert.alert(
-      'Confirm',
-      `₹${Number(pAmount).toLocaleString(
-        'en-IN',
-      )} will be used to ${label} your loan. Continue?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: () => {
-            Alert.alert('Success', 'Request submitted successfully.', [
-              { text: 'OK' },
-            ]);
-            setValue('prepayAmount', '');
-            setValue('prepayMode', '');
-          },
-        },
-      ],
+    toast.show(
+      `₹${Number(pAmount).toLocaleString('en-IN')} ${label} request submitted successfully.`,
+      'success',
     );
+    setValue('prepayAmount', '');
+    setValue('prepayMode', '');
   };
 
   const scheduleList = useMemo(

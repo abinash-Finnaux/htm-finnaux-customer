@@ -14,6 +14,7 @@ type Props<T extends FieldValues> = {
   label: string;
   placeholder?: string;
   rules?: RegisterOptions<T>;
+  autoFocus?: boolean;
 };
 
 export default function FormPasswordInput<T extends FieldValues>({
@@ -22,6 +23,7 @@ export default function FormPasswordInput<T extends FieldValues>({
   label,
   placeholder,
   rules,
+  autoFocus,
 }: Props<T>) {
   return (
     <Controller
@@ -39,6 +41,7 @@ export default function FormPasswordInput<T extends FieldValues>({
           onChangeText={onChange}
           value={value}
           error={error?.message}
+          autoFocus={autoFocus}
         />
       )}
     />

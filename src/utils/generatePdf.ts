@@ -1,6 +1,7 @@
 import { generatePDF } from 'react-native-html-to-pdf';
-import { Platform, Alert } from 'react-native';
-import RNFetchBlob, { MediaCollection } from 'react-native-blob-util';
+import { Platform } from 'react-native';
+import RNFetchBlob from 'react-native-blob-util';
+import { toast } from '../components/toast/ToastProvider';
 
 type TransactionEntry = {
   date: string;
@@ -153,7 +154,7 @@ export async function generateSoaPdf(data: SoaPdfData): Promise<void> {
         const destPath = `${RNFetchBlob.fs.dirs.DownloadDir}/${fileName}.pdf`;
         await RNFetchBlob.fs.cp(file.filePath, destPath);
 
-        const mediaUri = await RNFetchBlob.MediaCollection.copyToMediaStore(
+        await RNFetchBlob.MediaCollection.copyToMediaStore(
           {
             name: `${fileName}.pdf`,
             parentFolder: '',
@@ -163,26 +164,17 @@ export async function generateSoaPdf(data: SoaPdfData): Promise<void> {
           destPath,
         );
 
-        Alert.alert(
-          'Download Complete',
-          `Statement saved to Downloads.\n${mediaUri}`,
-          [{ text: 'OK' }],
-        );
+        toast.show('Statement saved to Downloads.', 'success');
       } else {
-        Alert.alert(
-          'Download Complete',
+        toast.show(
           `Statement saved to:\n${file.filePath}`,
-          [{ text: 'OK' }],
+          'success',
         );
       }
     }
   } catch (error) {
     console.error('PDF generation error:', error);
-    Alert.alert(
-      'Download Failed',
-      'Unable to generate PDF. Please try again.',
-      [{ text: 'OK' }],
-    );
+    toast.show('Unable to generate PDF. Please try again.', 'error');
   }
 }
 
@@ -300,7 +292,7 @@ export async function generateCloserPdf(data: CloserPdfData): Promise<void> {
         const destPath = `${RNFetchBlob.fs.dirs.DownloadDir}/${fileName}.pdf`;
         await RNFetchBlob.fs.cp(file.filePath, destPath);
 
-        const mediaUri = await RNFetchBlob.MediaCollection.copyToMediaStore(
+        await RNFetchBlob.MediaCollection.copyToMediaStore(
           {
             name: `${fileName}.pdf`,
             parentFolder: '',
@@ -310,25 +302,16 @@ export async function generateCloserPdf(data: CloserPdfData): Promise<void> {
           destPath,
         );
 
-        Alert.alert(
-          'Download Complete',
-          `Closure statement saved to Downloads.\n${mediaUri}`,
-          [{ text: 'OK' }],
-        );
+        toast.show('Closure statement saved to Downloads.', 'success');
       } else {
-        Alert.alert(
-          'Download Complete',
+        toast.show(
           `Statement saved to:\n${file.filePath}`,
-          [{ text: 'OK' }],
+          'success',
         );
       }
     }
   } catch (error) {
     console.error('PDF generation error:', error);
-    Alert.alert(
-      'Download Failed',
-      'Unable to generate PDF. Please try again.',
-      [{ text: 'OK' }],
-    );
+    toast.show('Unable to generate PDF. Please try again.', 'error');
   }
 }

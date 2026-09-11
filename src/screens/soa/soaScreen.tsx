@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '../../context/ThemeContext';
@@ -392,31 +392,19 @@ export default function SOAScreen({ navigation }: Props) {
     PERIODS.find(item => item.key === period)?.label ?? 'All';
 
   const handleDownload = async () => {
-    Alert.alert(
-      'Download Statement',
-      `Statement of account for ${loan.type} (${loan.id}) — ${activePeriodLabel} will be downloaded as PDF.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Download',
-          onPress: async () => {
-            await generateSoaPdf({
-              loanType: loan.type,
-              loanId: loan.id,
-              period: activePeriodLabel,
-              entries: filteredEntries.map(e => ({
-                date: e.date,
-                particulars: e.particulars,
-                type: e.type,
-                amount: e.amount,
-                balance: e.balance,
-              })),
-              summary,
-            });
-          },
-        },
-      ],
-    );
+    await generateSoaPdf({
+      loanType: loan.type,
+      loanId: loan.id,
+      period: activePeriodLabel,
+      entries: filteredEntries.map(e => ({
+        date: e.date,
+        particulars: e.particulars,
+        type: e.type,
+        amount: e.amount,
+        balance: e.balance,
+      })),
+      summary,
+    });
   };
 
   return (

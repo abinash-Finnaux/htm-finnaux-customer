@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '../../context/ThemeContext';
+import { toast } from '../../components/toast/ToastProvider';
 import type { RootStackParamList } from '../../../App';
 
 import GlobalInputText from '../../components/inputTexts/GlobalInputText';
@@ -118,29 +119,9 @@ export default function EmiDepositScreen({ navigation }: Props) {
       return;
     }
 
-    Alert.alert(
-      'Confirm Payment',
-      `Pay ${formatINR(amount)} for ${loan.type} (${loan.id}) via ${
-        PAYMENT_MODES.find(m => m.id === mode)?.label
-      }?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Pay Now',
-          onPress: () =>
-            Alert.alert(
-              'Payment Successful',
-              `${formatINR(amount)} paid towards ${loan.type}.`,
-              [
-                {
-                  text: 'View History',
-                  onPress: () => navigation.navigate('PaymentHistory'),
-                },
-                { text: 'Done', style: 'default' },
-              ],
-            ),
-        },
-      ],
+    toast.show(
+      `${formatINR(amount)} paid towards ${loan.type}.`,
+      'success',
     );
   };
 

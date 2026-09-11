@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
+import { useUser, getInitials } from '../../../context/UserContext';
 
 import { SLIDE_WIDTH, createDrawerStyles } from './../styles';
 import DrawerMenuList, { type DrawerRoute } from './DrawerMenuList';
@@ -27,6 +28,7 @@ export default function ProfileDrawerModal({
 }: Props) {
   const { theme, isDark } = useTheme();
   const { colors } = theme;
+  const { user } = useUser();
 
   const slideAnim = useRef(new Animated.Value(-SLIDE_WIDTH)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
@@ -98,11 +100,19 @@ export default function ProfileDrawerModal({
         >
           <View style={themed.header}>
             <View style={themed.avatar}>
-              <Text style={themed.avatarText}>JD</Text>
+              <Text style={themed.avatarText}>
+                {getInitials(user?.Customer_Name)}
+              </Text>
             </View>
-            <Text style={themed.name}>John Doe</Text>
-            <Text style={themed.email}>john.doe@email.com</Text>
-            <Text style={themed.phone}>+91 98765 43210</Text>
+            <Text style={themed.name}>
+              {user?.Customer_Name || 'Customer'}
+            </Text>
+            {!!user?.Customer_Email && (
+              <Text style={themed.email}>{user.Customer_Email}</Text>
+            )}
+            {!!user?.Customer_PhoneNo && (
+              <Text style={themed.phone}>{user.Customer_PhoneNo}</Text>
+            )}
           </View>
 
           <View style={themed.body}>

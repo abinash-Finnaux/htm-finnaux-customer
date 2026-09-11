@@ -1,6 +1,8 @@
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/auth/login',
+    VERIFY_USER: '/CustomerLogin/ValidateCustomerCIF',
+    LOGIN: '/CustomerLogin/GetCustomerLogin',
+
     SIGNUP: '/auth/signup',
     LOGOUT: '/auth/logout',
     FORGOT_PASSWORD: '/auth/forgot-password',

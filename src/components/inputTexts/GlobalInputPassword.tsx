@@ -46,7 +46,7 @@ export default function GlobalInputPassword({
           style={[styles.input, { color: colors.text }]}
           placeholderTextColor={colors.textSecondary}
           secureTextEntry={!showPassword}
-          autoCapitalize="none"
+          autoCapitalize="sentences"
           autoCorrect={false}
           {...rest}
         />

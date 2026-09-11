@@ -27,6 +27,7 @@ type Props<T extends FieldValues> = {
   | 'multiline'
   | 'textAlignVertical'
   | 'numberOfLines'
+  | 'editable'
 >;
 
 export default function FormTextInput<T extends FieldValues>({
@@ -45,6 +46,7 @@ export default function FormTextInput<T extends FieldValues>({
   multiline,
   textAlignVertical,
   numberOfLines,
+  editable,
 }: Props<T>) {
   return (
     <Controller
@@ -71,6 +73,7 @@ export default function FormTextInput<T extends FieldValues>({
           multiline={multiline}
           textAlignVertical={textAlignVertical}
           numberOfLines={numberOfLines}
+          editable={editable}
         />
       )}
     />

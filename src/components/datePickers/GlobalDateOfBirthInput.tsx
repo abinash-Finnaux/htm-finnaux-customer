@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker, {
-  type DateTimePickerEvent,
+  type DateTimePickerChangeEvent,
 } from '@react-native-community/datetimepicker';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -33,13 +33,18 @@ export default function GlobalDateOfBirthInput({
   const { colors, spacing, radius } = theme;
   const [show, setShow] = useState(false);
 
-  const handleChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
+  const handleValueChange = (
+    _event: DateTimePickerChangeEvent,
+    date: Date,
+  ) => {
     if (Platform.OS === 'android') {
       setShow(false);
     }
-    if (selectedDate) {
-      onChange(selectedDate);
-    }
+    onChange(date);
+  };
+
+  const handleDismiss = () => {
+    setShow(false);
   };
 
   const displayValue = value ? formatDate(value) : '';
@@ -81,13 +86,11 @@ export default function GlobalDateOfBirthInput({
           value={value || new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleChange}
+          onValueChange={handleValueChange}
+          onDismiss={handleDismiss}
           maximumDate={maximumDate}
           minimumDate={minimumDate}
           themeVariant={theme.dark ? 'dark' : 'light'}
-          {...(Platform.OS === 'ios' && {
-            onDismiss: () => setShow(false),
-          })}
         />
       )}
       {Platform.OS === 'ios' && show && (

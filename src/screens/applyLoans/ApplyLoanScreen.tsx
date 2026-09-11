@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Text,
   View,
-  Alert,
   Pressable,
   ScrollView,
   KeyboardAvoidingView,
@@ -10,6 +9,7 @@ import {
 import { createStyles } from './styles';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
+import { toast } from '../../components/toast/ToastProvider';
 import type { ApplyLoanForm } from './types';
 import type { RootStackParamList } from '../../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -53,11 +53,11 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   };
 
   const handleSubmit = () => {
-    Alert.alert(
-      'Application Submitted',
+    toast.show(
       'Your loan application has been submitted successfully. Our team will contact you shortly.',
-      [{ text: 'OK', onPress: () => navigation.goBack() }],
+      'success',
     );
+    navigation.goBack();
   };
 
   const themed = createStyles(

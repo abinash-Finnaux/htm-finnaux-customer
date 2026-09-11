@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Text,
   View,
-  Alert,
   Animated,
   Pressable,
   ScrollView,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useForm, Controller } from 'react-hook-form';
+import { toast } from '../../components/toast/ToastProvider';
 
 import type { AppTheme } from '../../constants/themes';
 import type { RootStackParamList } from '../../../App';
@@ -336,7 +336,7 @@ export default function SignUpScreen({ navigation }: Props) {
     const stepErrors = getStepErrors();
     if (stepErrors.length > 0) {
       doShake();
-      Alert.alert('Missing Information', stepErrors.join('\n'));
+      toast.show(stepErrors.join('\n'), 'error');
       return;
     }
     if (step < 4) goToStep(step + 1);
@@ -350,7 +350,7 @@ export default function SignUpScreen({ navigation }: Props) {
   const handleSignUp = () => {
     if (!getValues('termsAccepted')) {
       doShake();
-      Alert.alert('Required', 'Please accept Terms & Conditions');
+      toast.show('Please accept Terms & Conditions', 'error');
       return;
     }
     handleSubmit(onSubmit)();

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Text, View, Image, Pressable, ScrollView } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { useUser, getInitials } from '../../context/UserContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../App';
@@ -76,6 +77,7 @@ const SERVICES = [
 export default function HomeScreen({ navigation }: Props) {
   const { theme, isDark, toggleTheme } = useTheme();
   const { colors, spacing } = theme;
+  const { user, setUser } = useUser();
 
   const greeting = useMemo(() => getGreeting(), []);
 
@@ -83,6 +85,7 @@ export default function HomeScreen({ navigation }: Props) {
 
   const handleLogout = async () => {
     try {
+      await setUser(null);
       await AsyncStorage.clear();
     } catch {}
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
@@ -116,7 +119,9 @@ export default function HomeScreen({ navigation }: Props) {
               ]}
             >
               <View style={themed.profileAvatar}>
-                <Text style={themed.profileInitials}>JD</Text>
+                <Text style={themed.profileInitials}>
+                  {getInitials(user?.Customer_Name)}
+                </Text>
               </View>
               <View style={themed.profileBadge} />
             </Pressable>
@@ -142,9 +147,11 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={themed.heroGreeting}>
               {greeting.emoji} {greeting.text}
             </Text>
-            <Text style={themed.heroName}>John Doe</Text>
+            <Text style={themed.heroName}>
+              {user?.Customer_Name || 'Customer'}
+            </Text>
             <Text style={themed.heroSub}>
-              Welcome to HMT Finance — your finance, simplified.
+              {user?.CIF ? `CIF: ${user.CIF}` : 'Welcome to HMT Finance — your finance, simplified.'}
             </Text>
           </View>
 

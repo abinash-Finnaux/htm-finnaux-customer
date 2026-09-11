@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -6,10 +6,11 @@ import {
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
-  Alert,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
+import { useUser } from '../../context/UserContext';
+import { toast } from '../../components/toast/ToastProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { RootStackParamList } from '../../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -20,59 +21,130 @@ import LogoHeader from './_components/LogoHeader';
 import AuthFooter from './_components/AuthFooter';
 import FormTextInput from '../../components/forms/FormTextInput';
 import FormPasswordInput from '../../components/forms/FormPasswordInput';
-import { apiService } from '../../api';
+import FormDateOfBirthInput from '../../components/forms/FormDateOfBirthInput';
+import { apiClient } from '../../api';
 import { API_ENDPOINTS } from '../../api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
+type VerifyForm = {
+  cifNumber: string;
+  customerDob: Date | null;
+};
+
 type LoginForm = {
-  customerId: string;
   password: string;
 };
 
-type LoginResponse = {
-  token: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  };
-};
+function formatDob(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
 
 export default function LoginScreen({ navigation }: Props) {
   const { theme } = useTheme();
   const { colors, spacing, radius } = theme;
+  const { setUser } = useUser();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<LoginForm>({
+  const [step, setStep] = useState<1 | 2>(1);
+  const [cifNumber, setCifNumber] = useState('');
+  const [stepToken, setStepToken] = useState('');
+
+  const verifyForm = useForm<VerifyForm>({
     defaultValues: {
-      customerId: '',
+      cifNumber: '',
+      customerDob: null,
+    },
+  });
+
+  const loginForm = useForm<LoginForm>({
+    defaultValues: {
       password: '',
     },
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  useEffect(() => {
+    if (cifNumber) {
+      verifyForm.setValue('cifNumber', cifNumber);
+    }
+  }, [cifNumber]);
+
+  const onVerify = async (data: VerifyForm) => {
     try {
-      const response = await apiService.post<LoginResponse>(
-        API_ENDPOINTS.AUTH.LOGIN,
-        {
-          customerId: data.customerId,
-          password: data.password,
-        },
-      );
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.VERIFY_USER, {
+        CIF: data.cifNumber,
+        Customer_DOB: data.customerDob ? formatDob(data.customerDob) : '',
+      });
 
-      await AsyncStorage.setItem('@finnaux_token', response.data.token);
-      await AsyncStorage.setItem('@finnaux_refresh_token', response.data.refreshToken);
+      const result =
+        typeof response.data === 'string'
+          ? JSON.parse(response.data)
+          : response.data;
 
-      navigation.replace('Home');
+      if (Number(result.CODE) === 1) {
+        await AsyncStorage.setItem('@finnaux_token', result.Token);
+        await setUser(result);
+        setCifNumber(result.CIF);
+        setStepToken(result.Token);
+        setStep(2);
+      } else {
+        toast.show(result.Msg || JSON.stringify(result), 'error');
+      }
     } catch (error: any) {
+      toast.show(
+        error?.response?.data?.Msg ||
+          error?.response?.data?.message ||
+          error?.message ||
+          'Verification failed. Please try again.',
+        'error',
+      );
+    }
+  };
+
+  const onLogin = async (data: LoginForm) => {
+    console.log('LOGINFUNCTION');
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
+        StepToken: stepToken,
+        Password: data.password,
+        IPAddress: '122.180.246.21',
+      });
+
+      const result =
+        typeof response.data === 'string'
+          ? JSON.parse(response.data)
+          : response.data;
+
+      console.log('loginResultLOG', result);
+
+      if (Number(result.CODE) === 1) {
+        await AsyncStorage.setItem('@finnaux_token', result.Token);
+        await setUser(result);
+        navigation.replace('Home');
+      } else {
+        toast.show(result.Msg || JSON.stringify(result), 'error');
+      }
+    } catch (error: any) {
+      const status = error?.response?.status;
+      const responseData = error?.response?.data;
+      console.log('loginErrorLOG', {
+        status,
+        data: responseData,
+        config: error?.config?.url,
+      });
+
       const message =
-        error?.response?.data?.message || 'Login failed. Please try again.';
-      Alert.alert('Login Failed', message);
+        responseData?.Msg ||
+        responseData?.message ||
+        (typeof responseData === 'string' && responseData) ||
+        (responseData &&
+          typeof responseData === 'object' &&
+          JSON.stringify(responseData)) ||
+        error?.message ||
+        'Login failed. Please try again.';
+
+      toast.show(status ? `${message} (${status})` : message, 'error');
     }
   };
 
@@ -95,38 +167,82 @@ export default function LoginScreen({ navigation }: Props) {
 
           <View style={themed.formCard}>
             <Text style={themed.formTitle}>Welcome</Text>
-            <Text style={themed.formSubtitle}>Sign in to continue</Text>
+            <Text style={themed.formSubtitle}>
+              {step === 1
+                ? 'Verify your identity to continue'
+                : 'Enter your password to sign in'}
+            </Text>
 
-            <View style={themed.fieldGroup}>
-              <FormTextInput
-                control={control}
-                name="customerId"
-                label="Customer ID"
-                placeholder="Enter your customer ID"
-                rules={{ required: 'Customer ID is required' }}
-                backgroundColor={colors.surface}
-              />
+            {step === 1 ? (
+              <View style={themed.fieldGroup}>
+                <FormTextInput
+                  control={verifyForm.control}
+                  name="cifNumber"
+                  label="CIF Number"
+                  placeholder="Enter your CIF number"
+                  rules={{ required: 'CIF number is required' }}
+                  backgroundColor={colors.surface}
+                  formatText={(text: string) => text.toUpperCase()}
+                />
 
-              <FormPasswordInput
-                control={control}
-                name="password"
-                label="Password"
-                placeholder="Enter your password"
-                rules={{ required: 'Password is required' }}
-              />
+                <FormDateOfBirthInput
+                  control={verifyForm.control}
+                  name="customerDob"
+                  label="Date of Birth"
+                  rules={{ required: 'Date of birth is required' }}
+                />
 
-              <Pressable style={themed.forgotRow}>
-                <Text style={themed.forgotText}>Forgot Password?</Text>
-              </Pressable>
+                <PrimaryButton
+                  title="Verify User"
+                  onPress={verifyForm.handleSubmit(onVerify)}
+                  loading={verifyForm.formState.isSubmitting}
+                  disabled={verifyForm.formState.isSubmitting}
+                  style={themed.submitButton}
+                />
+              </View>
+            ) : (
+              <View style={themed.fieldGroup}>
+                <FormTextInput
+                  control={verifyForm.control}
+                  name="cifNumber"
+                  label="CIF Number"
+                  placeholder="Enter your CIF number"
+                  rules={{ required: 'CIF number is required' }}
+                  backgroundColor={colors.surface}
+                  editable={false}
+                />
+                <FormPasswordInput
+                  control={loginForm.control}
+                  name="password"
+                  label="Password"
+                  placeholder="Enter your password"
+                  rules={{ required: 'Password is required' }}
+                  autoFocus
+                />
 
-              <PrimaryButton
-                title="Sign In"
-                onPress={handleSubmit(onSubmit)}
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                style={themed.submitButton}
-              />
-            </View>
+                <Pressable style={themed.forgotRow}>
+                  <Text style={themed.forgotText}>Forgot Password?</Text>
+                </Pressable>
+
+                <PrimaryButton
+                  title="Sign In"
+                  onPress={loginForm.handleSubmit(onLogin)}
+                  loading={loginForm.formState.isSubmitting}
+                  disabled={loginForm.formState.isSubmitting}
+                  style={themed.submitButton}
+                />
+
+                {/* <Pressable
+                  style={themed.backRow}
+                  onPress={() => {
+                    setStep(1);
+                    loginForm.reset();
+                  }}
+                >
+                  <Text style={themed.backText}>← Back</Text>
+                </Pressable> */}
+              </View>
+            )}
           </View>
 
           <AuthFooter
@@ -186,6 +302,16 @@ function createStyles(
     fieldGroup: {
       marginTop: spacing.md,
     },
+    cifLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      // marginBottom: spacing.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+    },
     forgotRow: {
       alignSelf: 'flex-end',
       marginTop: spacing.sm,
@@ -196,6 +322,15 @@ function createStyles(
     },
     submitButton: {
       marginTop: spacing.xl,
+    },
+    backRow: {
+      alignSelf: 'center',
+      marginTop: spacing.md,
+    },
+    backText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '500',
     },
   });
 }

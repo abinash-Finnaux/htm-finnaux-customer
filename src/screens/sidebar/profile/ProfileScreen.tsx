@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
-  Alert,
   Pressable,
   ScrollView,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { RootStackParamList } from '../../../../App';
 import { useTheme } from '../../../context/ThemeContext';
+import { toast } from '../../../components/toast/ToastProvider';
+import {
+  useUser,
+  getInitials,
+  type CustomerProfile,
+} from '../../../context/UserContext';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -19,32 +24,41 @@ import EditProfileModal, {
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
+function toFormValues(user: CustomerProfile | null): ProfileForm {
+  return {
+    fullName: user?.Customer_Name || '',
+    email: user?.Customer_Email || '',
+    phone: user?.Customer_PhoneNo || '',
+    dob: user?.Customer_DOB || '',
+    address1: user?.PresentAddress || user?.PermanentAddress || '',
+    address2: '',
+  };
+}
+
 export default function ProfileScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
   const { colors, spacing, radius } = theme;
+  const { user } = useUser();
 
   const headerBg = isDark ? '#1E293B' : colors.primary;
   const decorBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)';
 
   const [editVisible, setEditVisible] = useState(false);
 
-  const { control, watch } = useForm<ProfileForm>({
-    defaultValues: {
-      fullName: 'John Doe',
-      email: 'john.doe@email.com',
-      phone: '+91 98765 43210',
-      dob: '15 Jan 1990',
-      address1: '123, MG Road, Andheri West',
-      address2: 'Mumbai, Maharashtra - 400053',
-    },
+  const { control, watch, reset } = useForm<ProfileForm>({
+    defaultValues: toFormValues(user),
   });
+
+  useEffect(() => {
+    reset(toFormValues(user));
+  }, [user, reset]);
 
   const formFullName = watch('fullName');
   const formEmail = watch('email');
 
   const handleSave = () => {
     setEditVisible(false);
-    Alert.alert('Saved', 'Profile updated successfully.');
+    toast.show('Profile updated successfully.', 'success');
   };
 
   const themed = createStyles(colors, spacing, radius, headerBg, decorBg);
@@ -83,12 +97,18 @@ export default function ProfileScreen({ navigation }: Props) {
         <View style={themed.headerBody}>
           <View style={themed.avatarRing}>
             <View style={themed.avatar}>
-              <Text style={themed.avatarText}>JD</Text>
+              <Text style={themed.avatarText}>
+                {getInitials(formFullName || user?.Customer_Name)}
+              </Text>
             </View>
           </View>
-          <Text style={themed.headerName}>{formFullName}</Text>
+          <Text style={themed.headerName}>
+            {formFullName || user?.Customer_Name || 'Customer'}
+          </Text>
           <Text style={themed.headerEmail}>{formEmail}</Text>
-          <Text style={themed.headerSub}>Customer ID: HMT-2024-001</Text>
+          <Text style={themed.headerSub}>
+            Customer ID: {user?.CIF || '—'}
+          </Text>
         </View>
       </View>
 
@@ -111,7 +131,7 @@ export default function ProfileScreen({ navigation }: Props) {
                   <Text style={themed.cardIcon}>{item.icon}</Text>
                   <View style={themed.cardInfo}>
                     <Text style={themed.cardLabel}>{item.label}</Text>
-                    <Text style={themed.cardValue}>{item.value}</Text>
+                    <Text style={themed.cardValue}>{item.value || '—'}</Text>
                   </View>
                 </View>
               </React.Fragment>
@@ -121,9 +141,9 @@ export default function ProfileScreen({ navigation }: Props) {
           <Text style={themed.sectionTitle}>Documents</Text>
           <View style={themed.card}>
             {[
-              { label: 'PAN Number', value: 'ABCDE1234F', icon: '🪪' },
-              { label: 'Aadhaar', value: 'XXXX XXXX 6789', icon: '🪪' },
-              { label: 'Customer ID', value: 'HMT-2024-001', icon: '🔖' },
+              { label: 'PAN Number', value: user?.PAN || '—', icon: '🪪' },
+              { label: 'Aadhaar', value: user?.Aadhaar || '—', icon: '🪪' },
+              { label: 'Customer ID', value: user?.CIF || '—', icon: '🔖' },
             ].map((item, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <View style={themed.cardDivider} />}
@@ -143,8 +163,12 @@ export default function ProfileScreen({ navigation }: Props) {
             <View style={themed.cardRow}>
               <Text style={themed.cardIcon}>📍</Text>
               <View style={themed.cardInfo}>
-                <Text style={themed.cardValue}>{watch('address1')}</Text>
-                <Text style={themed.cardValue}>{watch('address2')}</Text>
+                <Text style={themed.cardValue}>
+                  {watch('address1') || '—'}
+                </Text>
+                {!!watch('address2') && (
+                  <Text style={themed.cardValue}>{watch('address2')}</Text>
+                )}
               </View>
             </View>
           </View>

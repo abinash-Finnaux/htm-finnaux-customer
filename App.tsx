@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { UserProvider } from './src/context/UserContext';
+import { ToastProvider } from './src/components/toast/ToastProvider';
 
 import SplashScreen from './src/screens/splash/SplashScreen';
 import PermissionScreen from './src/screens/permission/PermissionScreen';
@@ -95,7 +97,11 @@ function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <AppContent />
+        <UserProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </UserProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
