@@ -77,7 +77,7 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        await AsyncStorage.multiRemove([
+        await AsyncStorage.removeMany([
           '@finnaux_token',
           '@finnaux_refresh_token',
         ]);
