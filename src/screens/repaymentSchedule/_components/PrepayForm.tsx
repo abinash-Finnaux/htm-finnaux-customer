@@ -7,6 +7,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Controller, useWatch, type Control } from 'react-hook-form';
+import { Banknote, CreditCard, Flag, Landmark, Smartphone, Zap } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import FormPaymentModeSelect from '../../../components/forms/FormPaymentModeSelect';
 import PrimaryButton from '../../../components/buttons/PrimaryButton';
@@ -20,22 +22,27 @@ type PayForm = {
 };
 
 const PAYMENT_MODES = [
-  { id: 'upi', label: 'UPI', icon: '📱' },
-  { id: 'netbanking', label: 'Net Banking', icon: '🏦' },
-  { id: 'card', label: 'Card', icon: '💳' },
+  { id: 'upi', label: 'UPI', icon: Smartphone },
+  { id: 'netbanking', label: 'Net Banking', icon: Landmark },
+  { id: 'card', label: 'Card', icon: CreditCard },
 ];
 
-const PREPAY_TYPES = [
+const PREPAY_TYPES: {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  desc: string;
+}[] = [
   {
     id: 'prepay',
     label: 'Part Payment',
-    icon: '💰',
+    icon: Banknote,
     desc: 'Pay extra toward principal',
   },
   {
     id: 'foreclose',
     label: 'Foreclose Loan',
-    icon: '🏁',
+    icon: Flag,
     desc: 'Close loan in full',
   },
 ];
@@ -71,7 +78,7 @@ export default function PrepayForm({
     <View style={themed.card}>
       <View style={themed.header}>
         <View style={themed.headerIconBg}>
-          <Text style={themed.headerIconText}>⚡</Text>
+          <Zap size={20} color={colors.primary} />
         </View>
         <View>
           <Text style={themed.headerTitle}>Prepay or Foreclose</Text>
@@ -119,7 +126,12 @@ export default function PrepayForm({
                       { opacity: pressed ? 0.85 : 1 },
                     ]}
                   >
-                    <Text style={themed.typeCardIcon}>{t.icon}</Text>
+                    <View style={themed.typeCardIcon}>
+                      <t.icon
+                        size={24}
+                        color={selected ? '#FFFFFF' : colors.text}
+                      />
+                    </View>
                     <Text
                       style={[
                         themed.typeCardLabel,
@@ -186,7 +198,7 @@ export default function PrepayForm({
         title={
           prepayType === 'foreclose' ? 'Foreclose Loan' : 'Submit Prepayment'
         }
-        suffix="→"
+        arrow
         onPress={onSubmit}
         style={{ margin: 18 }}
       />

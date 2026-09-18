@@ -152,6 +152,15 @@ export function createStyles(
       flexWrap: 'wrap',
       gap: 12,
     },
+    loansSection: {
+      paddingHorizontal: spacing.lg,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: spacing.md,
+    },
   });
 }
 

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import { useUser, getInitials } from '../../../context/UserContext';
+import { ChevronRight, LogOut, User } from 'lucide-react-native';
 
 import { SLIDE_WIDTH, createDrawerStyles } from './../styles';
 import DrawerMenuList, { type DrawerRoute } from './DrawerMenuList';
@@ -121,9 +122,9 @@ export default function ProfileDrawerModal({
               activeOpacity={0.6}
               onPress={() => handleItemPress('Profile')}
             >
-              <Text style={themed.itemIcon}>👤</Text>
+              <User size={20} color={colors.text} style={{ width: 32, marginRight: 8 }} />
               <Text style={themed.itemLabel}>My Profile</Text>
-              <Text style={themed.itemArrow}>›</Text>
+              <ChevronRight size={20} color={colors.textSecondary} />
             </TouchableOpacity>
 
             <DrawerMenuList onItemPress={handleItemPress} />
@@ -135,7 +136,7 @@ export default function ProfileDrawerModal({
               activeOpacity={0.6}
               onPress={handleLogoutPress}
             >
-              <Text style={themed.itemIcon}>🚪</Text>
+              <LogOut size={20} color={colors.text} style={{ width: 32, marginRight: 8 }} />
               <Text style={themed.itemLabelDanger}>Logout</Text>
             </TouchableOpacity>
           </View>

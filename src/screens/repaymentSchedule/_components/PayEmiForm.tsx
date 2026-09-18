@@ -6,6 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useWatch, type Control } from 'react-hook-form';
+import { CreditCard, Landmark, Smartphone } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import FormTextInput from '../../../components/forms/FormTextInput';
 import FormPaymentModeSelect from '../../../components/forms/FormPaymentModeSelect';
@@ -26,9 +27,9 @@ type PayForm = {
 };
 
 const PAYMENT_MODES = [
-  { id: 'upi', label: 'UPI', icon: '📱' },
-  { id: 'netbanking', label: 'Net Banking', icon: '🏦' },
-  { id: 'card', label: 'Card', icon: '💳' },
+  { id: 'upi', label: 'UPI', icon: Smartphone },
+  { id: 'netbanking', label: 'Net Banking', icon: Landmark },
+  { id: 'card', label: 'Card', icon: CreditCard },
 ];
 
 type Props = {
@@ -60,7 +61,7 @@ export default function PayEmiForm({
     <View style={themed.card}>
       <View style={themed.header}>
         <View style={themed.headerIconBg}>
-          <Text style={themed.headerIconText}>💳</Text>
+          <CreditCard size={20} color={colors.primary} />
         </View>
         <View>
           <Text style={themed.headerTitle}>Make a Payment</Text>
@@ -140,7 +141,7 @@ export default function PayEmiForm({
 
       <PrimaryButton
         title={`Pay ₹${payAmount ? Number(payAmount).toLocaleString('en-IN') : '0'}`}
-        suffix="→"
+        arrow
         onPress={onSubmit}
         style={{ margin: 18 }}
       />

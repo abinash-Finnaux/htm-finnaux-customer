@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Camera, Check, CheckCheck, FolderOpen, MapPin, Smartphone } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import logo from '../../assets/images/logo.png';
 
@@ -22,7 +24,7 @@ type PermissionKey = 'location' | 'phone' | 'camera' | 'file';
 
 type PermissionItem = {
   key: PermissionKey;
-  icon: string;
+  icon: LucideIcon;
   title: string;
   description: string;
 };
@@ -30,28 +32,28 @@ type PermissionItem = {
 const PERMISSIONS: PermissionItem[] = [
   {
     key: 'location',
-    icon: '📍',
+    icon: MapPin,
     title: 'Location Access',
     description:
       'We use your location to find nearby services and provide personalized offers in your area.',
   },
   {
     key: 'phone',
-    icon: '📱',
+    icon: Smartphone,
     title: 'Phone State',
     description:
       'We need phone state access to verify your device and secure your account.',
   },
   {
     key: 'camera',
-    icon: '📸',
+    icon: Camera,
     title: 'Camera Access',
     description:
       'Scan QR codes, capture documents, and upload profile photos with camera access.',
   },
   {
     key: 'file',
-    icon: '📁',
+    icon: FolderOpen,
     title: 'Storage Access',
     description:
       'Access your files to upload documents, statements, and receipts securely.',
@@ -632,9 +634,11 @@ export default function PermissionScreen({ navigation }: any) {
                       isGranted ? themed.chipGranted : themed.chipPending,
                     ]}
                   >
-                    <Text style={themed.featureChipIcon}>
-                      {isGranted ? '✅' : permission.icon}
-                    </Text>
+                    {isGranted ? (
+                      <CheckCheck size={18} color={colors.success} />
+                    ) : (
+                      <permission.icon size={18} color={colors.text} />
+                    )}
 
                     <Text
                       style={[
@@ -707,7 +711,7 @@ export default function PermissionScreen({ navigation }: any) {
             ]}
           >
             <View style={themed.doneIconCircle}>
-              <Text style={themed.doneCheck}>✓</Text>
+              <Check size={44} color="#22C55E" />
             </View>
 
             <Text style={themed.doneTitle}>All Set!</Text>
@@ -805,7 +809,7 @@ export default function PermissionScreen({ navigation }: any) {
 
           {/* Permission icon */}
           <View style={themed.permIconCircle}>
-            <Text style={themed.permIcon}>{perm.icon}</Text>
+            <perm.icon size={44} color={colors.primary} />
           </View>
 
           {/* Permission title */}

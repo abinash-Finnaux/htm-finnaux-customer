@@ -1,15 +1,17 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 type Props = {
   title: string;
-  icon: string;
+  icon: LucideIcon;
   label: string;
   onBack: () => void;
 };
 
-export default function SupportHeader({ title, icon, label, onBack }: Props) {
+export default function SupportHeader({ title, icon: Icon, label, onBack }: Props) {
   const { theme, isDark } = useTheme();
   const themed = createStyles(theme, isDark);
 
@@ -25,13 +27,13 @@ export default function SupportHeader({ title, icon, label, onBack }: Props) {
             { opacity: pressed ? 0.6 : 1 },
           ]}
         >
-          <Text style={themed.backBtnText}>←</Text>
+          <ArrowLeft size={20} color="#FFFFFF" />
         </Pressable>
         <Text style={themed.topTitle}>{title}</Text>
         <View style={themed.topSpacer} />
       </View>
       <View style={themed.headerBody}>
-        <Text style={themed.headerIcon}>{icon}</Text>
+        <Icon size={36} color="#FFFFFF" />
         <Text style={themed.headerLabel}>{label}</Text>
       </View>
     </View>

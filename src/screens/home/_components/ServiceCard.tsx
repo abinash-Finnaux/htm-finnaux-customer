@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
+import { ChevronRight } from 'lucide-react-native';
 
 type Props = {
   icon: string;
@@ -31,7 +32,7 @@ export default function ServiceCard({ icon, label, bg, onPress }: Props) {
         <View style={themed.footerRow}>
           <Text style={themed.hint}>Open</Text>
           <View style={themed.arrow}>
-            <Text style={themed.arrowText}>→</Text>
+            <ChevronRight size={20} color="#FFFFFF" />
           </View>
         </View>
       </View>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ArrowRight } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 type Props = {
@@ -40,9 +41,14 @@ export default function NextEmiCard({
 
       <Pressable
         onPress={onPay}
-        style={({ pressed }) => [themed.payBtn, pressed && themed.pressed]}
+        style={({ pressed }) => [
+          themed.payBtn,
+          { flexDirection: 'row', alignItems: 'center', gap: 6 },
+          pressed && themed.pressed,
+        ]}
       >
-        <Text style={themed.payBtnText}>Pay Now →</Text>
+        <Text style={themed.payBtnText}>Pay Now</Text>
+        <ArrowRight size={15} color="#1E293B" />
       </Pressable>
     </View>
   );

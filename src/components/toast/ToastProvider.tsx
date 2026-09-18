@@ -13,6 +13,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Check, Info, X } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -32,10 +34,10 @@ export type ToastContextValue = {
 
 const DURATION = 2600;
 
-const TYPE_CONFIG: Record<ToastType, { icon: string; color: string }> = {
-  success: { icon: '✓', color: '#059669' },
-  error: { icon: '✕', color: '#DC2626' },
-  info: { icon: 'ℹ', color: '#2563EB' },
+const TYPE_CONFIG: Record<ToastType, { icon: LucideIcon; color: string }> = {
+  success: { icon: Check, color: '#059669' },
+  error: { icon: X, color: '#DC2626' },
+  info: { icon: Info, color: '#2563EB' },
 };
 
 let showToastFn: ShowToastFn | null = null;
@@ -140,7 +142,7 @@ function ToastPill({ item }: { item: ToastItem }) {
       ]}
     >
       <View style={[styles.icon, { backgroundColor: config.color }]}>
-        <Text style={styles.iconText}>{config.icon}</Text>
+        <config.icon size={18} color="#FFFFFF" />
       </View>
       <Text style={[styles.message, { color: colors.text }]} numberOfLines={4}>
         {item.message}

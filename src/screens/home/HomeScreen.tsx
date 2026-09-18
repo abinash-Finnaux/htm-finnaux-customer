@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Text, View, Image, Pressable, ScrollView } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useUser, getInitials } from '../../context/UserContext';
+import { apiClient, API_ENDPOINTS } from '../../api';
+import { mapCustomerProfile } from '../../utils/mapCustomerProfile';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../App';
@@ -9,70 +11,73 @@ import type { RootStackParamList } from '../../../App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import logo from './../../assets/images/logo.png';
 import { createStyles } from './styles';
+import type { LucideIcon } from 'lucide-react-native';
+import { Sun, Moon } from 'lucide-react-native';
 import StatCard from './_components/StatCard';
 import ServiceCard from './_components/ServiceCard';
+import ApplicationCard from './_components/ApplicationCard';
 import ProfileDrawerModal from './_components/ProfileDrawerModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-function getGreeting(): { text: string; emoji: string } {
+function getGreeting(): { text: string; icon: LucideIcon } {
   const hour = new Date().getHours();
-  if (hour < 12) return { text: 'Good Morning', emoji: '☀️' };
-  if (hour < 17) return { text: 'Good Afternoon', emoji: '🌤️' };
-  if (hour < 21) return { text: 'Good Evening', emoji: '🌅' };
-  return { text: 'Good Night', emoji: '🌙' };
+  if (hour < 12) return { text: 'Good Morning', icon: Sun };
+  if (hour < 17) return { text: 'Good Afternoon', icon: Sun };
+  if (hour < 21) return { text: 'Good Evening', icon: Sun };
+  return { text: 'Good Night', icon: Moon };
 }
 
-const SERVICES = [
-  {
-    icon: '📝',
-    label: 'Apply Loan',
-    color: '#2563EB',
-    bg: '#1E3A5F',
-    title: 'Apply Loan',
-    description: 'Apply for a new loan directly from the app.',
-  },
-  {
-    icon: '📅',
-    label: 'Repayment Schedule',
-    color: '#7C3AED',
-    bg: '#3B1F6E',
-    title: 'Repayment Schedule',
-    description: 'View your complete repayment schedule.',
-  },
-  {
-    icon: '📊',
-    label: 'EMI Details',
-    color: '#0891B2',
-    bg: '#134E5E',
-    title: 'EMI Details',
-    description: 'Check your EMI breakup and details.',
-  },
-  {
-    icon: '💳',
-    label: 'EMI Deposit',
-    color: '#059669',
-    bg: '#1A3C34',
-    title: 'EMI Deposit',
-    description: 'Make your EMI payment directly.',
-  },
-  {
-    icon: '📑',
-    label: 'Closer Statement',
-    color: '#DC2626',
-    bg: '#5C1A1A',
-    title: 'Closer Statement',
-    description: 'Download your loan closure statement.',
-  },
-  {
-    icon: '📋',
-    label: 'SOA',
-    color: '#D97706',
-    bg: '#5C3A0A',
-    title: 'Statement of Account',
-    description: 'Access your detailed statement of account.',
-  },
-];
+// export const SERVICES = [
+//   {
+//     icon: '📝',
+//     label: 'Apply Loan',
+//     color: '#2563EB',
+//     bg: '#1E3A5F',
+//     title: 'Apply Loan',
+//     description: 'Apply for a new loan directly from the app.',
+//   },
+//   {
+//     icon: '📅',
+//     label: 'Repayment Schedule',
+//     color: '#7C3AED',
+//     bg: '#3B1F6E',
+//     title: 'Repayment Schedule',
+//     description: 'View your complete repayment schedule.',
+//   },
+//   {
+//     icon: '📊',
+//     label: 'EMI Details',
+//     color: '#0891B2',
+//     bg: '#134E5E',
+//     title: 'EMI Details',
+//     description: 'Check your EMI breakup and details.',
+//   },
+//   {
+//     icon: '💳',
+//     label: 'EMI Deposit',
+//     color: '#059669',
+//     bg: '#1A3C34',
+//     title: 'EMI Deposit',
+//     description: 'Make your EMI payment directly.',
+//   },
+//   {
+//     icon: '📑',
+//     label: 'Closer Statement',
+//     color: '#DC2626',
+//     bg: '#5C1A1A',
+//     title: 'Closer Statement',
+//     description: 'Download your loan closure statement.',
+//   },
+//   {
+//     icon: '📋',
+//     label: 'SOA',
+//     color: '#D97706',
+//     bg: '#5C3A0A',
+//     title: 'Statement of Account',
+//     description: 'Access your detailed statement of account.',
+//   },
+// ];
 
 export default function HomeScreen({ navigation }: Props) {
   const { theme, isDark, toggleTheme } = useTheme();
@@ -82,6 +87,55 @@ export default function HomeScreen({ navigation }: Props) {
   const greeting = useMemo(() => getGreeting(), []);
 
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const fetchCustomerDetails = async () => {
+    try {
+      const storedCustomerId = await AsyncStorage.getItem('@customer_id');
+      const storedToken = await AsyncStorage.getItem('@finnaux_token');
+      console.log('customerIdLog', storedCustomerId);
+      console.log('tokenLogg', storedToken);
+      if (!storedToken || !storedCustomerId) {
+        console.warn('CUSTOMER_DETAILS missing token or customerId');
+        return;
+      }
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.USER.CUSTOMER_DETAILS,
+        { CustomerId: storedCustomerId },
+      );
+
+      console.log('CUSTOMER_DETAILS_SUCCESS', typeof response, response);
+
+      const data =
+        typeof response.data === 'string'
+          ? JSON.parse(response.data)
+          : response.data;
+      const profile = mapCustomerProfile(data);
+      if (profile) {
+        await setUser(profile);
+      }
+    } catch (error: any) {
+      const authHeader =
+        typeof error?.config?.headers?.Authorization === 'string'
+          ? error.config.headers.Authorization.substring(0, 40)
+          : 'undefined';
+      console.log(
+        'CUSTOMER_DETAILS error log:',
+        'status=',
+        error?.response?.status,
+        'data=',
+        // JSON.stringify(error?.response?.data)?.substring(0, 500),
+        error?.response?.data,
+        'headers sent=',
+        authHeader,
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomerDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -139,30 +193,69 @@ export default function HomeScreen({ navigation }: Props) {
                 pressed && themed.iconBtnPressed,
               ]}
             >
-              <Text style={themed.topBarBtnIcon}>{isDark ? '🌞' : '🌙'}</Text>
+              {isDark ? (
+                <Sun size={18} color="#FFFFFF" />
+              ) : (
+                <Moon size={18} color="#FFFFFF" />
+              )}
             </Pressable>
           </View>
 
           <View style={themed.heroBody}>
-            <Text style={themed.heroGreeting}>
-              {greeting.emoji} {greeting.text}
-            </Text>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <greeting.icon size={18} color="#FFFFFF" />
+              <Text style={themed.heroGreeting}>{greeting.text}</Text>
+            </View>
             <Text style={themed.heroName}>
               {user?.Customer_Name || 'Customer'}
             </Text>
             <Text style={themed.heroSub}>
-              {user?.CIF ? `CIF: ${user.CIF}` : 'Welcome to HMT Finance — your finance, simplified.'}
+              {user?.CIF
+                ? `CIF: ${user.CIF}`
+                : 'Welcome to HMT Finance — your finance, simplified.'}
             </Text>
           </View>
 
-          <View style={themed.statsRow}>
+          {/* <View style={themed.statsRow}>
             <StatCard emoji="🏦" value="Active" label="Loan Status" />
             <StatCard emoji="📁" value="2" label="Total Loans" />
             <StatCard emoji="💳" value="₹12K" label="Next EMI" />
-          </View>
+          </View> */}
         </View>
 
-        <View style={themed.servicesSection}>
+        <View style={themed.loansSection}>
+          <Text style={themed.sectionTitle}>
+            My Applications{' '}
+            {user?.applications?.length ? `(${user.applications.length})` : ''}
+          </Text>
+          {user?.applications && user.applications.length > 0 ? (
+            user.applications.map((application, index) => (
+              <ApplicationCard
+                key={index}
+                application={application}
+                onPress={() =>
+                  navigation.navigate('Service', {
+                    title: application.Product || 'Loan Application',
+                    icon: '📝',
+                    description: `View details and manage your ${
+                      application.Product || 'loan'
+                    } application${
+                      application.ApplicationNo
+                        ? ` (${application.ApplicationNo})`
+                        : ''
+                    }.`,
+                  })
+                }
+              />
+            ))
+          ) : (
+            <Text style={themed.emptyText}>No applications found.</Text>
+          )}
+        </View>
+
+        {/* <View style={themed.servicesSection}>
           <Text style={themed.sectionTitle}>Our Services</Text>
           <View style={themed.servicesGrid}>
             {SERVICES.map((service, index) => (
@@ -195,7 +288,7 @@ export default function HomeScreen({ navigation }: Props) {
               />
             ))}
           </View>
-        </View>
+        </View> */}
       </ScrollView>
 
       <ProfileDrawerModal

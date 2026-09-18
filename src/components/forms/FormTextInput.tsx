@@ -22,6 +22,7 @@ type Props<T extends FieldValues> = {
   | 'keyboardType'
   | 'maxLength'
   | 'autoComplete'
+  | 'autoCorrect'
   | 'autoCapitalize'
   | 'secureTextEntry'
   | 'multiline'
@@ -41,6 +42,7 @@ export default function FormTextInput<T extends FieldValues>({
   keyboardType,
   maxLength,
   autoComplete,
+  autoCorrect,
   autoCapitalize,
   secureTextEntry,
   multiline,
@@ -61,13 +63,14 @@ export default function FormTextInput<T extends FieldValues>({
           label={label}
           placeholder={placeholder}
           onBlur={onBlur}
-          onChangeText={(text) => onChange(formatText ? formatText(text) : text)}
+          onChangeText={text => onChange(formatText ? formatText(text) : text)}
           value={value}
           error={error?.message}
           backgroundColor={backgroundColor}
           keyboardType={keyboardType}
           maxLength={maxLength}
           autoComplete={autoComplete}
+          autoCorrect={autoCorrect}
           autoCapitalize={autoCapitalize}
           secureTextEntry={secureTextEntry}
           multiline={multiline}

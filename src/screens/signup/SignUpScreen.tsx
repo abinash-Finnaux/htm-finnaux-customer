@@ -9,6 +9,14 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  IdCard,
+  MapPin,
+  User,
+} from 'lucide-react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { toast } from '../../components/toast/ToastProvider';
 
@@ -87,14 +95,13 @@ function StepIndicator({
                   },
                 ]}
               >
-                <Text
-                  style={[
-                    themed.siCircleText,
-                    { color: isDone ? meta.color : '#FFFFFF' },
-                  ]}
-                >
-                  {isDone ? '✓' : s}
-                </Text>
+                {isDone ? (
+                  <Check size={12} color={meta.color} />
+                ) : (
+                  <Text style={[themed.siCircleText, { color: '#FFFFFF' }]}>
+                    {s}
+                  </Text>
+                )}
               </View>
               <Text
                 style={[
@@ -375,7 +382,7 @@ export default function SignUpScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Sign Up</Text>
           <View style={themed.topSpacer} />
@@ -645,14 +652,23 @@ export default function SignUpScreen({ navigation }: Props) {
                         { backgroundColor: STEP_META[0].color + '10' },
                       ]}
                     >
-                      <Text
-                        style={[
-                          themed.reviewHeaderText,
-                          { color: STEP_META[0].color },
-                        ]}
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
                       >
-                        👤 Personal Info
-                      </Text>
+                        <User size={13} color={STEP_META[0].color} />
+                        <Text
+                          style={[
+                            themed.reviewHeaderText,
+                            { color: STEP_META[0].color },
+                          ]}
+                        >
+                          Personal Info
+                        </Text>
+                      </View>
                       <TouchableOpacity onPress={() => goToStep(1)}>
                         <Text
                           style={[
@@ -750,14 +766,23 @@ export default function SignUpScreen({ navigation }: Props) {
                         { backgroundColor: STEP_META[1].color + '10' },
                       ]}
                     >
-                      <Text
-                        style={[
-                          themed.reviewHeaderText,
-                          { color: STEP_META[1].color },
-                        ]}
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
                       >
-                        🪪 KYC Documents
-                      </Text>
+                        <IdCard size={13} color={STEP_META[1].color} />
+                        <Text
+                          style={[
+                            themed.reviewHeaderText,
+                            { color: STEP_META[1].color },
+                          ]}
+                        >
+                          KYC Documents
+                        </Text>
+                      </View>
                       <TouchableOpacity onPress={() => goToStep(2)}>
                         <Text
                           style={[
@@ -799,14 +824,23 @@ export default function SignUpScreen({ navigation }: Props) {
                         { backgroundColor: STEP_META[2].color + '10' },
                       ]}
                     >
-                      <Text
-                        style={[
-                          themed.reviewHeaderText,
-                          { color: STEP_META[2].color },
-                        ]}
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
                       >
-                        📍 Address
-                      </Text>
+                        <MapPin size={13} color={STEP_META[2].color} />
+                        <Text
+                          style={[
+                            themed.reviewHeaderText,
+                            { color: STEP_META[2].color },
+                          ]}
+                        >
+                          Address
+                        </Text>
+                      </View>
                       <TouchableOpacity onPress={() => goToStep(3)}>
                         <Text
                           style={[
@@ -871,7 +905,7 @@ export default function SignUpScreen({ navigation }: Props) {
                             },
                           ]}
                         >
-                          {value && <Text style={themed.checkIcon}>✓</Text>}
+                          {value && <Check size={13} color="#FFFFFF" />}
                         </View>
                         <Text style={themed.termsText}>
                           I agree to the Terms of Service and Privacy Policy
@@ -897,14 +931,27 @@ export default function SignUpScreen({ navigation }: Props) {
                 { opacity: pressed ? 0.9 : 1 },
               ]}
             >
-              <Text
-                style={[
-                  themed.nextBtnText,
-                  { color: canProceed() ? '#FFFFFF' : colors.textSecondary },
-                ]}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
               >
-                Continue →
-              </Text>
+                <Text
+                  style={[
+                    themed.nextBtnText,
+                    { color: canProceed() ? '#FFFFFF' : colors.textSecondary },
+                  ]}
+                >
+                  Continue
+                </Text>
+                <ArrowRight
+                  size={16}
+                  color={canProceed() ? '#FFFFFF' : colors.textSecondary}
+                />
+              </View>
             </Pressable>
           ) : (
             <Pressable
@@ -918,14 +965,27 @@ export default function SignUpScreen({ navigation }: Props) {
                 { opacity: pressed ? 0.9 : 1 },
               ]}
             >
-              <Text
-                style={[
-                  themed.nextBtnText,
-                  { color: canProceed() ? '#FFFFFF' : colors.textSecondary },
-                ]}
-              >
-                {canProceed() ? 'Create Account ✓' : 'Accept Terms to Continue'}
-              </Text>
+              {canProceed() ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <Text style={[themed.nextBtnText, { color: '#FFFFFF' }]}>
+                    Create Account
+                  </Text>
+                  <Check size={16} color="#FFFFFF" />
+                </View>
+              ) : (
+                <Text
+                  style={[themed.nextBtnText, { color: colors.textSecondary }]}
+                >
+                  Accept Terms to Continue
+                </Text>
+              )}
             </Pressable>
           )}
         </View>

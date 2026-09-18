@@ -1,28 +1,30 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 type Props = {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   value: string;
   isLast?: boolean;
 };
 
 export default function DetailItem({
-  icon,
+  icon: Icon,
   label,
   value,
   isLast = false,
 }: Props) {
   const { theme } = useTheme();
+  const { colors } = theme;
   const themed = createStyles(theme);
 
   return (
     <View>
       <View style={themed.row}>
         <View style={themed.iconWrap}>
-          <Text style={themed.icon}>{icon}</Text>
+          <Icon size={15} color={colors.primary} />
         </View>
         <Text style={themed.label}>{label}</Text>
         <Text style={themed.value}>{value}</Text>

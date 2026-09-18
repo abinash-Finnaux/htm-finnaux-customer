@@ -1,10 +1,63 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ArrowLeft, Lightbulb } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 import type { RootStackParamList } from '../../App';
+import ServiceCard from './home/_components/ServiceCard';
+// import { SERVICES } from './home/HomeScreen';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Service'>;
+export const SERVICES = [
+  {
+    icon: '📝',
+    label: 'Ammortization',
+    color: '#2563EB',
+    bg: '#1E3A5F',
+    title: 'Apply Loan',
+    description: 'Apply for a new loan directly from the app.',
+  },
+  // {
+  //   icon: '📅',
+  //   label: 'Repayment Schedule',
+  //   color: '#7C3AED',
+  //   bg: '#3B1F6E',
+  //   title: 'Repayment Schedule',
+  //   description: 'View your complete repayment schedule.',
+  // },
+  // {
+  //   icon: '📊',
+  //   label: 'EMI Details',
+  //   color: '#0891B2',
+  //   bg: '#134E5E',
+  //   title: 'EMI Details',
+  //   description: 'Check your EMI breakup and details.',
+  // },
+  // {
+  //   icon: '💳',
+  //   label: 'EMI Deposit',
+  //   color: '#059669',
+  //   bg: '#1A3C34',
+  //   title: 'EMI Deposit',
+  //   description: 'Make your EMI payment directly.',
+  // },
+  // {
+  //   icon: '📑',
+  //   label: 'Closer Statement',
+  //   color: '#DC2626',
+  //   bg: '#5C1A1A',
+  //   title: 'Closer Statement',
+  //   description: 'Download your loan closure statement.',
+  // },
+  // {
+  //   icon: '📋',
+  //   label: 'SOA',
+  //   color: '#D97706',
+  //   bg: '#5C3A0A',
+  //   title: 'Statement of Account',
+  //   description: 'Access your detailed statement of account.',
+  // },
+];
 
 export default function ServiceScreen({ navigation, route }: Props) {
   const { title, icon, description } = route.params;
@@ -16,12 +69,7 @@ export default function ServiceScreen({ navigation, route }: Props) {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <View
-        style={[
-          styles.header,
-          { backgroundColor: headerBg },
-        ]}
-      >
+      <View style={[styles.header, { backgroundColor: headerBg }]}>
         <View style={[styles.decor1, { backgroundColor: decorBg }]} />
         <View style={[styles.decor2, { backgroundColor: decorBg }]} />
 
@@ -33,7 +81,7 @@ export default function ServiceScreen({ navigation, route }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={styles.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={styles.topTitle}>Service Details</Text>
           <View style={{ width: 40 }} />
@@ -52,74 +100,41 @@ export default function ServiceScreen({ navigation, route }: Props) {
         contentContainerStyle={[styles.content, { padding: spacing.lg }]}
         showsVerticalScrollIndicator={false}
       >
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-              borderRadius: radius.lg,
-              padding: spacing.xl,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.cardTitle,
-              { color: colors.text, marginBottom: spacing.sm },
-            ]}
-          >
-            About this service
-          </Text>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <Text
-            style={[
-              styles.cardDesc,
-              { color: colors.textSecondary, marginTop: spacing.md },
-            ]}
-          >
-            {description}
-          </Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Our Services
+        </Text>
+        <View style={styles.servicesGrid}>
+          {SERVICES.map((service, index) => (
+            <ServiceCard
+              key={index}
+              icon={service.icon}
+              label={service.label}
+              bg={service.bg}
+              onPress={() => {
+                if (index === 0) {
+                  navigation.navigate('ApplyLoan');
+                }
+                // else if (index === 1) {
+                //   navigation.navigate('RepaymentSchedule');
+                // } else if (index === 2) {
+                //   navigation.navigate('EmiDetails');
+                // } else if (index === 3) {
+                //   navigation.navigate('EmiDeposit');
+                // } else if (index === 4) {
+                //   navigation.navigate('CloserStatement');
+                // } else if (index === 5) {
+                //   navigation.navigate('SOA');
+                // } else {
+                //   navigation.navigate('Service', {
+                //     title: service.title,
+                //     icon: service.icon,
+                //     description: service.description,
+                //   });
+                // }
+              }}
+            />
+          ))}
         </View>
-
-        <View
-          style={[
-            styles.infoCard,
-            {
-              backgroundColor: colors.primary + '08',
-              borderColor: colors.primary + '20',
-              borderRadius: radius.md,
-              padding: spacing.lg,
-              marginTop: spacing.md,
-            },
-          ]}
-        >
-          <Text style={styles.infoIcon}>💡</Text>
-          <Text
-            style={[
-              styles.infoText,
-              { color: colors.text, marginTop: spacing.xs },
-            ]}
-          >
-            Need help? Contact our support team for assistance with this service.
-          </Text>
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.actionBtn,
-            {
-              backgroundColor: colors.primary,
-              borderRadius: radius.pill,
-              marginTop: spacing.xl,
-              opacity: pressed ? 0.85 : 1,
-            },
-          ]}
-        >
-          <Text style={[styles.actionBtnText, { color: colors.onPrimary }]}>
-            Request Now
-          </Text>
-        </Pressable>
       </ScrollView>
     </View>
   );
@@ -203,6 +218,21 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 40,
+  },
+  heroWrap: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 32,
+    marginBottom: 16,
+  },
+  servicesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
   },
   card: {
     borderWidth: 1,

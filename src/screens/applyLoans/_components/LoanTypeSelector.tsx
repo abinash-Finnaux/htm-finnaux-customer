@@ -1,13 +1,25 @@
 import React from 'react';
 import { Text, View, Pressable } from 'react-native';
+import { Briefcase, CarFront, Home, User } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import type { createStyles } from '../styles';
 
-const LOAN_TYPES = [
-  { id: 'personal', label: 'Personal Loan', icon: '👤', range: '₹50K - ₹5L' },
-  { id: 'business', label: 'Business Loan', icon: '💼', range: '₹1L - ₹25L' },
-  { id: 'home', label: 'Home Loan', icon: '🏠', range: '₹10L - ₹1Cr' },
-  { id: 'vehicle', label: 'Vehicle Loan', icon: '🚗', range: '₹2L - ₹15L' },
+const LOAN_TYPES: {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  range: string;
+}[] = [
+  { id: 'personal', label: 'Personal Loan', icon: User, range: '₹50K - ₹5L' },
+  {
+    id: 'business',
+    label: 'Business Loan',
+    icon: Briefcase,
+    range: '₹1L - ₹25L',
+  },
+  { id: 'home', label: 'Home Loan', icon: Home, range: '₹10L - ₹1Cr' },
+  { id: 'vehicle', label: 'Vehicle Loan', icon: CarFront, range: '₹2L - ₹15L' },
 ];
 
 type Props = {
@@ -52,14 +64,10 @@ export default function LoanTypeSelector({ value, onChange, themed }: Props) {
                 },
               ]}
             >
-              <Text
-                style={[
-                  themed.loanIcon,
-                  { color: selected ? '#FFFFFF' : undefined },
-                ]}
-              >
-                {item.icon}
-              </Text>
+              <item.icon
+                size={26}
+                color={selected ? '#FFFFFF' : colors.text}
+              />
             </View>
             <Text
               style={[

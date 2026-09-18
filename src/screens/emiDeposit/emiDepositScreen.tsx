@@ -1,13 +1,23 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  CreditCard,
+  Landmark,
+  Smartphone,
+} from 'lucide-react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 import { toast } from '../../components/toast/ToastProvider';
 import type { RootStackParamList } from '../../../App';
 
 import GlobalInputText from '../../components/inputTexts/GlobalInputText';
-import PaymentMethodPicker from './_components/PaymentMethodPicker';
+import PaymentMethodPicker, {
+  type PaymentMode,
+} from './_components/PaymentMethodPicker';
 import { createStyles } from './styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EmiDeposit'>;
@@ -49,10 +59,10 @@ const UPCOMING_EMIS: DueEmi[] = [
   { month: 9, date: '15 May', amount: 12500 },
 ];
 
-const PAYMENT_MODES = [
-  { id: 'upi', label: 'UPI', icon: '📱' },
-  { id: 'netbanking', label: 'Net Banking', icon: '🏦' },
-  { id: 'card', label: 'Card', icon: '💳' },
+const PAYMENT_MODES: PaymentMode[] = [
+  { id: 'upi', label: 'UPI', icon: Smartphone },
+  { id: 'netbanking', label: 'Net Banking', icon: Landmark },
+  { id: 'card', label: 'Card', icon: CreditCard },
 ];
 
 const CONVENIENCE_FEE = 0;
@@ -150,7 +160,7 @@ export default function EmiDepositScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>EMI Deposit</Text>
           <View style={themed.topSpacer} />
@@ -159,12 +169,18 @@ export default function EmiDepositScreen({ navigation }: Props) {
           <View style={themed.heroLeft}>
             <Text style={themed.heroLabel}>Outstanding Balance</Text>
             <Text style={themed.heroAmount}>{formatINR(loan.outstanding)}</Text>
-            <View style={themed.heroDueBadge}>
-              <Text style={themed.heroDueText}>📅 Next due {loan.dueDate}</Text>
+            <View
+              style={[
+                themed.heroDueBadge,
+                { flexDirection: 'row', alignItems: 'center', gap: 6 },
+              ]}
+            >
+              <CalendarDays size={11} color="#FFFFFF" />
+              <Text style={themed.heroDueText}>Next due {loan.dueDate}</Text>
             </View>
           </View>
           <View style={themed.heroIconWrap}>
-            <Text style={themed.heroIcon}>💳</Text>
+            <CreditCard size={30} color="#FFFFFF" />
           </View>
         </View>
       </View>
@@ -195,7 +211,10 @@ export default function EmiDepositScreen({ navigation }: Props) {
                     selected && themed.loanIconCircleSelected,
                   ]}
                 >
-                  <Text style={themed.loanIconText}>🏦</Text>
+                  <Landmark
+                    size={20}
+                    color={selected ? '#FFFFFF' : colors.primary}
+                  />
                 </View>
                 <View style={themed.loanMiddle}>
                   <Text
@@ -342,6 +361,7 @@ export default function EmiDepositScreen({ navigation }: Props) {
           disabled={!canPay}
           style={({ pressed }) => [
             themed.payBtn,
+            { flexDirection: 'row', alignItems: 'center', gap: 6 },
             !canPay && themed.payBtnDisabled,
             canPay && pressed && themed.payBtnPressed,
           ]}
@@ -349,8 +369,12 @@ export default function EmiDepositScreen({ navigation }: Props) {
           <Text
             style={[themed.payBtnText, !canPay && themed.payBtnTextDisabled]}
           >
-            Pay Now →
+            Pay Now
           </Text>
+          <ArrowRight
+            size={15}
+            color={!canPay ? colors.textSecondary : colors.onPrimary}
+          />
         </Pressable>
       </View>
     </View>

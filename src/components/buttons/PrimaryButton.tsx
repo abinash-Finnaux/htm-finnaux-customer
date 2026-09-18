@@ -1,11 +1,6 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  type ViewStyle,
-} from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { ArrowRight } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 type Props = {
@@ -14,6 +9,7 @@ type Props = {
   disabled?: boolean;
   loading?: boolean;
   suffix?: string;
+  arrow?: boolean;
   style?: ViewStyle;
 };
 
@@ -23,6 +19,7 @@ export default function PrimaryButton({
   disabled = false,
   loading = false,
   suffix,
+  arrow = false,
   style,
 }: Props) {
   const { theme } = useTheme();
@@ -45,10 +42,13 @@ export default function PrimaryButton({
       {loading ? (
         <ActivityIndicator color={colors.onPrimary} size="small" />
       ) : (
-        <Text style={[styles.text, { color: colors.onPrimary }]}>
-          {title}
-          {suffix ? ` ${suffix}` : ''}
-        </Text>
+        <View style={styles.row}>
+          <Text style={[styles.text, { color: colors.onPrimary }]}>
+            {title}
+            {suffix ? ` ${suffix}` : ''}
+          </Text>
+          {arrow && <ArrowRight size={16} color={colors.onPrimary} />}
+        </View>
       )}
     </Pressable>
   );
@@ -59,6 +59,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   text: {
     fontSize: 16,

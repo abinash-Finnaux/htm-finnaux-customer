@@ -1,6 +1,13 @@
 import React from 'react';
 import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  ArrowLeft,
+  CircleHelp,
+  Lightbulb,
+  MessageCircle,
+  Phone,
+} from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../../App';
 
@@ -47,13 +54,13 @@ export default function HelpSupportScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Help & Support</Text>
           <View style={themed.topSpacer} />
         </View>
         <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>❓</Text>
+          <CircleHelp size={36} color="#FFFFFF" />
           <Text style={themed.headerLabel}>How can we help?</Text>
         </View>
       </View>
@@ -65,7 +72,7 @@ export default function HelpSupportScreen({ navigation }: Props) {
       >
         <View style={themed.contactRow}>
           <ContactCard
-            icon="📞"
+            icon={Phone}
             label="Call Us"
             sub="1800-123-456"
             bg={colors.primary}
@@ -73,7 +80,7 @@ export default function HelpSupportScreen({ navigation }: Props) {
           />
 
           <ContactCard
-            icon="💬"
+            icon={MessageCircle}
             label="WhatsApp"
             sub="Chat with us"
             bg="#22C55E"
@@ -88,7 +95,7 @@ export default function HelpSupportScreen({ navigation }: Props) {
         ))}
 
         <View style={themed.infoCard}>
-          <Text style={themed.infoIcon}>💡</Text>
+          <Lightbulb size={18} color={colors.primary} />
           <Text style={themed.infoText}>
             Our support team is available Monday to Saturday, 9:00 AM to 6:00
             PM.

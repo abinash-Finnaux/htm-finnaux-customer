@@ -12,6 +12,7 @@ import {
 import type { Control } from 'react-hook-form';
 import FormTextInput from '../../../../components/forms/FormTextInput';
 import { useTheme } from '../../../../context/ThemeContext';
+import { X } from 'lucide-react-native';
 
 export type ProfileForm = {
   fullName: string;
@@ -56,7 +57,7 @@ export default function EditProfileModal({
             <View style={themed.modalHeader}>
               <Text style={themed.modalTitle}>Edit Profile</Text>
               <Pressable onPress={onClose} style={themed.modalCloseBtn}>
-                <Text style={themed.modalCloseText}>✕</Text>
+                <X size={16} color={colors.textSecondary} />
               </Pressable>
             </View>
 

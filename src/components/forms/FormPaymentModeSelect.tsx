@@ -7,12 +7,13 @@ import {
   type RegisterOptions,
 } from 'react-hook-form';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 type Option = {
   id: string;
   label: string;
-  icon: string;
+  icon: LucideIcon;
 };
 
 type Props<T extends FieldValues> = {
@@ -60,7 +61,10 @@ export default function FormPaymentModeSelect<T extends FieldValues>({
                     },
                   ]}
                 >
-                  <Text style={styles.cardIcon}>{mode.icon}</Text>
+                  <mode.icon
+                    size={22}
+                    color={selected ? '#FFFFFF' : colors.text}
+                  />
                   <Text
                     style={[
                       styles.cardLabel,

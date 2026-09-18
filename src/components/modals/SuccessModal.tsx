@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Check } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import type { AppTheme } from '../../constants/themes';
 
@@ -35,7 +36,7 @@ export default function SuccessModal({
               { backgroundColor: colors.primary + '15' },
             ]}
           >
-            <Text style={[themed.icon, { color: colors.primary }]}>✓</Text>
+            <Check size={28} color={colors.primary} />
           </View>
 
           <Text style={[themed.title, { color: colors.text }]}>{title}</Text>

@@ -152,6 +152,16 @@ export function createStyles(
     cardAddress: {
       padding: spacing.lg,
     },
+    addressRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+    },
+    addressDivider: {
+      height: 1,
+      marginVertical: spacing.xs,
+      backgroundColor: colors.border,
+    },
     cardRow: {
       flexDirection: 'row',
       alignItems: 'center',

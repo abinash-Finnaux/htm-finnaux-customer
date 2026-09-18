@@ -1,6 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
+import {
+  ChevronRight,
+  CircleHelp,
+  ClipboardList,
+  CreditCard,
+  Landmark,
+  Settings,
+  type LucideIcon,
+} from 'lucide-react-native';
 
 export type DrawerRoute =
   | 'Profile'
@@ -11,17 +20,17 @@ export type DrawerRoute =
   | 'HelpSupport';
 
 type DrawerItem = {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   route: DrawerRoute;
 };
 
 const MENU_ITEMS: DrawerItem[] = [
-  { icon: '📋', label: 'Applied Loans', route: 'AppliedLoans' },
-  { icon: '🏦', label: 'My Loans', route: 'MyLoans' },
-  { icon: '💳', label: 'Payment History', route: 'PaymentHistory' },
-  { icon: '⚙️', label: 'Settings', route: 'Settings' },
-  { icon: '❓', label: 'Help & Support', route: 'HelpSupport' },
+  { icon: ClipboardList, label: 'Applied Loans', route: 'AppliedLoans' },
+  { icon: Landmark, label: 'My Loans', route: 'MyLoans' },
+  { icon: CreditCard, label: 'Payment History', route: 'PaymentHistory' },
+  { icon: Settings, label: 'Settings', route: 'Settings' },
+  { icon: CircleHelp, label: 'Help & Support', route: 'HelpSupport' },
 ];
 
 type Props = {
@@ -30,6 +39,7 @@ type Props = {
 
 export default function DrawerMenuList({ onItemPress }: Props) {
   const { theme } = useTheme();
+  const { colors } = theme;
   const themed = createStyles(theme);
 
   return (
@@ -41,9 +51,13 @@ export default function DrawerMenuList({ onItemPress }: Props) {
           activeOpacity={0.6}
           onPress={() => onItemPress(item.route)}
         >
-          <Text style={themed.itemIcon}>{item.icon}</Text>
+          <item.icon
+            size={20}
+            color={colors.text}
+            style={{ width: 32, marginRight: 8 }}
+          />
           <Text style={themed.itemLabel}>{item.label}</Text>
-          <Text style={themed.itemArrow}>›</Text>
+          <ChevronRight size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       ))}
     </>

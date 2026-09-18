@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker, {
   type DateTimePickerChangeEvent,
 } from '@react-native-community/datetimepicker';
+import { CalendarDays } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
   value: Date | null;
   onChange: (date: Date) => void;
   error?: string;
+  backgroundColor?: string;
   maximumDate?: Date;
   minimumDate?: Date;
 };
@@ -26,6 +28,7 @@ export default function GlobalDateOfBirthInput({
   value,
   onChange,
   error,
+  backgroundColor,
   maximumDate = new Date(),
   minimumDate,
 }: Props) {
@@ -59,7 +62,7 @@ export default function GlobalDateOfBirthInput({
         style={[
           styles.input,
           {
-            backgroundColor: colors.surfaceElevated,
+            backgroundColor: backgroundColor ?? colors.surfaceElevated,
             borderColor: error ? colors.error : colors.border,
             borderRadius: radius.md,
             marginTop: spacing.sm,
@@ -74,9 +77,7 @@ export default function GlobalDateOfBirthInput({
         >
           {displayValue || 'DD/MM/YYYY'}
         </Text>
-        <Text style={[styles.calendarIcon, { color: colors.textSecondary }]}>
-          📅
-        </Text>
+        <CalendarDays size={18} color={colors.textSecondary} />
       </Pressable>
       {error ? (
         <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>

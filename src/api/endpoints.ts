@@ -7,11 +7,11 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
-    REFRESH_TOKEN: '/auth/refresh-token',
   },
   USER: {
     PROFILE: '/user/profile',
     UPDATE_PROFILE: '/user/profile',
+    CUSTOMER_DETAILS: '/LMS/Get_LMS_CustomerDetails',
   },
   LOANS: {
     BASE: '/loans',

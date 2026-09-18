@@ -1,6 +1,17 @@
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  ArrowLeft,
+  Banknote,
+  BarChart3,
+  CalendarDays,
+  Hourglass,
+  Landmark,
+  Repeat,
+  TrendingUp,
+} from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 import { toast } from '../../components/toast/ToastProvider';
@@ -45,13 +56,13 @@ const PROGRESS = {
 
 const formatINR = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
-const LOAN_OVERVIEW = [
-  { icon: '💰', label: 'Loan Amount', value: formatINR(LOAN.principal) },
-  { icon: '📈', label: 'Interest Rate', value: `${LOAN.interestRate}% p.a.` },
-  { icon: '⏳', label: 'Tenure', value: `${LOAN.tenureMonths} Months` },
-  { icon: '📅', label: 'Start Date', value: LOAN.startDate },
-  { icon: '🔁', label: 'Frequency', value: LOAN.frequency },
-  { icon: '🏦', label: 'Loan Type', value: LOAN.type },
+const LOAN_OVERVIEW: { icon: LucideIcon; label: string; value: string }[] = [
+  { icon: Banknote, label: 'Loan Amount', value: formatINR(LOAN.principal) },
+  { icon: TrendingUp, label: 'Interest Rate', value: `${LOAN.interestRate}% p.a.` },
+  { icon: Hourglass, label: 'Tenure', value: `${LOAN.tenureMonths} Months` },
+  { icon: CalendarDays, label: 'Start Date', value: LOAN.startDate },
+  { icon: Repeat, label: 'Frequency', value: LOAN.frequency },
+  { icon: Landmark, label: 'Loan Type', value: LOAN.type },
 ];
 
 export default function EmiDetailsScreen({ navigation }: Props) {
@@ -94,7 +105,7 @@ export default function EmiDetailsScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>EMI Details</Text>
           <View style={themed.topSpacer} />
@@ -105,14 +116,20 @@ export default function EmiDetailsScreen({ navigation }: Props) {
             <Text style={themed.heroAmount}>
               {formatINR(PROGRESS.outstanding)}
             </Text>
-            <View style={themed.heroBadge}>
+            <View
+              style={[
+                themed.heroBadge,
+                { flexDirection: 'row', alignItems: 'center', gap: 6 },
+              ]}
+            >
+              <BarChart3 size={11} color="#FFFFFF" />
               <Text style={themed.heroBadgeText}>
-                📊 {PROGRESS.paidCount} of {LOAN.tenureMonths} EMIs paid
+                {PROGRESS.paidCount} of {LOAN.tenureMonths} EMIs paid
               </Text>
             </View>
           </View>
           <View style={themed.heroIconWrap}>
-            <Text style={themed.heroIcon}>📊</Text>
+            <BarChart3 size={30} color="#FFFFFF" />
           </View>
         </View>
       </View>

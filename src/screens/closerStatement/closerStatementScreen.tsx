@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ArrowLeft, Clock, FileText } from 'lucide-react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../../App';
@@ -126,7 +127,7 @@ export default function CloserStatementScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Closer Statement</Text>
           <View style={themed.topSpacer} />
@@ -136,13 +137,16 @@ export default function CloserStatementScreen({ navigation }: Props) {
             <Text style={themed.heroLabel}>Total Closure Amount</Text>
             <Text style={themed.heroAmount}>{formatINR(totalClosure)}</Text>
             <View style={themed.heroBadge}>
-              <Text style={themed.heroBadgeText}>
-                ⏳ Valid till {getValidTillDate()}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <Clock size={12} color="#FFFFFF" />
+                <Text style={themed.heroBadgeText}>
+                  Valid till {getValidTillDate()}
+                </Text>
+              </View>
             </View>
           </View>
           <View style={themed.heroIconWrap}>
-            <Text style={themed.heroIcon}>📑</Text>
+            <FileText size={28} color="#FFFFFF" />
           </View>
         </View>
       </View>
@@ -218,7 +222,7 @@ export default function CloserStatementScreen({ navigation }: Props) {
         </View>
 
         <View style={themed.validityBanner}>
-          <Text style={themed.validityIcon}>⏳</Text>
+          <Clock size={16} color={colors.warning} />
           <Text style={themed.validityText}>
             Quote as of {getAsOfDate()} is valid till {getValidTillDate()}.
             Amounts may change after this date due to daily interest accrual.

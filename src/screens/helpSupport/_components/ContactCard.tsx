@@ -1,16 +1,17 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 type Props = {
-  icon: string;
+  icon: LucideIcon;
   label: string;
   sub: string;
   bg: string;
   onPress: () => void;
 };
 
-export default function ContactCard({ icon, label, sub, bg, onPress }: Props) {
+export default function ContactCard({ icon: Icon, label, sub, bg, onPress }: Props) {
   const { theme } = useTheme();
   const themed = createStyles(theme, bg);
 
@@ -19,7 +20,7 @@ export default function ContactCard({ icon, label, sub, bg, onPress }: Props) {
       onPress={onPress}
       style={({ pressed }) => [themed.card, pressed && themed.pressed]}
     >
-      <Text style={themed.icon}>{icon}</Text>
+      <Icon size={28} color="#FFFFFF" style={themed.icon} />
       <Text style={themed.label}>{label}</Text>
       <Text style={themed.sub}>{sub}</Text>
     </Pressable>

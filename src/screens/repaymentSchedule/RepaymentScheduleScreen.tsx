@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
+import { ArrowLeft, CalendarDays } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { toast } from '../../components/toast/ToastProvider';
 
@@ -300,7 +301,7 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Repayment Schedule</Text>
           <View style={themed.topSpacer} />
@@ -311,14 +312,20 @@ export default function RepaymentScheduleScreen({ navigation }: Props) {
             <Text style={themed.heroAmount}>
               ₹{outstandingBalance.toLocaleString('en-IN')}
             </Text>
-            <View style={themed.heroBadge}>
+            <View
+              style={[
+                themed.heroBadge,
+                { flexDirection: 'row', alignItems: 'center', gap: 6 },
+              ]}
+            >
+              <CalendarDays size={11} color="#FFFFFF" />
               <Text style={themed.heroBadgeText}>
-                📅 {paidCount} of {SCHEDULE.length} EMIs paid
+                {paidCount} of {SCHEDULE.length} EMIs paid
               </Text>
             </View>
           </View>
           <View style={themed.heroIconWrap}>
-            <Text style={themed.heroIcon}>📅</Text>
+            <CalendarDays size={30} color="#FFFFFF" />
           </View>
         </View>
       </View>

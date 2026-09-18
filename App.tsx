@@ -1,11 +1,13 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { Platform, StatusBar, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { UserProvider } from './src/context/UserContext';
 import { ToastProvider } from './src/components/toast/ToastProvider';
+import { useDeveloperOptionsGate } from './src/hooks/useDeveloperOptionsGate';
+import DeveloperOptionsBlockedScreen from './src/screens/blocked/DeveloperOptionsBlockedScreen';
 
 import SplashScreen from './src/screens/splash/SplashScreen';
 import PermissionScreen from './src/screens/permission/PermissionScreen';
@@ -93,13 +95,29 @@ function AppContent() {
   );
 }
 
+function SecurityGate() {
+  const { blocked, ready } = useDeveloperOptionsGate();
+  const { theme } = useTheme();
+
+  if (Platform.OS === 'android' && !__DEV__) {
+    if (!ready) {
+      return <View style={{ flex: 1, backgroundColor: theme.colors.background }} />;
+    }
+    if (blocked) {
+      return <DeveloperOptionsBlockedScreen />;
+    }
+  }
+
+  return <AppContent />;
+}
+
 function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <UserProvider>
           <ToastProvider>
-            <AppContent />
+            <SecurityGate />
           </ToastProvider>
         </UserProvider>
       </ThemeProvider>

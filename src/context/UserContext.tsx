@@ -8,18 +8,71 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export type CustomerAddress = {
+  AddressId?: number;
+  AddressType?: string;
+  Address?: string;
+  LandMark?: string;
+  Tehsil_Name?: string;
+  District_Name?: string;
+  PinCode?: string;
+  AddressRentBuy?: string;
+  TotalYearsOnAddress?: string;
+  IsCommunicationAddress?: string;
+};
+
+export type CustomerDocument = Record<string, unknown>;
+
+export type CustomerApplication = {
+  ApplicationId?: string;
+  ApplicationIdentity?: number;
+  ApplicationNo?: string;
+  CustomerType?: string;
+  Branch?: string;
+  Product?: string;
+  LoanAmount?: string;
+  Status?: string;
+  CreateOn?: string | null;
+  Total_OverDUE_EMI_Amount?: string;
+  Balance_Principle?: string;
+  LoanAcNo?: string | null;
+  Application_Type?: string;
+  ProductId?: number;
+  ProcessId?: number;
+};
+
 export type CustomerProfile = {
   CustomerId?: number | string;
   CIF?: string;
   Customer_Name?: string;
   Customer_Gender?: string;
+  Customer_Age?: string;
+  FatherName?: string;
   Customer_PhoneNo?: string;
   Customer_Email?: string;
+  Customer_Other_Email?: string;
   Customer_DOB?: string;
+  CreateOn?: string;
+  Religion?: string;
+  Cast?: string;
+  MaritalStatus?: string;
+  RelationName?: string;
+  Occupation?: string;
+  BusinessCategory?: string;
+  Nature_of_work?: string;
+  Profile?: string;
+  Category?: string;
+  Sub_Category?: string;
+  Customer_Cur_Address?: string;
+  Customer_Per_Address?: string;
   PermanentAddress?: string;
   PresentAddress?: string;
+  addresses?: CustomerAddress[];
+  documents?: CustomerDocument[];
+  applications?: CustomerApplication[];
   PAN?: string;
   Aadhaar?: string;
+  raw?: Record<string, unknown>;
 };
 
 interface UserContextValue {

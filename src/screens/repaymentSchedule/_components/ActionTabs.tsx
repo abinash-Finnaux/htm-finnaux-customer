@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Text, View, Pressable, StyleSheet } from 'react-native';
+import { CreditCard, Zap } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 type Props = {
@@ -33,7 +34,12 @@ export default function ActionTabs({
           { opacity: pressed ? 0.85 : 1 },
         ]}
       >
-        <Text style={themed.tabIcon}>💳</Text>
+        <View style={themed.tabIcon}>
+          <CreditCard
+            size={24}
+            color={activeTab === 'pay' ? '#FFFFFF' : colors.text}
+          />
+        </View>
         <Text
           style={[
             themed.tabLabel,
@@ -54,7 +60,12 @@ export default function ActionTabs({
           { opacity: pressed ? 0.85 : 1 },
         ]}
       >
-        <Text style={themed.tabIcon}>⚡</Text>
+        <View style={themed.tabIcon}>
+          <Zap
+            size={24}
+            color={activeTab === 'prepay' ? '#FFFFFF' : colors.text}
+          />
+        </View>
         <Text
           style={[
             themed.tabLabel,

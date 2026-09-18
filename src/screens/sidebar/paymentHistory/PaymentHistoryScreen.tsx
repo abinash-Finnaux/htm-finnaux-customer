@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ArrowLeft, CreditCard } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../../../context/ThemeContext';
 import type { RootStackParamList } from '../../../../App';
@@ -82,13 +83,13 @@ export default function PaymentHistoryScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Payment History</Text>
           <View style={themed.topSpacer} />
         </View>
         <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>💳</Text>
+          <CreditCard size={36} color="#FFFFFF" />
           <Text style={themed.headerLabel}>All Transactions</Text>
         </View>
       </View>

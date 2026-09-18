@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ArrowLeft, Briefcase, FileText, Home, Landmark, ReceiptText } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../../App';
@@ -18,7 +20,7 @@ type PeriodKey = '3M' | '6M' | '1Y' | 'ALL';
 type LoanAccount = {
   id: string;
   type: string;
-  icon: string;
+  icon: LucideIcon;
   outstanding: number;
 };
 
@@ -28,13 +30,13 @@ const LOANS: LoanAccount[] = [
   {
     id: 'LA-2024-88321',
     type: 'Personal Loan',
-    icon: '💼',
+    icon: Briefcase,
     outstanding: 286940,
   },
   {
     id: 'LA-2024-77410',
     type: 'Home Loan',
-    icon: '🏠',
+    icon: Home,
     outstanding: 2627840,
   },
 ];
@@ -420,7 +422,7 @@ export default function SOAScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Statement of Account</Text>
           <View style={themed.topSpacer} />
@@ -430,13 +432,16 @@ export default function SOAScreen({ navigation }: Props) {
             <Text style={themed.heroLabel}>Closing Outstanding</Text>
             <Text style={themed.heroAmount}>{formatINR(summary.closing)}</Text>
             <View style={themed.heroBadge}>
-              <Text style={themed.heroBadgeText}>
-                🧾 {filteredEntries.length} entries • Last {activePeriodLabel}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <ReceiptText size={12} color="#FFFFFF" />
+                <Text style={themed.heroBadgeText}>
+                  {filteredEntries.length} entries • Last {activePeriodLabel}
+                </Text>
+              </View>
             </View>
           </View>
           <View style={themed.heroIconWrap}>
-            <Text style={themed.heroIcon}>🧾</Text>
+            <ReceiptText size={28} color="#FFFFFF" />
           </View>
         </View>
       </View>
@@ -462,7 +467,10 @@ export default function SOAScreen({ navigation }: Props) {
                   { opacity: pressed ? 0.85 : 1 },
                 ]}
               >
-                <Text style={themed.loanPillIcon}>{item.icon}</Text>
+                <item.icon
+                  size={20}
+                  color={selected ? '#FFFFFF' : colors.text}
+                />
                 <View>
                   <Text
                     style={[
@@ -487,7 +495,7 @@ export default function SOAScreen({ navigation }: Props) {
         </View>
         <View style={themed.accountStrip}>
           <View style={themed.stripIconCircle}>
-            <Text style={themed.stripIconText}>🏦</Text>
+            <Landmark size={18} color={colors.primary} />
           </View>
           <View style={themed.stripMiddle}>
             <Text style={themed.stripType}>{loan.type}</Text>
@@ -554,7 +562,7 @@ export default function SOAScreen({ navigation }: Props) {
         <View style={themed.ledgerWrap}>
           {filteredEntries.length === 0 ? (
             <View style={themed.emptyState}>
-              <Text style={themed.emptyIcon}>📄</Text>
+              <FileText size={32} color={colors.textSecondary} />
               <Text style={themed.emptyText}>
                 No transactions in this period
               </Text>

@@ -1,19 +1,25 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 type Props = {
-  icon: string;
+  icon: LucideIcon;
   message: string;
 };
 
-export default function InfoCard({ icon, message }: Props) {
+export default function InfoCard({ icon: Icon, message }: Props) {
   const { theme } = useTheme();
+  const { colors, spacing } = theme;
   const themed = createStyles(theme);
 
   return (
     <View style={themed.card}>
-      <Text style={themed.icon}>{icon}</Text>
+      <Icon
+        size={18}
+        color={colors.primary}
+        style={{ marginRight: spacing.sm }}
+      />
       <Text style={themed.message}>{message}</Text>
     </View>
   );

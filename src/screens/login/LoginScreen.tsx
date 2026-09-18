@@ -18,12 +18,14 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import logo from './../../assets/images/logo.png';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import LogoHeader from './_components/LogoHeader';
-import AuthFooter from './_components/AuthFooter';
+// import AuthFooter from './_components/AuthFooter';
 import FormTextInput from '../../components/forms/FormTextInput';
 import FormPasswordInput from '../../components/forms/FormPasswordInput';
 import FormDateOfBirthInput from '../../components/forms/FormDateOfBirthInput';
 import { apiClient } from '../../api';
 import { API_ENDPOINTS } from '../../api';
+import { mapCustomerProfile } from '../../utils/mapCustomerProfile';
+import { formatDateToYYYYMMDD } from '../../utils/formatters';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -36,12 +38,6 @@ type LoginForm = {
   password: string;
 };
 
-function formatDob(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
 export default function LoginScreen({ navigation }: Props) {
   const { theme } = useTheme();
   const { colors, spacing, radius } = theme;
@@ -53,14 +49,14 @@ export default function LoginScreen({ navigation }: Props) {
 
   const verifyForm = useForm<VerifyForm>({
     defaultValues: {
-      cifNumber: '',
-      customerDob: null,
+      cifNumber: 'CIF0000002270',
+      customerDob: new Date('1999-06-14'),
     },
   });
 
   const loginForm = useForm<LoginForm>({
     defaultValues: {
-      password: '',
+      password: 'Mana@14061999',
     },
   });
 
@@ -74,7 +70,9 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       const response = await apiClient.post(API_ENDPOINTS.AUTH.VERIFY_USER, {
         CIF: data.cifNumber,
-        Customer_DOB: data.customerDob ? formatDob(data.customerDob) : '',
+        Customer_DOB: data.customerDob
+          ? formatDateToYYYYMMDD(data.customerDob)
+          : '',
       });
 
       const result =
@@ -83,9 +81,8 @@ export default function LoginScreen({ navigation }: Props) {
           : response.data;
 
       if (Number(result.CODE) === 1) {
-        await AsyncStorage.setItem('@finnaux_token', result.Token);
-        await setUser(result);
-        setCifNumber(result.CIF);
+        const profile = mapCustomerProfile(result);
+        setCifNumber(profile?.CIF || result.CIF || data.cifNumber);
         setStepToken(result.Token);
         setStep(2);
       } else {
@@ -103,7 +100,6 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   const onLogin = async (data: LoginForm) => {
-    console.log('LOGINFUNCTION');
     try {
       const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
         StepToken: stepToken,
@@ -119,8 +115,16 @@ export default function LoginScreen({ navigation }: Props) {
       console.log('loginResultLOG', result);
 
       if (Number(result.CODE) === 1) {
-        await AsyncStorage.setItem('@finnaux_token', result.Token);
-        await setUser(result);
+        console.log('resultResponse', result);
+        if (result.Token) {
+          console.log('logintokennn', result.Token);
+          await AsyncStorage.setItem('@finnaux_token', result.Token);
+        } else {
+          console.warn('GetCustomerLogin returned no Token field', result);
+        }
+        if (result.CustomerId) {
+          await AsyncStorage.setItem('@customer_id', String(result.CustomerId));
+        }
         navigation.replace('Home');
       } else {
         toast.show(result.Msg || JSON.stringify(result), 'error');
@@ -183,6 +187,9 @@ export default function LoginScreen({ navigation }: Props) {
                   rules={{ required: 'CIF number is required' }}
                   backgroundColor={colors.surface}
                   formatText={(text: string) => text.toUpperCase()}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  autoComplete="off"
                 />
 
                 <FormDateOfBirthInput
@@ -190,6 +197,7 @@ export default function LoginScreen({ navigation }: Props) {
                   name="customerDob"
                   label="Date of Birth"
                   rules={{ required: 'Date of birth is required' }}
+                  backgroundColor={colors.surface}
                 />
 
                 <PrimaryButton
@@ -245,13 +253,13 @@ export default function LoginScreen({ navigation }: Props) {
             )}
           </View>
 
-          <AuthFooter
+          {/* <AuthFooter
             message="Don't have an account?"
             linkLabel="Sign Up"
             onLinkPress={() => navigation.navigate('SignUp')}
             skipLabel="Skip for now →"
             onSkipPress={() => navigation.replace('Home')}
-          />
+          /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

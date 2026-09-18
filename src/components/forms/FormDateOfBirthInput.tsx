@@ -15,6 +15,7 @@ type Props<T extends FieldValues> = {
   rules?: RegisterOptions<T>;
   maximumDate?: Date;
   minimumDate?: Date;
+  backgroundColor?: string;
 };
 
 export default function FormDateOfBirthInput<T extends FieldValues>({
@@ -24,6 +25,7 @@ export default function FormDateOfBirthInput<T extends FieldValues>({
   rules,
   maximumDate,
   minimumDate,
+  backgroundColor,
 }: Props<T>) {
   return (
     <Controller
@@ -36,6 +38,7 @@ export default function FormDateOfBirthInput<T extends FieldValues>({
           value={value}
           onChange={onChange}
           error={error?.message}
+          backgroundColor={backgroundColor}
           maximumDate={maximumDate}
           minimumDate={minimumDate}
         />

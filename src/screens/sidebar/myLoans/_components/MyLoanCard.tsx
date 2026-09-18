@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ArrowRight } from 'lucide-react-native';
 import { useTheme } from '../../../../context/ThemeContext';
 
 export type MyLoan = {
@@ -20,6 +21,7 @@ type Props = {
 
 export default function MyLoanCard({ loan, onSchedulePress }: Props) {
   const { theme } = useTheme();
+  const { colors } = theme;
   const themed = createStyles(theme);
 
   return (
@@ -71,7 +73,10 @@ export default function MyLoanCard({ loan, onSchedulePress }: Props) {
         ]}
         onPress={onSchedulePress}
       >
-        <Text style={themed.scheduleBtnText}>View Schedule →</Text>
+        <View style={themed.scheduleRow}>
+          <Text style={themed.scheduleBtnText}>View Schedule</Text>
+          <ArrowRight size={13} color={colors.primary} />
+        </View>
       </Pressable>
     </View>
   );
@@ -148,6 +153,11 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     scheduleBtn: {
       marginTop: 12,
       alignSelf: 'flex-end',
+    },
+    scheduleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
     },
     scheduleBtnText: {
       fontSize: 13,

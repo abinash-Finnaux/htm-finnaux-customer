@@ -1,11 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 
 export type PaymentMode = {
   id: string;
   label: string;
-  icon: string;
+  icon: LucideIcon;
 };
 
 type Props = {
@@ -20,6 +21,7 @@ export default function PaymentMethodPicker({
   onChange,
 }: Props) {
   const { theme } = useTheme();
+  const { colors } = theme;
   const themed = createStyles(theme);
 
   return (
@@ -36,7 +38,7 @@ export default function PaymentMethodPicker({
               { opacity: pressed ? 0.85 : 1 },
             ]}
           >
-            <Text style={themed.icon}>{mode.icon}</Text>
+            <mode.icon size={22} color={selected ? '#FFFFFF' : colors.text} />
             <Text style={[themed.label, selected && themed.labelSelected]}>
               {mode.label}
             </Text>

@@ -26,12 +26,15 @@ apiClient.interceptors.request.use(
     try {
       if (!isCustomerLoginEndpoint(config.url)) {
         const token = await AsyncStorage.getItem('@finnaux_token');
+        console.log('url:', config.url, 'token exists:', token);
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+      } else {
+        console.log('[API] login endpoint, skipping token:', config.url);
       }
     } catch (error) {
-      // Silently fail - token might not exist yet
+      console.log('[API] interceptor error:', error);
     }
     return config;
   },
@@ -42,49 +45,7 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   response => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
-
-    if (
-      error.response?.status === 401 &&
-      !isCustomerLoginEndpoint(originalRequest?.url) &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = await AsyncStorage.getItem(
-          '@finnaux_refresh_token',
-        );
-
-        if (refreshToken) {
-          const response = await axios.post(
-            `${BASE_URL}${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`,
-            {
-              refreshToken,
-            },
-          );
-
-          const { token } = response.data.data;
-          await AsyncStorage.setItem('@finnaux_token', token);
-
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-          }
-
-          return apiClient(originalRequest);
-        }
-      } catch (refreshError) {
-        await AsyncStorage.removeMany([
-          '@finnaux_token',
-          '@finnaux_refresh_token',
-        ]);
-        return Promise.reject(refreshError);
-      }
-    }
-
+  (error: AxiosError) => {
     return Promise.reject(error);
   },
 );

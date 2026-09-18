@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ArrowLeft, Landmark } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../../../context/ThemeContext';
 import type { RootStackParamList } from '../../../../App';
@@ -53,13 +54,13 @@ export default function MyLoansScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>My Loans</Text>
           <View style={themed.topSpacer} />
         </View>
         <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>🏦</Text>
+          <Landmark size={36} color="#FFFFFF" />
           <Text style={themed.headerLabel}>{LOANS.length} Active Loans</Text>
         </View>
       </View>

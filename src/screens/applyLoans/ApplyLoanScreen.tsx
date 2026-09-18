@@ -6,6 +6,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { createStyles } from './styles';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
@@ -84,7 +85,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Apply Loan</Text>
           <View style={themed.topSpacer} />

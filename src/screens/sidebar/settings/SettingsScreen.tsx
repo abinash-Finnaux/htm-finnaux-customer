@@ -1,5 +1,13 @@
 import React from 'react';
 import { Text, View, Switch, Pressable, ScrollView } from 'react-native';
+import {
+  ArrowLeft,
+  ChevronRight,
+  KeyRound,
+  Moon,
+  Settings,
+  Smartphone,
+} from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { createStyles } from './styles';
@@ -33,13 +41,13 @@ export default function SettingsScreen({ navigation }: Props) {
               { opacity: pressed ? 0.6 : 1 },
             ]}
           >
-            <Text style={themed.backBtnText}>←</Text>
+            <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Settings</Text>
           <View style={themed.topSpacer} />
         </View>
         <View style={themed.headerBody}>
-          <Text style={themed.headerIcon}>⚙️</Text>
+          <Settings size={36} color="#FFFFFF" />
         </View>
       </View>
 
@@ -49,7 +57,7 @@ export default function SettingsScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         <SettingsSection title="Appearance">
-          <SettingsRow icon="🌙" label="Dark Mode">
+          <SettingsRow icon={Moon} label="Dark Mode">
             <Switch
               value={isDark}
               onValueChange={toggleTheme}
@@ -72,13 +80,13 @@ export default function SettingsScreen({ navigation }: Props) {
 
         <SettingsSection title="Security" spaced>
           <View style={themed.divider} />
-          <SettingsRow icon="🔑" label="Change Password">
-            <Text style={themed.rowArrow}>›</Text>
+          <SettingsRow icon={KeyRound} label="Change Password">
+            <ChevronRight size={22} color={colors.textSecondary} />
           </SettingsRow>
         </SettingsSection>
 
         <SettingsSection title="About" spaced>
-          <SettingsRow icon="📱" label="App Version">
+          <SettingsRow icon={Smartphone} label="App Version">
             <Text style={themed.rowValue}>v1.0.0</Text>
           </SettingsRow>
         </SettingsSection>
