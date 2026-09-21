@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Text, View, ScrollView, Pressable } from 'react-native';
+import {
+  Text,
+  View,
+  ScrollView,
+  Pressable,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
@@ -9,8 +16,6 @@ import { buildAmortizationData } from './data';
 import YearCard from './_components/YearCard';
 import { createStyles } from './styles';
 import { generateAmortizationPdf } from '../../utils/generatePdf';
-import { toast } from '../../components/toast/ToastProvider';
-import DownloadButton from '../../components/buttons/DownloadButton';
 
 const currency = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
@@ -20,7 +25,9 @@ export default function AmortizationScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const data = useMemo(() => buildAmortizationData(), []);
+  const { emi, loan, totalInterest, paidCount, schedule, years } = data;
   const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
@@ -28,34 +35,33 @@ export default function AmortizationScreen() {
     setDownloading(true);
     try {
       await generateAmortizationPdf(data);
-      toast.show('Amortization schedule saved to Downloads.', 'success');
-    } catch {
-      toast.show('Unable to generate PDF. Please try again.', 'error');
     } finally {
       setDownloading(false);
     }
   };
 
-  const overview = [
-    { label: 'Loan Amount', value: currency(data.loan.principal) },
-    { label: 'Monthly EMI', value: currency(data.emi) },
-    { label: 'Tenure', value: `${data.loan.tenureMonths} months` },
-    { label: 'Interest Rate', value: `${data.loan.interestRate}% p.a.` },
-    {
-      label: 'First EMI',
-      value: data.loan.startDate,
-    },
-    {
-      label: 'Disbursement',
-      value: data.loan.disbursementDate,
-    },
-    { label: 'Loan Ac No', value: data.loan.accountNo },
-    { label: 'Frequency', value: data.loan.frequency },
+  const overview: { label: string; value: string }[][] = [
+    [
+      { label: 'Loan Amount', value: currency(loan.principal) },
+      { label: 'Monthly EMI', value: currency(emi) },
+    ],
+    [
+      { label: 'Tenure', value: `${loan.tenureMonths} months` },
+      { label: 'Interest Rate', value: `${loan.interestRate}% p.a.` },
+    ],
+    [
+      { label: 'Loan Ac No', value: loan.accountNo },
+      { label: 'Loan Type', value: loan.type },
+    ],
+    [
+      { label: 'Disbursement', value: loan.disbursementDate },
+      { label: 'First EMI', value: loan.startDate },
+    ],
   ];
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.headerBar}>
+      <View style={styles.header}>
         <Pressable
           onPress={() => navigation.goBack()}
           style={({ pressed }) => [
@@ -71,49 +77,60 @@ export default function AmortizationScreen() {
       <View style={styles.separator} />
 
       <ScrollView
+        style={styles.scroll}
         contentContainerStyle={styles.footer}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.hero}>
+          <View style={styles.heroDecor1} />
+          <View style={styles.heroDecor2} />
           <View style={styles.heroTop}>
-            <Text style={styles.heroTitle}>MONTHLY EMI</Text>
+            <Text style={styles.heroTitle}>Monthly EMI</Text>
             <View style={styles.paidBadge}>
               <Text style={styles.paidText}>
-                {data.paidCount}/{data.loan.tenureMonths} PAID
+                {paidCount}/{loan.tenureMonths} Paid
               </Text>
             </View>
           </View>
-          <Text style={styles.emiLabel}>Equated Monthly Instalment</Text>
-          <Text style={styles.emiAmount}>{currency(data.emi)}</Text>
-          <View style={styles.heroSub}>
-            <Text style={styles.heroSubText}>{data.loan.accountNo}</Text>
-            <View style={styles.heroDivider} />
-            <Text style={styles.heroSubText}>{data.loan.type}</Text>
-            <View style={styles.heroDivider} />
-            <Text style={styles.heroSubText}>
-              {data.loan.tenureMonths} months
-            </Text>
+          <Text style={styles.emiLabel}>Your Equated Monthly Instalment</Text>
+          <Text style={styles.emiAmount}>{currency(emi)}</Text>
+          <View style={styles.heroDivider} />
+          <View style={styles.heroRow}>
+            <View style={styles.heroCol}>
+              <Text style={styles.heroColLabel}>Loan Amount</Text>
+              <Text style={styles.heroColValue}>
+                {currency(loan.principal)}
+              </Text>
+            </View>
+            <View style={styles.heroCol}>
+              <Text style={styles.heroColLabel}>Tenure</Text>
+              <Text style={styles.heroColValue}>
+                {loan.tenureMonths} months
+              </Text>
+            </View>
+            <View style={styles.heroCol}>
+              <Text style={styles.heroColLabel}>Rate</Text>
+              <Text style={styles.heroColValue}>{loan.interestRate}% p.a.</Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>Total EMIs</Text>
-            <Text style={styles.statValue}>{data.loan.tenureMonths}</Text>
+            <Text style={styles.statValue}>{loan.tenureMonths}</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>Paid</Text>
-            <Text style={styles.statValue}>{data.paidCount}</Text>
+            <Text style={styles.statValue}>{paidCount}</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>Balance</Text>
-            <Text style={styles.statValue}>
-              {data.loan.tenureMonths - data.paidCount}
-            </Text>
+            <Text style={styles.statValue}>{loan.tenureMonths - paidCount}</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>Rate</Text>
-            <Text style={styles.statValueGood}>{data.loan.interestRate}%</Text>
+            <Text style={styles.statValueSuccess}>{loan.interestRate}%</Text>
           </View>
         </View>
 
@@ -122,26 +139,23 @@ export default function AmortizationScreen() {
           <Text style={styles.sectionSub}>
             How your loan repayment gets divided
           </Text>
-        </View>
-
-        <View style={[styles.borrowingCard, styles.section]}>
-          <View style={styles.borrowingRow}>
-            <View style={styles.legendBlock}>
-              <View
-                style={[styles.legendDot, { backgroundColor: colors.primary }]}
-              />
-              <Text style={styles.legendLabel}>Principal Amount</Text>
-              <Text style={styles.legendValue}>
-                {currency(data.loan.principal)}
+          <View style={styles.borrowingCard}>
+            <View style={styles.borrowingItem}>
+              <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+              <Text style={styles.borrowingLabel}>Principal Amount</Text>
+              <Text style={styles.borrowingValue}>
+                {currency(loan.principal)}
               </Text>
             </View>
-            <View style={styles.dividerVertical} />
-            <View style={styles.legendBlock}>
+            <View style={styles.borrowingDivider} />
+            <View style={styles.borrowingItem}>
               <View
-                style={[styles.legendDot, { backgroundColor: colors.warning }]}
+                style={[styles.dot, { backgroundColor: colors.warning }]}
               />
-              <Text style={styles.legendLabel}>Total Interest</Text>
-              <Text style={styles.legendValue}>{currency(data.totalInterest)}</Text>
+              <Text style={styles.borrowingLabel}>Total Interest</Text>
+              <Text style={styles.borrowingValue}>
+                {currency(totalInterest)}
+              </Text>
             </View>
           </View>
         </View>
@@ -150,24 +164,29 @@ export default function AmortizationScreen() {
           <Text style={styles.sectionTitle}>Loan Overview</Text>
         </View>
 
-        <View style={styles.detailCard}>
-          {overview.map((item, index) => {
-            const isLast = index === overview.length - 1;
-            return (
-              <View
-                key={item.label}
-                style={[
-                  styles.detailRow,
-                  !isLast && styles.dividerRowBorder,
-                ]}
-              >
-                <View style={styles.detailCell}>
-                  <Text style={styles.detailLabel}>{item.label}</Text>
-                  <Text style={styles.detailValue}>{item.value}</Text>
+        <View style={styles.overviewCard}>
+          {overview.map((row, rowIndex) => (
+            <View
+              key={rowIndex}
+              style={[
+                styles.overviewRow,
+                rowIndex < overview.length - 1 && styles.rowDivider,
+              ]}
+            >
+              {row.map((cell, cellIndex) => (
+                <View
+                  key={cell.label}
+                  style={[
+                    styles.overviewCell,
+                    cellIndex === 0 && styles.cellDividerRight,
+                  ]}
+                >
+                  <Text style={styles.cellLabel}>{cell.label}</Text>
+                  <Text style={styles.cellValue}>{cell.value}</Text>
                 </View>
-              </View>
-            );
-          })}
+              ))}
+            </View>
+          ))}
         </View>
 
         <View style={styles.section}>
@@ -177,17 +196,23 @@ export default function AmortizationScreen() {
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.scheduleList}>
-            {data.years.map((year) => (
-              <YearCard key={year.label} year={year} schedule={data.schedule} />
-            ))}
-          </View>
+        <View style={styles.scheduleList}>
+          {years.map(year => (
+            <YearCard key={year.label} year={year} schedule={schedule} />
+          ))}
         </View>
 
-        <View style={styles.downloadWrap}>
-          <DownloadButton onPress={handleDownload} label="Download PDF" />
-        </View>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={handleDownload}
+          style={styles.downloadBtn}
+        >
+          {downloading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.downloadText}>Download PDF</Text>
+          )}
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
