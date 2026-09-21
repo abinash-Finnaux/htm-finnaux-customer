@@ -11,11 +11,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Service'>;
 export const SERVICES = [
   {
     icon: '📝',
-    label: 'Ammortization',
+    label: 'Amortization',
     color: '#2563EB',
     bg: '#1E3A5F',
-    title: 'Apply Loan',
-    description: 'Apply for a new loan directly from the app.',
+    title: 'Amortization',
+    description:
+      'View EMI-wise principal, interest, payment dates, and outstanding loan balance.',
   },
   // {
   //   icon: '📅',
@@ -112,7 +113,7 @@ export default function ServiceScreen({ navigation, route }: Props) {
               bg={service.bg}
               onPress={() => {
                 if (index === 0) {
-                  navigation.navigate('ApplyLoan');
+                  navigation.navigate('Amortization');
                 }
                 // else if (index === 1) {
                 //   navigation.navigate('RepaymentSchedule');

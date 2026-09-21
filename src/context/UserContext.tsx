@@ -39,6 +39,11 @@ export type CustomerApplication = {
   Application_Type?: string;
   ProductId?: number;
   ProcessId?: number;
+  Next_Due_Date?: string;
+  Next_Due_Amount?: string;
+  Last_Due_Date?: string;
+  Last_Due_Amount?: string;
+  Last_Recv_Amount?: string;
 };
 
 export type CustomerProfile = {

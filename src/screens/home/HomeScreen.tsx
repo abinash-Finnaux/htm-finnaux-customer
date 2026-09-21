@@ -227,7 +227,7 @@ export default function HomeScreen({ navigation }: Props) {
 
         <View style={themed.loansSection}>
           <Text style={themed.sectionTitle}>
-            My Applications{' '}
+            Loan Applications{' '}
             {user?.applications?.length ? `(${user.applications.length})` : ''}
           </Text>
           {user?.applications && user.applications.length > 0 ? (

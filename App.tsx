@@ -27,6 +27,7 @@ import EmiDetailsScreen from './src/screens/emiDetails/emiDetailsScreen';
 import EmiDepositScreen from './src/screens/emiDeposit/emiDepositScreen';
 import CloserStatementScreen from './src/screens/closerStatement/closerStatementScreen';
 import SOAScreen from './src/screens/soa/soaScreen';
+import AmortizationScreen from './src/screens/amortization/AmortizationScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -47,6 +48,7 @@ export type RootStackParamList = {
   EmiDeposit: undefined;
   CloserStatement: undefined;
   SOA: undefined;
+  Amortization: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -89,6 +91,7 @@ function AppContent() {
             component={CloserStatementScreen}
           />
           <Stack.Screen name="SOA" component={SOAScreen} />
+          <Stack.Screen name="Amortization" component={AmortizationScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

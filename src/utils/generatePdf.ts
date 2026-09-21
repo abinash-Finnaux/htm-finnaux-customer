@@ -315,3 +315,161 @@ export async function generateCloserPdf(data: CloserPdfData): Promise<void> {
     toast.show('Unable to generate PDF. Please try again.', 'error');
   }
 }
+
+type AmortizationInstallment = {
+  no: number;
+  date: string;
+  principal: number;
+  interest: number;
+  emi: number;
+  balance: number;
+  status: 'Paid' | 'Upcoming';
+};
+
+type AmortizationPdfData = {
+  loan: {
+    accountNo: string;
+    type: string;
+    principal: number;
+    interestRate: number;
+    tenureMonths: number;
+    startDate: string;
+    frequency: string;
+    disbursementDate: string;
+  };
+  emi: number;
+  totalInterest: number;
+  totalPayable: number;
+  paidCount: number;
+  schedule: AmortizationInstallment[];
+};
+
+const formatAmount = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+
+const generateAmortizationHtml = (data: AmortizationPdfData): string => {
+  const headerRows = [
+    { label: 'Loan Account No', value: data.loan.accountNo },
+    { label: 'Loan Type', value: data.loan.type },
+    { label: 'Loan Amount', value: formatAmount(data.loan.principal) },
+    { label: 'Interest Rate', value: `${data.loan.interestRate}% p.a.` },
+    { label: 'Tenure', value: `${data.loan.tenureMonths} months` },
+    { label: 'Monthly EMI', value: formatAmount(data.emi) },
+    { label: 'Disbursement', value: data.loan.disbursementDate },
+    { label: 'Total Interest', value: formatAmount(data.totalInterest) },
+    { label: 'Total Payable', value: formatAmount(data.totalPayable) },
+  ];
+
+  const headerCells = headerRows
+    .map(
+      (row) => `
+      <div class="cell">
+        <span class="label">${row.label}</span>
+        <span class="value">${row.value}</span>
+      </div>`,
+    )
+    .join('');
+
+  const scheduleRows = data.schedule
+    .map(
+      (row) => `
+      <tr>
+        <td>${row.no}</td>
+        <td>${row.date}</td>
+        <td>${formatAmount(row.principal)}</td>
+        <td>${formatAmount(row.interest)}</td>
+        <td>${formatAmount(row.emi)}</td>
+        <td>${formatAmount(row.balance)}</td>
+        <td>${row.status}</td>
+      </tr>`,
+    )
+    .join('');
+
+  return `
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          @page { margin: 20px; }
+          body { font-family: Arial, Helvetica, sans-serif; color: #1E293B; margin: 0; padding: 20px; }
+          .header { border-bottom: 3px solid #2563EB; padding-bottom: 16px; margin-bottom: 20px; }
+          .brand { font-size: 24px; font-weight: bold; color: #2563EB; }
+          .heading { font-size: 18px; font-weight: bold; text-align: right; margin-top: 8px; }
+          .subheading { font-size: 11px; color: #64748B; text-align: right; }
+          .meta-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+          .cell { flex: 1 1 30%; min-width: 140px; background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 12px; box-sizing: border-box; }
+          .label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748B; margin-bottom: 4px; }
+          .value { font-size: 14px; font-weight: bold; }
+          table { width: 100%; border-collapse: collapse; font-size: 10px; }
+          th { background: #2563EB; color: #fff; padding: 8px 6px; text-align: left; }
+          td { padding: 6px; border-bottom: 1px solid #E2E8F0; }
+          tr:nth-child(even) td { background: #F8FAFC; }
+          .footer { margin-top: 24px; text-align: center; font-size: 10px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="brand">Finaux</div>
+            <div>
+              <div class="heading">Loan Amortization Schedule</div>
+              <div class="subheading">Generated on ${data.loan.startDate}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta-grid">${headerCells}</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Principal</th>
+              <th>Interest</th>
+              <th>EMI</th>
+              <th>Balance</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>${scheduleRows}</tbody>
+        </table>
+
+        <div class="footer">Finaux Customer App - Confidential</div>
+      </body>
+    </html>
+  `;
+};
+
+export async function generateAmortizationPdf(
+  data: AmortizationPdfData,
+): Promise<string | void> {
+  try {
+    const html = generateAmortizationHtml(data);
+    const fileName = `Amortization_${data.loan.accountNo.replace(
+      /[^a-zA-Z0-9]/g,
+      '_',
+    )}`;
+
+    const destPath: string | undefined =
+      Platform.OS === 'android'
+        ? `${RNFetchBlob.fs.dirs.DownloadDir}/${fileName}.pdf`
+        : undefined;
+
+    const file = await generatePDF({ html, fileName, directory: 'Downloads' });
+
+    if (Platform.OS === 'android' && destPath) {
+      RNFetchBlob.fs
+        .mv(file.filePath, destPath)
+        .then(() => {
+          RNFetchBlob.android.actionViewIntent(destPath, 'application/pdf');
+        })
+        .catch(() => {
+          toast.show('Unable to generate PDF. Please try again.', 'error');
+        });
+    }
+    return file.filePath;
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    toast.show('Unable to generate PDF. Please try again.', 'error');
+  }
+}

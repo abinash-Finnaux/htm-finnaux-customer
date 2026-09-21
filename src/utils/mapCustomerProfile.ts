@@ -129,6 +129,11 @@ export function mapCustomerProfile(
         Application_Type: cleanText(item?.Application_Type),
         ProductId: item?.ProductId as number | undefined,
         ProcessId: item?.ProcessId as number | undefined,
+        Next_Due_Date: cleanText(item?.Next_Due_Date),
+        Next_Due_Amount: cleanText(item?.Next_Due_Amount),
+        Last_Due_Date: cleanText(item?.Last_Due_Date),
+        Last_Due_Amount: cleanText(item?.Last_Due_Amount),
+        Last_Recv_Amount: cleanText(item?.Last_Recv_Amount),
       }))
     : [];
 

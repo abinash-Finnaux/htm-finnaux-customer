@@ -98,6 +98,45 @@ export default function ApplicationCard({ application, onPress }: Props) {
           </View>
         )}
       </View>
+
+      <View style={themed.divider} />
+      <View style={themed.dueHeader}>
+        <Text style={themed.dueTitle}>Due Details</Text>
+      </View>
+      <View style={themed.grid}>
+        <View style={themed.field}>
+          <Text style={themed.fieldLabel}>Next Due Date</Text>
+          <Text style={themed.fieldValue}>
+            {application.Next_Due_Date || '—'}
+          </Text>
+        </View>
+        <View style={themed.field}>
+          <Text style={[themed.fieldLabel, themed.dueLabel]}>
+            Next Due Amount
+          </Text>
+          <Text style={[themed.fieldValue, themed.valuePrimary]}>
+            {formatAmount(application.Next_Due_Amount)}
+          </Text>
+        </View>
+        <View style={themed.field}>
+          <Text style={themed.fieldLabel}>Last Due Date</Text>
+          <Text style={themed.fieldValue}>
+            {application.Last_Due_Date || '—'}
+          </Text>
+        </View>
+        <View style={themed.field}>
+          <Text style={themed.fieldLabel}>Last Due Amount</Text>
+          <Text style={themed.fieldValue}>
+            {formatAmount(application.Last_Due_Amount)}
+          </Text>
+        </View>
+        <View style={themed.field}>
+          <Text style={themed.fieldLabel}>Last Received</Text>
+          <Text style={themed.fieldValue}>
+            {formatAmount(application.Last_Recv_Amount)}
+          </Text>
+        </View>
+      </View>
     </Pressable>
   );
 }
@@ -159,6 +198,19 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       height: 1,
       marginVertical: 14,
       backgroundColor: colors.border,
+    },
+    dueHeader: {
+      marginBottom: 12,
+    },
+    dueTitle: {
+      fontSize: 13,
+      fontWeight: '800',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      color: colors.text,
+    },
+    dueLabel: {
+      color: colors.warning,
     },
     grid: {
       flexDirection: 'row',
