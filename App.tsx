@@ -35,7 +35,14 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Home: undefined;
-  Service: { title: string; icon: string; description: string };
+  Service: {
+    title: string;
+    icon: string;
+    description: string;
+    ApplicationNo?: string;
+    loanId?: string;
+    ApplicationIdentity?: number;
+  };
   Profile: undefined;
   AppliedLoans: undefined;
   MyLoans: undefined;
@@ -48,7 +55,7 @@ export type RootStackParamList = {
   EmiDeposit: undefined;
   CloserStatement: undefined;
   SOA: undefined;
-  Amortization: undefined;
+  Amortization: { ApplicationIdentity?: number } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

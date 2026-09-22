@@ -49,14 +49,14 @@ export default function LoginScreen({ navigation }: Props) {
 
   const verifyForm = useForm<VerifyForm>({
     defaultValues: {
-      cifNumber: 'CIF0000002270',
-      customerDob: new Date('1999-06-14'),
+      cifNumber: 'CIF0000001861',
+      customerDob: new Date('2003-07-05'),
     },
   });
 
   const loginForm = useForm<LoginForm>({
     defaultValues: {
-      password: 'Mana@14061999',
+      password: 'Ishi@05072003',
     },
   });
 

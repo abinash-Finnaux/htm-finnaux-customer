@@ -19,6 +19,14 @@ export type CustomerAddress = {
   AddressRentBuy?: string;
   TotalYearsOnAddress?: string;
   IsCommunicationAddress?: string;
+  Present_Address?: string;
+  Permanent_Address?: string;
+  Work_Address?: string;
+  Rent_Own?: string;
+  Customer_IsFirm?: boolean;
+  Present_LatLong?: string;
+  Permanent_LatLong?: string;
+  Work_LatLong?: string;
 };
 
 export type CustomerDocument = Record<string, unknown>;
@@ -44,6 +52,43 @@ export type CustomerApplication = {
   Last_Due_Date?: string;
   Last_Due_Amount?: string;
   Last_Recv_Amount?: string;
+  Loan_Id?: string;
+  InquiryNo?: string;
+  Process_Status?: string | null;
+  ApplicationCreateOn?: string;
+  Application_CreateDate?: string;
+  TAT_Hr?: number;
+  Application_LoanEMIAmount?: string;
+  Application_LoanDuration_Month?: string;
+  LoanPurpose?: string;
+  Lead_Reference?: string | null;
+  AssetCost?: string;
+  NetFinance?: string;
+  Flat_Rate?: string;
+  Tenure?: string;
+  No_Of_Instl?: string;
+  Adv_Instl?: string;
+  ManagementFee?: string;
+  DisbursementAmt?: string;
+  AgreementValue?: string;
+  InterestAmt?: string;
+  EMIAmount?: string;
+  Case_IRR?: string;
+  Disbursement_IRR?: string;
+  LTV?: string;
+  Margin?: string;
+  FirstEMIDate?: string | null;
+  Loan_Date?: string | null;
+  ExpiryDate?: string | null;
+  CollectionOn?: string | null;
+  CollectionMode?: string | null;
+  CloseDate?: string | null;
+  Watermark_Status?: string | null;
+  LoanSegment?: string | null;
+  DPD_DAYS?: string | number;
+  Customer?: string;
+  CustomerName?: string;
+  CustomerId?: string | null;
 };
 
 export type CustomerProfile = {

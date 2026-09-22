@@ -1,7 +1,9 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { Text, View, Image, Pressable, ScrollView } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Text, View, Image, Pressable } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useTheme } from '../../context/ThemeContext';
 import { useUser, getInitials } from '../../context/UserContext';
+import type { CustomerApplication } from '../../context/UserContext';
 import { apiClient, API_ENDPOINTS } from '../../api';
 import { mapCustomerProfile } from '../../utils/mapCustomerProfile';
 
@@ -13,8 +15,6 @@ import logo from './../../assets/images/logo.png';
 import { createStyles } from './styles';
 import type { LucideIcon } from 'lucide-react-native';
 import { Sun, Moon } from 'lucide-react-native';
-import StatCard from './_components/StatCard';
-import ServiceCard from './_components/ServiceCard';
 import ApplicationCard from './_components/ApplicationCard';
 import ProfileDrawerModal from './_components/ProfileDrawerModal';
 
@@ -150,15 +150,44 @@ export default function HomeScreen({ navigation }: Props) {
     ? 'rgba(255,255,255,0.04)'
     : 'rgba(255,255,255,0.08)';
 
-  const themed = createStyles(colors, spacing, heroBg, heroDecor);
+  const themed = useMemo(
+    () => createStyles(colors, spacing, heroBg, heroDecor),
+    [colors, spacing, heroBg, heroDecor],
+  );
 
-  return (
-    <View style={themed.root}>
-      <ScrollView
-        style={themed.flex}
-        contentContainerStyle={themed.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+  const applications = user?.applications ?? [];
+
+  const handleApplicationPress = useCallback(
+    (application: CustomerApplication) => {
+      navigation.navigate('Service', {
+        title: application.Product || 'Loan Application',
+        icon: '📝',
+        description: `View details and manage your`,
+        ApplicationNo: application.ApplicationNo,
+        ApplicationIdentity: application.ApplicationIdentity,
+      });
+    },
+    [navigation],
+  );
+
+  const renderApplication = useCallback(
+    ({ item }: { item: CustomerApplication }) => (
+      <View style={themed.loanItem}>
+        <ApplicationCard application={item} onPress={handleApplicationPress} />
+      </View>
+    ),
+    [themed.loanItem, handleApplicationPress],
+  );
+
+  const keyExtractor = useCallback(
+    (item: CustomerApplication, index: number) =>
+      String(item.ApplicationId ?? item.ApplicationNo ?? index),
+    [],
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <>
         <View style={themed.hero}>
           <View style={themed.heroDecor1} />
           <View style={themed.heroDecor2} />
@@ -230,66 +259,33 @@ export default function HomeScreen({ navigation }: Props) {
             Loan Applications{' '}
             {user?.applications?.length ? `(${user.applications.length})` : ''}
           </Text>
-          {user?.applications && user.applications.length > 0 ? (
-            user.applications.map((application, index) => (
-              <ApplicationCard
-                key={index}
-                application={application}
-                onPress={() =>
-                  navigation.navigate('Service', {
-                    title: application.Product || 'Loan Application',
-                    icon: '📝',
-                    description: `View details and manage your ${
-                      application.Product || 'loan'
-                    } application${
-                      application.ApplicationNo
-                        ? ` (${application.ApplicationNo})`
-                        : ''
-                    }.`,
-                  })
-                }
-              />
-            ))
-          ) : (
-            <Text style={themed.emptyText}>No applications found.</Text>
-          )}
         </View>
+      </>
+    ),
+    [themed, greeting, user, isDark, toggleTheme],
+  );
 
-        {/* <View style={themed.servicesSection}>
-          <Text style={themed.sectionTitle}>Our Services</Text>
-          <View style={themed.servicesGrid}>
-            {SERVICES.map((service, index) => (
-              <ServiceCard
-                key={index}
-                icon={service.icon}
-                label={service.label}
-                bg={service.bg}
-                onPress={() => {
-                  if (index === 0) {
-                    navigation.navigate('ApplyLoan');
-                  } else if (index === 1) {
-                    navigation.navigate('RepaymentSchedule');
-                  } else if (index === 2) {
-                    navigation.navigate('EmiDetails');
-                  } else if (index === 3) {
-                    navigation.navigate('EmiDeposit');
-                  } else if (index === 4) {
-                    navigation.navigate('CloserStatement');
-                  } else if (index === 5) {
-                    navigation.navigate('SOA');
-                  } else {
-                    navigation.navigate('Service', {
-                      title: service.title,
-                      icon: service.icon,
-                      description: service.description,
-                    });
-                  }
-                }}
-              />
-            ))}
-          </View>
-        </View> */}
-      </ScrollView>
+  const listEmpty = useMemo(
+    () => (
+      <View style={themed.loansSection}>
+        <Text style={themed.emptyText}>No applications found.</Text>
+      </View>
+    ),
+    [themed.loansSection, themed.emptyText],
+  );
+
+  return (
+    <View style={themed.root}>
+      <FlashList
+        data={applications}
+        renderItem={renderApplication}
+        keyExtractor={keyExtractor}
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={listEmpty}
+        style={themed.flex}
+        contentContainerStyle={themed.scrollContent}
+        showsVerticalScrollIndicator={false}
+      />
 
       <ProfileDrawerModal
         visible={profileOpen}

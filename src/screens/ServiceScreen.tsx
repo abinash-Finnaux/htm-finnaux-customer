@@ -61,7 +61,9 @@ export const SERVICES = [
 ];
 
 export default function ServiceScreen({ navigation, route }: Props) {
-  const { title, icon, description } = route.params;
+  const { title, icon, ApplicationNo, ApplicationIdentity } = route.params;
+  console.log('applicationIdentityLOGLOG', ApplicationIdentity);
+
   const { theme, isDark } = useTheme();
   const { colors, spacing, radius, typography } = theme;
 
@@ -93,6 +95,9 @@ export default function ServiceScreen({ navigation, route }: Props) {
             <Text style={styles.headerIcon}>{icon}</Text>
           </View>
           <Text style={styles.headerTitle}>{title}</Text>
+          {!!ApplicationNo && (
+            <Text style={styles.headerSub}>Application: {ApplicationNo}</Text>
+          )}
         </View>
       </View>
 
@@ -113,7 +118,13 @@ export default function ServiceScreen({ navigation, route }: Props) {
               bg={service.bg}
               onPress={() => {
                 if (index === 0) {
-                  navigation.navigate('Amortization');
+                  const params: {
+                    ApplicationIdentity?: number;
+                  } = {};
+                  if (ApplicationIdentity) {
+                    params.ApplicationIdentity = ApplicationIdentity;
+                  }
+                  navigation.navigate('Amortization', params);
                 }
                 // else if (index === 1) {
                 //   navigation.navigate('RepaymentSchedule');
@@ -212,6 +223,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginTop: 14,
+    textAlign: 'center',
+  },
+  headerSub: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 6,
     textAlign: 'center',
   },
   flex: {

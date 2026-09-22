@@ -155,6 +155,9 @@ export function createStyles(
     loansSection: {
       paddingHorizontal: spacing.lg,
     },
+    loanItem: {
+      paddingHorizontal: spacing.lg,
+    },
     emptyText: {
       fontSize: 14,
       color: colors.textSecondary,

@@ -7,12 +7,13 @@ import InstallmentRow from './InstallmentRow';
 type Props = {
   year: AmortizationYear;
   schedule: Installment[];
+  initialExpanded?: boolean;
 };
 
-function YearCard({ year, schedule }: Props) {
+function YearCard({ year, schedule, initialExpanded = false }: Props) {
   const { theme } = useTheme();
   const { colors } = theme;
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initialExpanded);
 
   const themed = useMemo(() => createStyles(colors), [colors]);
 

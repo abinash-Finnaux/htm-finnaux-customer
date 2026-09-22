@@ -13,6 +13,10 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: '/user/profile',
     CUSTOMER_DETAILS: '/LMS/Get_LMS_CustomerDetails',
   },
+  LMS: {
+    AMORTIZATION_CHART: '/LMS/LMS_Get_Amortization_Chart',
+    LOAN_DETAILS: '/LMS/LMS_GetLoanDetails',
+  },
   LOANS: {
     BASE: '/loans',
     APPLY: '/loans/apply',

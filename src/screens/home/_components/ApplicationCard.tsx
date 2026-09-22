@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import type { CustomerApplication } from '../../../context/UserContext';
 
 type Props = {
   application: CustomerApplication;
-  onPress?: () => void;
+  onPress?: (application: CustomerApplication) => void;
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -26,17 +26,19 @@ function formatAmount(value?: string): string {
   return `₹${amount.toLocaleString('en-IN')}`;
 }
 
-export default function ApplicationCard({ application, onPress }: Props) {
-  console.log('applicationLog', application);
+function ApplicationCard({ application, onPress }: Props) {
   const { theme } = useTheme();
-  const themed = createStyles(theme);
-
-  const status = application.Status || 'Created';
+  const themed = useMemo(() => createStyles(theme), [theme]);
+  const handlePress = useCallback(
+    () => onPress?.(application),
+    [onPress, application],
+  );
+  const status = application.Status || '';
   const statusColor = STATUS_COLORS[status] || '#6B7280';
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       style={({ pressed }) => [themed.card, pressed && themed.pressed]}
     >
       <View style={themed.header}>
@@ -140,6 +142,8 @@ export default function ApplicationCard({ application, onPress }: Props) {
     </Pressable>
   );
 }
+
+export default React.memo(ApplicationCard);
 
 function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
   const { colors, spacing, radius } = theme;
