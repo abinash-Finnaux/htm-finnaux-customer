@@ -143,6 +143,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(USER_STORAGE_KEY);
+        console.log('rawLOGLOGLOGLGOLOG', raw);
+
         if (raw) {
           setUserState(JSON.parse(raw));
         }

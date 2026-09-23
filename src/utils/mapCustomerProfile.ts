@@ -111,17 +111,6 @@ function numberText(value: unknown, fallback = ''): string {
 }
 
 function mapApplication(item: Record<string, unknown>): CustomerApplication {
-  const loanAmount =
-    numberText(item?.AssetCost) ||
-    numberText(item?.NetFinance) ||
-    numberText(item?.DisbursementAmt) ||
-    numberText(item?.AgreementValue);
-
-  const status =
-    cleanText(item?.Status) ||
-    cleanText(item?.Process_Status) ||
-    cleanText(item?.Watermark_Status);
-
   return {
     ApplicationId: emptyToUndefined(cleanText(item?.ApplicationId)),
     ApplicationIdentity: item?.ApplicationIdentity as number | undefined,
@@ -129,10 +118,10 @@ function mapApplication(item: Record<string, unknown>): CustomerApplication {
     CustomerType: cleanText(item?.CustomerType),
     Branch: cleanText(item?.Branch),
     Product: cleanText(item?.Product),
-    LoanAmount: loanAmount,
-    Status: status,
-    CreateOn:
-      cleanText(item?.CreateOn) || cleanText(item?.ApplicationCreateOn),
+    LoanAmount: cleanText(item?.LoanAmount),
+    Status: cleanText(item?.Status),
+
+    CreateOn: cleanText(item?.CreateOn) || cleanText(item?.ApplicationCreateOn),
     Total_OverDUE_EMI_Amount: cleanText(item?.Total_OverDUE_EMI_Amount),
     Balance_Principle: cleanText(item?.Balance_Principle),
     LoanAcNo: emptyToUndefined(cleanText(item?.LoanAcNo)),
@@ -281,7 +270,8 @@ export function mapCustomerProfile(
         'Customer',
         'Name',
         'Customer_Name',
-      ]) || (applications[0]?.CustomerName ?? ''),
+      ]) ||
+      (applications[0]?.CustomerName ?? ''),
     Customer_Gender:
       gender || pickString(personal, ['Gender', 'Customer_Gender']),
     Customer_Age:

@@ -1,5 +1,12 @@
-import React, { useCallback, useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import type { CustomerApplication } from '../../../context/UserContext';
 
@@ -35,6 +42,8 @@ function ApplicationCard({ application, onPress }: Props) {
   );
   const status = application.Status || '';
   const statusColor = STATUS_COLORS[status] || '#6B7280';
+  const [expanded, setExpanded] = useState(false);
+  const toggleExpand = useCallback(() => setExpanded(v => !v), []);
 
   return (
     <Pressable
@@ -51,12 +60,26 @@ function ApplicationCard({ application, onPress }: Props) {
             <Text style={themed.branch}>{application.Branch}</Text>
           )}
         </View>
-        <View
-          style={[themed.statusBadge, { backgroundColor: statusColor + '18' }]}
-        >
-          <Text style={[themed.statusText, { color: statusColor }]}>
-            {status}
-          </Text>
+        <View style={themed.headerRight}>
+          <View
+            style={[themed.statusBadge, { backgroundColor: statusColor + '18' }]}
+          >
+            <Text style={[themed.statusText, { color: statusColor }]}>
+              {status}
+            </Text>
+          </View>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={toggleExpand}
+            hitSlop={8}
+            style={themed.toggleIconBtn}
+          >
+            {expanded ? (
+              <ChevronUp size={16} color={theme.colors.primary} />
+            ) : (
+              <ChevronDown size={16} color={theme.colors.primary} />
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -69,76 +92,85 @@ function ApplicationCard({ application, onPress }: Props) {
             {formatAmount(application.LoanAmount)}
           </Text>
         </View>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Balance Principal</Text>
-          <Text style={themed.fieldValue}>
-            {formatAmount(application.Balance_Principle)}
-          </Text>
-        </View>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Customer Type</Text>
-          <Text style={themed.fieldValue}>
-            {application.CustomerType || '—'}
-          </Text>
-        </View>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Application Type</Text>
-          <Text style={themed.fieldValue}>
-            {application.Application_Type || '—'}
-          </Text>
-        </View>
-        {!!application.LoanAcNo && (
-          <View style={themed.field}>
-            <Text style={themed.fieldLabel}>Loan Account No</Text>
-            <Text style={themed.fieldValue}>{application.LoanAcNo}</Text>
-          </View>
-        )}
-        {!!application.CreateOn && (
-          <View style={themed.field}>
-            <Text style={themed.fieldLabel}>Created On</Text>
-            <Text style={themed.fieldValue}>{application.CreateOn}</Text>
-          </View>
+
+      {expanded && (
+          <>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Balance Principal</Text>
+              <Text style={themed.fieldValue}>
+                {formatAmount(application.Balance_Principle)}
+              </Text>
+            </View>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Customer Type</Text>
+              <Text style={themed.fieldValue}>
+                {application.CustomerType || '—'}
+              </Text>
+            </View>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Application Type</Text>
+              <Text style={themed.fieldValue}>
+                {application.Application_Type || '—'}
+              </Text>
+            </View>
+            {!!application.LoanAcNo && (
+              <View style={themed.field}>
+                <Text style={themed.fieldLabel}>Loan Account No</Text>
+                <Text style={themed.fieldValue}>{application.LoanAcNo}</Text>
+              </View>
+            )}
+            {!!application.CreateOn && (
+              <View style={themed.field}>
+                <Text style={themed.fieldLabel}>Created On</Text>
+                <Text style={themed.fieldValue}>{application.CreateOn}</Text>
+              </View>
+            )}
+          </>
         )}
       </View>
 
-      <View style={themed.divider} />
-      <View style={themed.dueHeader}>
-        <Text style={themed.dueTitle}>Due Details</Text>
-      </View>
-      <View style={themed.grid}>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Next Due Date</Text>
-          <Text style={themed.fieldValue}>
-            {application.Next_Due_Date || '—'}
-          </Text>
-        </View>
-        <View style={themed.field}>
-          <Text style={[themed.fieldLabel, themed.dueLabel]}>
-            Next Due Amount
-          </Text>
-          <Text style={[themed.fieldValue, themed.valuePrimary]}>
-            {formatAmount(application.Next_Due_Amount)}
-          </Text>
-        </View>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Last Due Date</Text>
-          <Text style={themed.fieldValue}>
-            {application.Last_Due_Date || '—'}
-          </Text>
-        </View>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Last Due Amount</Text>
-          <Text style={themed.fieldValue}>
-            {formatAmount(application.Last_Due_Amount)}
-          </Text>
-        </View>
-        <View style={themed.field}>
-          <Text style={themed.fieldLabel}>Last Received</Text>
-          <Text style={themed.fieldValue}>
-            {formatAmount(application.Last_Recv_Amount)}
-          </Text>
-        </View>
-      </View>
+      {expanded && (
+        <>
+          <View style={themed.divider} />
+          <View style={themed.dueHeader}>
+            <Text style={themed.dueTitle}>Due Details</Text>
+          </View>
+          <View style={themed.grid}>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Next Due Date</Text>
+              <Text style={themed.fieldValue}>
+                {application.Next_Due_Date || '—'}
+              </Text>
+            </View>
+            <View style={themed.field}>
+              <Text style={[themed.fieldLabel, themed.dueLabel]}>
+                Next Due Amount
+              </Text>
+              <Text style={[themed.fieldValue, themed.valuePrimary]}>
+                {formatAmount(application.Next_Due_Amount)}
+              </Text>
+            </View>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Last Due Date</Text>
+              <Text style={themed.fieldValue}>
+                {application.Last_Due_Date || '—'}
+              </Text>
+            </View>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Last Due Amount</Text>
+              <Text style={themed.fieldValue}>
+                {formatAmount(application.Last_Due_Amount)}
+              </Text>
+            </View>
+            <View style={themed.field}>
+              <Text style={themed.fieldLabel}>Last Received</Text>
+              <Text style={themed.fieldValue}>
+                {formatAmount(application.Last_Recv_Amount)}
+              </Text>
+            </View>
+          </View>
+        </>
+      )}
     </Pressable>
   );
 }
@@ -173,6 +205,13 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     headerLeft: {
       flex: 1,
       paddingRight: 10,
+    },
+    headerRight: {
+      alignItems: 'flex-end',
+      gap: 8,
+    },
+    toggleIconBtn: {
+      padding: 4,
     },
     product: {
       fontSize: 16,

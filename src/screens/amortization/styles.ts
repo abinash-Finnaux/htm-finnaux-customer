@@ -266,6 +266,19 @@ export const createStyles = (colors: any) =>
       alignItems: 'center',
       gap: 10,
     },
+    fullLoader: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 120,
+      paddingHorizontal: 32,
+      gap: 14,
+    },
+    fullLoaderText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
     emptyWrap: {
       alignItems: 'center',
       justifyContent: 'center',

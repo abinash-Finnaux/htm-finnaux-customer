@@ -44,7 +44,12 @@ function pick(record: LoanDetailsRecord | null, keys: string[]): unknown {
   }
   for (const key of keys) {
     const value = record[key];
-    if (value !== null && value !== undefined && value !== '') {
+    if (
+      value !== null &&
+      value !== undefined &&
+      String(value).trim() !== '' &&
+      Number(value) !== 0
+    ) {
       return value;
     }
   }
@@ -62,7 +67,9 @@ function paramsFromDetails(
         'NetFinance',
         'AgreementValue',
         'SanctionedAmt',
+        'loanAmount',
         'LoanAmount',
+        'loan_amount',
         'Loan_Amount',
       ]),
     ),
@@ -149,11 +156,15 @@ export default function AmortizationScreen() {
     }
     (async () => {
       try {
-        const details = await getLoanDetails(appIdentity);
+        const [details, entries] = await Promise.all([
+          getLoanDetails(appIdentity),
+          getAmortizationChart(appIdentity),
+        ]);
         if (!active) {
           return;
         }
         console.log('loanDetailsLOG', details);
+        console.log('amortizationChartEntries', entries.length, entries);
         if (!details) {
           if (active) {
             setError('No data found');
@@ -163,11 +174,6 @@ export default function AmortizationScreen() {
         }
         setLoanDetails(details);
 
-        const entries = await getAmortizationChart(appIdentity);
-        if (!active) {
-          return;
-        }
-        console.log('amortizationChartEntries', entries.length, entries);
         if (entries.length > 0) {
           setChartData(
             buildAmortizationDataFromChart(entries, paramsFromDetails(details)),
@@ -196,15 +202,10 @@ export default function AmortizationScreen() {
     [loanDetails],
   );
 
-  const computedData = useMemo(() => {
-    const safeParams: AmortizationOptions = {
-      ...effectiveParams,
-      principal: effectiveParams.principal || 500000,
-      tenureMonths: effectiveParams.tenureMonths || 48,
-      interestRate: effectiveParams.interestRate || 9,
-    };
-    return buildAmortizationData(safeParams);
-  }, [effectiveParams]);
+  const computedData = useMemo(
+    () => buildAmortizationData(effectiveParams),
+    [effectiveParams],
+  );
 
   const data = chartData ?? computedData;
   const { emi, loan, totalInterest, paidCount, schedule, years } = data;
@@ -281,6 +282,11 @@ export default function AmortizationScreen() {
             >
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
+          </View>
+        ) : loading ? (
+          <View style={styles.fullLoader}>
+            <ActivityIndicator color={colors.primary} size="large" />
+            <Text style={styles.fullLoaderText}>Loading schedule...</Text>
           </View>
         ) : (
           <>
@@ -407,39 +413,30 @@ export default function AmortizationScreen() {
               </Text>
             </View>
 
-            {loading ? (
+            {chartEmpty ? (
               <View style={styles.chartLoader}>
-                <ActivityIndicator color={colors.primary} />
-                <Text style={styles.chartLoaderText}>Loading schedule...</Text>
+                <Text style={styles.chartErrorText}>No data found</Text>
               </View>
             ) : (
               <>
-                {chartEmpty ? (
-                  <View style={styles.chartLoader}>
-                    <Text style={styles.chartErrorText}>No data found</Text>
+                {!chartData && !error ? (
+                  <View style={styles.estimatedNote}>
+                    <Text style={styles.estimatedNoteText}>
+                      Showing estimated schedule. Live schedule will appear
+                      here.
+                    </Text>
                   </View>
-                ) : (
-                  <>
-                    {!chartData && !error ? (
-                      <View style={styles.estimatedNote}>
-                        <Text style={styles.estimatedNoteText}>
-                          Showing estimated schedule. Live schedule will appear
-                          here.
-                        </Text>
-                      </View>
-                    ) : null}
-                    <View style={styles.scheduleList}>
-                      {years.map((year, index) => (
-                        <YearCard
-                          key={year.label}
-                          year={year}
-                          schedule={schedule}
-                          initialExpanded={index === 0}
-                        />
-                      ))}
-                    </View>
-                  </>
-                )}
+                ) : null}
+                <View style={styles.scheduleList}>
+                  {years.map((year, index) => (
+                    <YearCard
+                      key={year.label}
+                      year={year}
+                      schedule={schedule}
+                      initialExpanded={index === 0}
+                    />
+                  ))}
+                </View>
               </>
             )}
 

@@ -152,10 +152,11 @@ function startOffsetOf(options: AmortizationOptions): {
   day: number;
 } {
   const parsed = parseStartDate(options.startDate);
+  const now = new Date();
   return {
-    year: parsed?.year ?? 2026,
-    monthIndex: parsed?.monthIndex ?? 8,
-    day: parsed?.day ?? 15,
+    year: parsed?.year ?? now.getFullYear(),
+    monthIndex: parsed?.monthIndex ?? now.getMonth(),
+    day: parsed?.day ?? now.getDate(),
   };
 }
 
@@ -164,10 +165,14 @@ export function buildAmortizationDataFromChart(
   options: AmortizationOptions = {},
 ): AmortizationData {
   const months = entries.length;
-  const principal = entries.reduce(
+  const chartPrincipal = entries.reduce(
     (sum, e) => sum + toNumber(e.Principle),
     0,
   );
+  const principal =
+    options.principal && options.principal > 0
+      ? options.principal
+      : chartPrincipal;
   const emi = toNumber(entries[0]?.EMI_Amount);
   const start = startOffsetOf(options);
 
@@ -204,7 +209,7 @@ export function buildAmortizationDataFromChart(
       accountNo: options.accountNo || '—',
       type: options.loanType || 'Loan',
       principal,
-      interestRate: options.interestRate ?? 9,
+      interestRate: options.interestRate ?? 0,
       tenureMonths: months,
       startDate,
       frequency: 'Monthly',
@@ -230,9 +235,7 @@ export function buildAmortizationData(
 
   const pow = Math.pow(1 + monthlyRate, months);
   const computedEmi = Math.round((principal * monthlyRate * pow) / (pow - 1));
-  const emiRaw =
-    options.emi && options.emi > 0 ? Math.round(options.emi) : computedEmi;
-  const emi = Number.isFinite(emiRaw) && emiRaw > 0 ? emiRaw : 0;
+  const emi = Number.isFinite(computedEmi) && computedEmi > 0 ? computedEmi : 0;
 
   const parsed = startOffsetOf(options);
   const startYear = parsed.year;
@@ -266,12 +269,12 @@ export function buildAmortizationData(
   const years = buildYears(schedule);
   const totalInterest = schedule.reduce((sum, i) => sum + i.interest, 0);
   const totalPayable = principal + totalInterest;
-  const startDate = options.startDate || '15 Sep 2026';
+  const startDate = options.startDate || '';
 
   return {
     loan: {
-      accountNo: options.accountNo || 'LA-2024-88321',
-      type: options.loanType || 'Personal Loan',
+      accountNo: options.accountNo || '—',
+      type: options.loanType || 'Loan',
       principal,
       interestRate: annualRate,
       tenureMonths: months,

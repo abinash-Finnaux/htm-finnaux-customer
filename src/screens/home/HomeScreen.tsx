@@ -83,6 +83,7 @@ export default function HomeScreen({ navigation }: Props) {
   const { theme, isDark, toggleTheme } = useTheme();
   const { colors, spacing } = theme;
   const { user, setUser } = useUser();
+  console.log('useruseruserLOG', user);
 
   const greeting = useMemo(() => getGreeting(), []);
 

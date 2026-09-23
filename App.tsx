@@ -51,7 +51,7 @@ export type RootStackParamList = {
   HelpSupport: undefined;
   ApplyLoan: undefined;
   RepaymentSchedule: undefined;
-  EmiDetails: undefined;
+  EmiDetails: { ApplicationIdentity?: number } | undefined;
   EmiDeposit: undefined;
   CloserStatement: undefined;
   SOA: undefined;
