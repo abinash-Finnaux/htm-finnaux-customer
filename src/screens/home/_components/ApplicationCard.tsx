@@ -3,7 +3,6 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
@@ -68,18 +67,6 @@ function ApplicationCard({ application, onPress }: Props) {
               {status}
             </Text>
           </View>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={toggleExpand}
-            hitSlop={8}
-            style={themed.toggleIconBtn}
-          >
-            {expanded ? (
-              <ChevronUp size={16} color={theme.colors.primary} />
-            ) : (
-              <ChevronDown size={16} color={theme.colors.primary} />
-            )}
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -171,6 +158,25 @@ function ApplicationCard({ application, onPress }: Props) {
           </View>
         </>
       )}
+
+      <Pressable
+        onPress={toggleExpand}
+        style={({ pressed }) => [
+          themed.footerToggle,
+          pressed && themed.footerPressed,
+        ]}
+      >
+        <View style={themed.footerIcon}>
+          {expanded ? (
+            <ChevronUp size={16} color={theme.colors.primary} />
+          ) : (
+            <ChevronDown size={16} color={theme.colors.primary} />
+          )}
+        </View>
+        <Text style={themed.footerText}>
+          {expanded ? 'Hide Details' : 'View Details'}
+        </Text>
+      </Pressable>
     </Pressable>
   );
 }
@@ -208,10 +214,6 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     },
     headerRight: {
       alignItems: 'flex-end',
-      gap: 8,
-    },
-    toggleIconBtn: {
-      padding: 4,
     },
     product: {
       fontSize: 16,
@@ -241,6 +243,34 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       height: 1,
       marginVertical: 14,
       backgroundColor: colors.border,
+    },
+    footerToggle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      marginTop: 14,
+      paddingVertical: 10,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.background,
+    },
+    footerPressed: {
+      opacity: 0.7,
+    },
+    footerIcon: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: colors.primary + '14',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    footerText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.primary,
     },
     dueHeader: {
       marginBottom: 12,

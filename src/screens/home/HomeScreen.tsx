@@ -16,6 +16,8 @@ import { createStyles } from './styles';
 import type { LucideIcon } from 'lucide-react-native';
 import { Sun, Moon } from 'lucide-react-native';
 import ApplicationCard from './_components/ApplicationCard';
+import ApplyLoanCard from './_components/ApplyLoanCard';
+import FloatingApplyLoanButton from './_components/FloatingApplyLoanButton';
 import ProfileDrawerModal from './_components/ProfileDrawerModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -255,6 +257,11 @@ export default function HomeScreen({ navigation }: Props) {
           </View> */}
         </View>
 
+        <ApplyLoanCard
+          onPress={() => navigation.navigate('ApplyLoan')}
+          activeApplications={user?.applications?.length}
+        />
+
         <View style={themed.loansSection}>
           <Text style={themed.sectionTitle}>
             Loan Applications{' '}
@@ -263,7 +270,7 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </>
     ),
-    [themed, greeting, user, isDark, toggleTheme],
+    [themed, greeting, user, isDark, toggleTheme, navigation],
   );
 
   const listEmpty = useMemo(
@@ -287,6 +294,8 @@ export default function HomeScreen({ navigation }: Props) {
         contentContainerStyle={themed.scrollContent}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* <FloatingApplyLoanButton onPress={() => navigation.navigate('ApplyLoan')} /> */}
 
       <ProfileDrawerModal
         visible={profileOpen}
