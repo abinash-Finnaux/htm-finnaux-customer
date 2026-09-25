@@ -1,24 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
   Pressable,
   ScrollView,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Check, MapPin, Briefcase, IndianRupee, FileCheck2, Wallet, HeartHandshake, ClipboardList } from 'lucide-react-native';
 import { createStyles } from './styles';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
 import { toast } from '../../components/toast/ToastProvider';
+import { useProductList } from '../../hooks/useProductList';
+import { useBranches } from '../../hooks/useBranches';
+import { mapProductsToLoanTypes } from './loanTypes';
 import type { ApplyLoanForm } from './types';
 import type { RootStackParamList } from '../../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import SelectBranchStep from './_components/SelectBranchStep';
 import LoanTypeStep from './_components/LoanTypeStep';
 import LoanAmountStep from './_components/LoanAmountStep';
 import EmploymentStep from './_components/EmploymentStep';
+import DocumentsStep, { DOCUMENTS } from './_components/DocumentsStep';
+import CustomerReferenceStep from './_components/CustomerReferenceStep';
+import SummaryStep from './_components/SummaryStep';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ApplyLoan'>;
+
+const STEPS = [
+  { key: 'branch', label: 'Branch', icon: MapPin },
+  { key: 'product', label: 'Loan Type', icon: Briefcase },
+  { key: 'requirement', label: 'Loan Amount', icon: IndianRupee },
+  { key: 'documents', label: 'Upload Documents', icon: FileCheck2 },
+  { key: 'employment', label: 'Employment & Income', icon: Wallet },
+  { key: 'reference', label: 'Customer Reference', icon: HeartHandshake },
+  { key: 'review', label: 'Review Application', icon: ClipboardList },
+];
 
 export default function ApplyLoanScreen({ navigation }: Props) {
   const { theme, isDark } = useTheme();
@@ -30,30 +48,86 @@ export default function ApplyLoanScreen({ navigation }: Props) {
 
   const [step, setStep] = useState(1);
 
-  const { control, watch } = useForm<ApplyLoanForm>({
+  const { products, loading } = useProductList();
+  const loanTypes = mapProductsToLoanTypes(products);
+
+  const { branches, nearest, coords, loading: branchesLoading, fallbackCoords } =
+    useBranches();
+
+  const { control, watch, setValue } = useForm<ApplyLoanForm>({
     defaultValues: {
+      branchId: '',
+      branchName: '',
       loanType: '',
       amount: '',
       tenure: '',
       purpose: '',
+      documents: [],
       monthlyIncome: '',
       employment: '',
+      references: [],
     },
   });
 
+  const branchId = watch('branchId');
+  const branchName = watch('branchName');
   const loanType = watch('loanType');
   const amount = watch('amount');
   const tenure = watch('tenure');
+  const purpose = watch('purpose');
   const monthlyIncome = watch('monthlyIncome');
   const employment = watch('employment');
+  const documents = watch('documents');
+  const references = watch('references');
+
+  useEffect(() => {
+    const nearestBranch = branches[0];
+    if (nearestBranch && branchId === '') {
+      setValue('branchId', String(nearestBranch.branch.BranchId), {
+        shouldValidate: true,
+      });
+      setValue('branchName', nearestBranch.branch.Branch_Name.trim());
+    }
+  }, [branches, branchId, setValue]);
 
   const canProceed = () => {
-    if (step === 1) return loanType !== '';
-    if (step === 2) return amount !== '' && tenure !== '';
-    return monthlyIncome !== '' && employment !== '';
+    if (step === 1) return branchId !== '';
+    if (step === 2) return loanType !== '';
+    if (step === 3) return amount !== '' && tenure !== '';
+    if (step === 4) {
+      const requiredKeys = DOCUMENTS.filter(d => d.required).map(d => d.key);
+      return requiredKeys.every(key => documents.some(d => d.key === key));
+    }
+    if (step === 5) return monthlyIncome !== '' && employment !== '';
+    if (step === 6) {
+      const list = references ?? [];
+      return (
+        list.length > 0 &&
+        list.every(
+          ref =>
+            ref.type !== '' &&
+            (ref.name.trim() !== '' || ref.phone !== '') &&
+            (ref.phone === '' || /^[0-9]{10}$/.test(ref.phone)),
+        )
+      );
+    }
+    return true;
   };
 
   const handleSubmit = () => {
+    const submitted = {
+      branchId,
+      branchName,
+      loanType,
+      amount,
+      tenure,
+      purpose,
+      documents,
+      monthlyIncome,
+      employment,
+      references,
+    };
+    console.log('[ApplyLoanScreen] submitted:', submitted);
     toast.show(
       'Your loan application has been submitted successfully. Our team will contact you shortly.',
       'success',
@@ -92,20 +166,52 @@ export default function ApplyLoanScreen({ navigation }: Props) {
         </View>
 
         <View style={themed.headerBody}>
-          <Text style={themed.stepLabel}>Step {step} of 3</Text>
-          <View style={themed.progressBar}>
-            {[1, 2, 3].map(s => (
-              <View
-                key={s}
-                style={[
-                  themed.progressDot,
-                  s <= step
-                    ? themed.progressDotActive
-                    : themed.progressDotInactive,
-                ]}
-              />
-            ))}
+          <View style={themed.stepStepper}>
+            {STEPS.map((item, index) => {
+              const idx = index + 1;
+              const done = idx < step;
+              const current = idx === step;
+              const Icon = item.icon;
+              return (
+                <React.Fragment key={item.key}>
+                  {index > 0 ? (
+                    <View
+                      style={[
+                        themed.stepConnector,
+                        idx <= step && themed.stepConnectorActive,
+                      ]}
+                    />
+                  ) : null}
+                  <View
+                    style={[
+                      themed.stepDot,
+                      done
+                        ? themed.stepDotDone
+                        : current
+                        ? themed.stepDotCurrent
+                        : themed.stepDotPending,
+                    ]}
+                  >
+                    {done ? (
+                      <Check size={12} color="#2563EB" strokeWidth={3.5} />
+                    ) : (
+                      <Icon
+                        size={13}
+                        color={
+                          current ? colors.primary : 'rgba(255,255,255,0.55)'
+                        }
+                        strokeWidth={2.4}
+                      />
+                    )}
+                  </View>
+                </React.Fragment>
+              );
+            })}
           </View>
+          <Text style={themed.currentStepName}>
+            <Text style={themed.currentStepCount}>Step {step} of 7 · </Text>
+            {STEPS[step - 1]?.label ?? ''}
+          </Text>
         </View>
       </View>
 
@@ -121,15 +227,56 @@ export default function ApplyLoanScreen({ navigation }: Props) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={themed.contentPadding}>
-            {step === 1 && <LoanTypeStep control={control} themed={themed} />}
-            {step === 2 && <LoanAmountStep control={control} themed={themed} />}
-            {step === 3 && (
-              <EmploymentStep
+            {step === 1 && (
+              <SelectBranchStep
                 control={control}
-                loanType={loanType}
-                amount={amount}
-                tenure={tenure}
                 themed={themed}
+                branches={branches}
+                loading={branchesLoading}
+                coords={coords}
+                fallbackCoords={fallbackCoords}
+              />
+            )}
+            {step === 2 &&
+              (loading ? (
+                <View style={themed.loadingWrap}>
+                  <ActivityIndicator color={colors.primary} size="large" />
+                </View>
+              ) : (
+                <LoanTypeStep
+                  control={control}
+                  themed={themed}
+                  loanTypes={loanTypes}
+                  nearestBranch={nearest}
+                  nearestCoords={coords}
+                  nearestFallback={fallbackCoords}
+                  nearestLoading={branchesLoading}
+                />
+              ))}
+            {step === 3 && <LoanAmountStep control={control} themed={themed} />}
+            {step === 4 && <DocumentsStep control={control} themed={themed} />}
+            {step === 5 && <EmploymentStep control={control} themed={themed} />}
+            {step === 6 && (
+              <CustomerReferenceStep control={control} themed={themed} />
+            )}
+            {step === 7 && (
+              <SummaryStep
+                branchId={branchId}
+                branches={branches}
+                loanTypes={loanTypes}
+                themed={themed}
+                form={{
+                  branchId,
+                  branchName,
+                  loanType,
+                  amount,
+                  tenure,
+                  purpose,
+                  documents,
+                  monthlyIncome,
+                  employment,
+                  references,
+                }}
               />
             )}
           </View>
@@ -138,7 +285,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
 
         <View style={themed.footer}>
           <Pressable
-            onPress={() => (step < 3 ? setStep(step + 1) : handleSubmit())}
+            onPress={() => (step < 7 ? setStep(step + 1) : handleSubmit())}
             disabled={!canProceed()}
             style={({ pressed }) => [
               themed.nextBtn,
@@ -152,7 +299,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                 { color: canProceed() ? '#FFFFFF' : colors.textSecondary },
               ]}
             >
-              {step < 3 ? 'Continue' : 'Submit Application'}
+              {step < 7 ? 'Continue' : 'Submit Application'}
             </Text>
           </Pressable>
         </View>

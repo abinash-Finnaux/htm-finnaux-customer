@@ -1,4 +1,8 @@
 export const API_ENDPOINTS = {
+  MASTERS: {
+    GET_PRODUCT_LIST: '/Masters/GetProductList',
+    GET_BRANCHES: '/Masters/GetBranches',
+  },
   AUTH: {
     VERIFY_USER: '/CustomerLogin/ValidateCustomerCIF',
     LOGIN: '/CustomerLogin/GetCustomerLogin',

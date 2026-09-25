@@ -1,84 +1,126 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import { type Control } from 'react-hook-form';
-
+import { Controller, type Control } from 'react-hook-form';
+import { Pressable, Text, View } from 'react-native';
+import {
+  Wallet,
+  Briefcase,
+  UserRound,
+  Store,
+  Laptop,
+  Check,
+} from 'lucide-react-native';
+import { useTheme } from '../../../context/ThemeContext';
+import FormTextInput from '../../../components/forms/FormTextInput';
+import SectionHeaderText from '../../../components/typography/SectionHeaderText';
 import type { createStyles } from '../styles';
 import type { ApplyLoanForm } from '../types';
-import FormTextInput from '../../../components/forms/FormTextInput';
-import FormSelectOption from '../../../components/forms/FormSelectOption';
 
-const LOAN_TYPES = [
-  { id: 'personal', label: 'Personal Loan' },
-  { id: 'business', label: 'Business Loan' },
-  { id: 'home', label: 'Home Loan' },
-  { id: 'vehicle', label: 'Vehicle Loan' },
-];
-
-const EMPLOYMENT_TYPES = [
-  'Salaried',
-  'Self-Employed',
-  'Business Owner',
-  'Freelancer',
+const EMPLOYMENT_TYPES: { value: string; icon: React.ElementType }[] = [
+  { value: 'Salaried', icon: Briefcase },
+  { value: 'Self-Employed', icon: UserRound },
+  { value: 'Business Owner', icon: Store },
+  { value: 'Freelancer', icon: Laptop },
 ];
 
 type Props = {
   control: Control<ApplyLoanForm>;
-  loanType: string;
-  amount: string;
-  tenure: string;
   themed: ReturnType<typeof createStyles>;
 };
 
-export default function EmploymentStep({
-  control,
-  loanType,
-  amount,
-  tenure,
-  themed,
-}: Props) {
+export default function EmploymentStep({ control, themed }: Props) {
+  const { theme } = useTheme();
+  const { colors } = theme;
+
   return (
     <>
+      <SectionHeaderText
+        title="Employment & Income"
+        subtitle="Help us assess your repayment capability."
+      />
+
+      <View style={themed.incomeHeroCard}>
+        <View style={themed.incomeHeroIcon}>
+          <Wallet size={24} color="#10B981" />
+        </View>
+        <View style={themed.incomeHeroBody}>
+          <Text style={themed.incomeHeroTitle}>Monthly Income</Text>
+          <Text style={themed.incomeHeroText}>
+            Your monthly income helps us decide your loan eligibility and
+            amount.
+          </Text>
+        </View>
+      </View>
+
       <FormTextInput
         control={control}
         name="monthlyIncome"
-        label="Monthly Income *"
+        label="Monthly Income (₹) *"
         placeholder="Enter your monthly income"
         rules={{ required: 'Monthly income is required' }}
         keyboardType="numeric"
       />
 
-      <FormSelectOption
+      <Controller
         control={control}
         name="employment"
-        label="Employment Type"
-        options={EMPLOYMENT_TYPES}
         rules={{ required: 'Employment type is required' }}
-      />
-
-      <View style={themed.summaryCard}>
-        <Text style={themed.summaryTitle}>Application Summary</Text>
-        <View style={themed.summaryDivider} />
-        {[
-          {
-            label: 'Loan Type',
-            value: LOAN_TYPES.find(l => l.id === loanType)?.label || '',
-          },
-          {
-            label: 'Amount',
-            value: amount ? `₹${Number(amount).toLocaleString('en-IN')}` : '',
-          },
-          {
-            label: 'Tenure',
-            value: tenure ? `${tenure} months` : '',
-          },
-          { label: 'Employment', value: '' },
-        ].map((item, i) => (
-          <View key={i} style={themed.summaryRow}>
-            <Text style={themed.summaryLabel}>{item.label}</Text>
-            <Text style={themed.summaryValue}>{item.value}</Text>
+        render={({ field: { value, onChange }, fieldState: { error } }) => (
+          <View style={themed.employmentSec}>
+            <Text style={themed.employmentLabel}>Employment Type</Text>
+            <View style={themed.employmentGrid}>
+              {EMPLOYMENT_TYPES.map(({ value: v, icon: Icon }) => {
+                const selected = value === v;
+                return (
+                  <Pressable
+                    key={v}
+                    onPress={() => onChange(v)}
+                    style={({ pressed }) => [
+                      themed.employmentOptCard,
+                      selected
+                        ? themed.employmentOptCardSelected
+                        : pressed
+                        ? themed.employmentOptCardPressed
+                        : themed.employmentOptCardUnselected,
+                    ]}
+                  >
+                    <View
+                      style={[
+                        themed.employmentOptIcon,
+                        selected && themed.employmentOptIconSelected,
+                      ]}
+                    >
+                      <Icon
+                        size={18}
+                        color={selected ? '#FFFFFF' : colors.primary}
+                      />
+                    </View>
+                    <Text
+                      style={[
+                        themed.employmentOptLabel,
+                        selected
+                          ? themed.employmentOptLabelSelected
+                          : themed.employmentOptLabelUnselected,
+                      ]}
+                    >
+                      {v}
+                    </Text>
+                    {selected ? (
+                      <Check
+                        size={16}
+                        color="#FFFFFF"
+                        style={themed.employmentOptTick}
+                      />
+                    ) : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+            {error ? (
+              <Text style={themed.employmentError}>{error.message}</Text>
+            ) : null}
           </View>
-        ))}
-      </View>
+        )}
+      />
     </>
   );
 }

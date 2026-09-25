@@ -6,7 +6,7 @@ import axios, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_ENDPOINTS } from './endpoints';
 
-const BASE_URL = 'https://demo.finnaux.in/api/api';
+const BASE_URL = 'https://demo.finnaux.in/api/api'; // change according to client
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
