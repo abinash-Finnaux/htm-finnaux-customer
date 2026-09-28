@@ -10,7 +10,7 @@ import {
 import { useTheme } from '../../../context/ThemeContext';
 
 const FEATURES = [
-  { icon: Layers, label: '4 Loan Types' },
+  { icon: Layers, label: 'Multiple Loan' },
   { icon: Clock, label: '<2 Min Apply' },
   { icon: ShieldCheck, label: 'Safe & Secure' },
 ];

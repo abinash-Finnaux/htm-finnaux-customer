@@ -387,6 +387,23 @@ export function createStyles(
     branchDebugValueOk: {
       color: colors.success,
     },
+    branchRetryBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      alignSelf: 'flex-start',
+      marginTop: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: radius.sm,
+      backgroundColor: colors.primary + '12',
+    },
+    branchRetryBtnText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.primary,
+    },
     currentAddressRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -412,91 +429,139 @@ export function createStyles(
       paddingVertical: 24,
     },
     branchCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 1.5,
-      padding: 14,
       borderRadius: radius.lg,
-    },
-    branchCardSelected: {
-      backgroundColor: palette.primary,
-      borderColor: palette.primary,
-    },
-    branchCardUnselected: {
-      backgroundColor: colors.surfaceElevated,
+      overflow: 'hidden',
+      borderWidth: 1,
       borderColor: colors.border,
+      backgroundColor: colors.surfaceElevated,
+      shadowColor: '#000000',
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
     },
-    branchCardPressed: {
-      backgroundColor: headerBgLight,
-    },
-    branchIconWrap: {
-      width: 42,
-      height: 42,
-      borderRadius: 14,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '1A',
-      marginRight: 12,
-    },
-    branchIconWrapSelected: {
-      backgroundColor: 'rgba(255,255,255,0.2)',
-    },
-    branchInfo: {
-      flex: 1,
-    },
-    branchNameRow: {
+    branchSingleNote: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
+      padding: 10,
+      borderRadius: radius.md,
+      backgroundColor: colors.success + '0F',
     },
-    branchName: {
-      fontSize: 15,
-      fontWeight: '700',
-    },
-    branchNearestChip: {
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-      borderRadius: 999,
-      backgroundColor: colors.success + '20',
-    },
-    branchNearestChipText: {
-      fontSize: 10,
-      fontWeight: '700',
-      color: colors.success,
-    },
-    branchMeta: {
+    branchSingleNoteText: {
+      flex: 1,
       fontSize: 12,
       fontWeight: '500',
-      marginTop: 2,
+      color: colors.textSecondary,
     },
-    branchPhoneRow: {
+    branchHero: {
+      backgroundColor: palette.primary,
+      paddingHorizontal: 18,
+      paddingTop: 16,
+      paddingBottom: 18,
+    },
+    branchHeroTopRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
+    branchHeroLabel: {
+      fontSize: 10,
+      fontWeight: '800',
+      letterSpacing: 1.2,
+      textTransform: 'uppercase',
+      color: 'rgba(255,255,255,0.75)',
+    },
+    branchHeroTitle: {
+      fontSize: 19,
+      fontWeight: '800',
+      color: '#FFFFFF',
+    },
+    branchHeroDistanceRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginTop: 10,
+    },
+    branchHeroDistance: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: '#FFFFFF',
+    },
+    branchHeroDistanceSub: {
+      fontSize: 11,
+      fontWeight: '500',
+      color: 'rgba(255,255,255,0.75)',
+    },
+    branchChipLight: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 4,
-      marginTop: 4,
-    },
-    branchRight: {
-      alignItems: 'flex-end',
-      gap: 4,
-      marginLeft: 8,
-    },
-    branchDistance: {
-      fontSize: 13,
-      fontWeight: '700',
-    },
-    branchMapBtn: {
-      width: 28,
-      height: 28,
-      borderRadius: 9,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 2,
-    },
-    branchMapBtnSelected: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 999,
       backgroundColor: 'rgba(255,255,255,0.22)',
     },
-    branchMapBtnUnselected: {
-      backgroundColor: colors.primary + '14',
+    branchChipLightText: {
+      fontSize: 11,
+      fontWeight: '800',
+      color: '#FFFFFF',
+    },
+    branchBody: {
+      padding: 14,
+    },
+    branchBodyRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 4,
+    },
+    branchBodyRowIcon: {
+      width: 18,
+      alignItems: 'center',
+    },
+    branchBodyRowText: {
+      flex: 1,
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    branchDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: 12,
+    },
+    branchActionRow: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    branchActionBtn: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingVertical: 11,
+      borderRadius: radius.md,
+    },
+    branchActionBtnPrimary: {
+      backgroundColor: palette.primary,
+    },
+    branchActionBtnPrimaryText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: '#FFFFFF',
+    },
+    branchActionBtnGhost: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    branchActionBtnGhostText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: palette.primary,
     },
     cardTick: {
       position: 'absolute',

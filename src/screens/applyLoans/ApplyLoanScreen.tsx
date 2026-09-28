@@ -29,8 +29,8 @@ import SummaryStep from './_components/SummaryStep';
 type Props = NativeStackScreenProps<RootStackParamList, 'ApplyLoan'>;
 
 const STEPS = [
-  { key: 'branch', label: 'Branch', icon: MapPin },
-  { key: 'product', label: 'Loan Type', icon: Briefcase },
+  { key: 'product', label: 'Select Product', icon: Briefcase },
+  { key: 'branch', label: 'Nearest Branch', icon: MapPin },
   { key: 'requirement', label: 'Loan Amount', icon: IndianRupee },
   { key: 'documents', label: 'Upload Documents', icon: FileCheck2 },
   { key: 'employment', label: 'Employment & Income', icon: Wallet },
@@ -51,7 +51,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   const { products, loading } = useProductList();
   const loanTypes = mapProductsToLoanTypes(products);
 
-  const { branches, nearest, coords, loading: branchesLoading, fallbackCoords } =
+  const { branches, coords, loading: branchesLoading, fallbackCoords, gpsStatus, refetch: refetchBranches } =
     useBranches();
 
   const { control, watch, setValue } = useForm<ApplyLoanForm>({
@@ -91,8 +91,8 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   }, [branches, branchId, setValue]);
 
   const canProceed = () => {
-    if (step === 1) return branchId !== '';
-    if (step === 2) return loanType !== '';
+    if (step === 1) return loanType !== '';
+    if (step === 2) return branchId !== '';
     if (step === 3) return amount !== '' && tenure !== '';
     if (step === 4) {
       const requiredKeys = DOCUMENTS.filter(d => d.required).map(d => d.key);
@@ -227,17 +227,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={themed.contentPadding}>
-            {step === 1 && (
-              <SelectBranchStep
-                control={control}
-                themed={themed}
-                branches={branches}
-                loading={branchesLoading}
-                coords={coords}
-                fallbackCoords={fallbackCoords}
-              />
-            )}
-            {step === 2 &&
+            {step === 1 &&
               (loading ? (
                 <View style={themed.loadingWrap}>
                   <ActivityIndicator color={colors.primary} size="large" />
@@ -247,12 +237,19 @@ export default function ApplyLoanScreen({ navigation }: Props) {
                   control={control}
                   themed={themed}
                   loanTypes={loanTypes}
-                  nearestBranch={nearest}
-                  nearestCoords={coords}
-                  nearestFallback={fallbackCoords}
-                  nearestLoading={branchesLoading}
                 />
               ))}
+            {step === 2 && (
+              <SelectBranchStep
+                themed={themed}
+                branches={branches}
+                loading={branchesLoading}
+                coords={coords}
+                fallbackCoords={fallbackCoords}
+                gpsStatus={gpsStatus}
+                onRetry={refetchBranches}
+              />
+            )}
             {step === 3 && <LoanAmountStep control={control} themed={themed} />}
             {step === 4 && <DocumentsStep control={control} themed={themed} />}
             {step === 5 && <EmploymentStep control={control} themed={themed} />}
