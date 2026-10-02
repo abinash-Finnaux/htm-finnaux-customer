@@ -184,7 +184,7 @@ export default function SelectBranchStep({
               <Text style={themed.branchHeroTitle}>
                 {nearest.branch.Branch_Name.trim()}
               </Text>
-              {nearest.distanceKm !== null ? (
+              {/* {nearest.distanceKm !== null ? (
                 <View style={themed.branchHeroDistanceRow}>
                   <Navigation2 size={14} color="#FFFFFF" />
                   <Text style={themed.branchHeroDistance}>
@@ -196,7 +196,7 @@ export default function SelectBranchStep({
                       : 'straight-line · from your location'}
                   </Text>
                 </View>
-              ) : null}
+              ) : null} */}
             </View>
 
             <View style={themed.branchBody}>
