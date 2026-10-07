@@ -52,3 +52,51 @@ export type GetBranchesRequest = {
   ZoneId?: number;
   DistrictId?: number;
 };
+
+export type GetProductPageInfoRequest = {
+  ProductId: number;
+};
+
+export type ProductPageInfo = {
+  MM_Id: number;
+  MM_Name: string;
+  MM_Short_Name: string;
+  PageOrder: number;
+  ProductCategory?: number;
+  ProductCategoryName?: string;
+};
+
+export interface TehsilMaster {
+  Tehsil_Id: number;
+  Tehsil_Name: string;
+}
+
+export interface DistrictMaster {
+  District_Id: number;
+  District_Name: string;
+  Tehsils?: TehsilMaster[];
+}
+
+export interface StateMaster {
+  State_Id: number;
+  State_Name: string;
+  Districts?: DistrictMaster[];
+}
+
+export type GetDistrictsRequest = {
+  StateID: number;
+};
+
+export type GetTehsilsRequest = {
+  DistrictId: number;
+};
+
+export type GetCommonMasterRequest = {
+  Commands: string;
+  Type: string;
+};
+
+export type GetCollectionExecutivesRequest = {
+  Branch_Id: number;
+  ProductId: number;
+};

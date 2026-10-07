@@ -37,12 +37,19 @@ export default function FormSelectOption<T extends FieldValues>({
         control={control}
         name={name}
         rules={rules}
-        render={({ field: { onChange, value } }) => (
-          <GlobalSelectOption
-            options={options}
-            value={value}
-            onChange={onChange}
-          />
+        render={({ field: { onChange, value }, fieldState: { error } }) => (
+          <>
+            <GlobalSelectOption
+              options={options}
+              value={value}
+              onChange={onChange}
+            />
+            {error?.message ? (
+              <Text style={[styles.error, { color: colors.error }]}>
+                {error.message}
+              </Text>
+            ) : null}
+          </>
         )}
       />
     </View>
@@ -57,5 +64,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 8,
+  },
+  error: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 6,
   },
 });

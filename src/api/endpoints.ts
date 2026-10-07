@@ -2,6 +2,10 @@ export const API_ENDPOINTS = {
   MASTERS: {
     GET_PRODUCT_LIST: '/Masters/GetProductList',
     GET_BRANCHES: '/Masters/GetBranches',
+    GET_PRODUCT_PAGE_INFO: '/CustomerLogin/CA_Get_ProductPage_Info',
+    GET_STATE: '/Masters/GetState',
+    GET_DISTRICTS: '/Masters/GetDistricts',
+    GET_TAHSIL: '/Masters/GetTahsil',
   },
   AUTH: {
     VERIFY_USER: '/CustomerLogin/ValidateCustomerCIF',
@@ -20,6 +24,8 @@ export const API_ENDPOINTS = {
   LMS: {
     AMORTIZATION_CHART: '/LMS/LMS_Get_Amortization_Chart',
     LOAN_DETAILS: '/LMS/LMS_GetLoanDetails',
+    COMMON_MASTER: '/LMS/LMS_Commaon_Master',
+    GET_COLLECTION_EXECUTIVE: '/LMS/GetCollectionExecutive',
   },
   LOANS: {
     BASE: '/loans',

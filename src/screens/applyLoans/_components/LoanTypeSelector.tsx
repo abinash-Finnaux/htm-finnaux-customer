@@ -60,7 +60,7 @@ export default function LoanTypeSelector({
                 { color: selected ? '#FFFFFF' : colors.text },
               ]}
             >
-              {item.label}
+              {item.label + ' - ' + item.productId}
             </Text>
             <Text
               style={[

@@ -6,6 +6,9 @@ import {
   Wallet,
   UserRound,
   FileCheck2,
+  Landmark,
+  PiggyBank,
+  CarFront,
   Check,
   Eye,
 } from 'lucide-react-native';
@@ -40,6 +43,12 @@ function estimateEmi(principal: number, annualRatePct: number, months: number) {
     'en-IN',
   )}`;
 }
+
+const formatDate = (date: Date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${date.getFullYear()}`;
+};
 
 function Section({
   themed,
@@ -177,6 +186,185 @@ export default function SummaryStep({
         rows={[
           { label: 'Monthly Income', value: inr(form.monthlyIncome) || '-' },
           { label: 'Employment', value: form.employment || '-' },
+        ]}
+      />
+
+      <Section
+        themed={themed}
+        tint="#3B82F6"
+        icon={UserRound}
+        title="Customer Info"
+        rows={[
+          { label: 'Full Name', value: form.customerInfo?.fullName || '-' },
+          { label: 'Mobile', value: form.customerInfo?.mobile || '-' },
+          { label: 'Email', value: form.customerInfo?.email || '-' },
+          {
+            label: 'Date of Birth',
+            value: form.customerInfo?.dob
+              ? formatDate(form.customerInfo.dob)
+              : '-',
+          },
+          { label: 'Gender', value: form.customerInfo?.gender || '-' },
+          { label: 'PAN', value: form.customerInfo?.pan || '-' },
+          { label: 'Aadhaar', value: form.customerInfo?.aadhaar || '-' },
+        ]}
+      />
+
+      <Section
+        themed={themed}
+        tint="#F59E0B"
+        icon={Landmark}
+        title="Account Info"
+        rows={[
+          {
+            label: 'Account Holder',
+            value: form.accountInfo?.accountHolderName || '-',
+          },
+          { label: 'Bank Name', value: form.accountInfo?.bankName || '-' },
+          { label: 'Account No.', value: form.accountInfo?.accountNumber || '-' },
+          { label: 'IFSC', value: form.accountInfo?.ifsc || '-' },
+          { label: 'Account Type', value: form.accountInfo?.accountType || '-' },
+        ]}
+      />
+
+      <Section
+        themed={themed}
+        tint="#0EA5E9"
+        icon={CarFront}
+        title="Vehicle Details"
+        rows={[
+          {
+            label: 'Condition',
+            value: form.vehicle?.condition || '-',
+          },
+          {
+            label: 'Usage',
+            value: form.vehicle?.usage || '-',
+          },
+          {
+            label: 'Dealer',
+            value: form.vehicle?.dealer || '-',
+          },
+          {
+            label: 'Make & Model',
+            value:
+              [form.vehicle?.manufacturer, form.vehicle?.modelName]
+                .filter(Boolean)
+                .join(' ') || '-',
+          },
+          {
+            label: 'Category',
+            value: form.vehicle?.vehicleCategory || '-',
+          },
+          {
+            label: 'Variant',
+            value: form.vehicle?.variant || '-',
+          },
+          {
+            label: 'Registration No.',
+            value: form.vehicle?.regNumber || '-',
+          },
+          {
+            label: 'Fuel Type',
+            value: form.vehicle?.fuelType || '-',
+          },
+          { label: 'Colour', value: form.vehicle?.colour || '-' },
+          {
+            label: 'Vehicle Cost',
+            value: inr(form.vehicle?.vehicleCost ?? '') || '-',
+          },
+          {
+            label: 'Engine No.',
+            value: form.vehicle?.engineNumber || '-',
+          },
+          {
+            label: 'Chassis No.',
+            value: form.vehicle?.chassisNumber || '-',
+          },
+          { label: 'Key No.', value: form.vehicle?.keyNo || '-' },
+          { label: 'Route', value: form.vehicle?.route || '-' },
+          {
+            label: 'On Road Price',
+            value: inr(form.vehicle?.onRoad ?? '') || '-',
+          },
+          {
+            label: 'Quotation',
+            value: form.vehicle?.quotationNo || '-',
+          },
+          {
+            label: 'Invoice',
+            value: form.vehicle?.invoiceNo || '-',
+          },
+        ]}
+      />
+
+      <Section
+        themed={themed}
+        tint="#F59E0B"
+        icon={PiggyBank}
+        title="Assets & Holdings"
+        rows={[
+          {
+            label: 'Owner',
+            value: form.assets?.propertyOwnerName || '-',
+          },
+          {
+            label: 'Address',
+            value: form.assets?.propertyAddress || '-',
+          },
+          {
+            label: 'Registration',
+            value: [form.assets?.regState, form.assets?.regDistrict]
+              .filter(Boolean)
+              .join(', ') || '-',
+          },
+          { label: 'Pincode', value: form.assets?.pincode || '-' },
+          {
+            label: 'Property Type',
+            value: [form.assets?.propertyType, form.assets?.natureOfProperty]
+              .filter(Boolean)
+              .join(' · ') || '-',
+          },
+          {
+            label: 'Ownership',
+            value: [
+              form.assets?.ownershipDocument,
+              form.assets?.ownershipType,
+            ]
+              .filter(Boolean)
+              .join(' · ') || '-',
+          },
+          {
+            label: 'Total Area',
+            value:
+              form.assets?.totalArea && form.assets.unitOfMeasurement
+                ? `${form.assets.totalArea} ${form.assets.unitOfMeasurement}`
+                : '-',
+          },
+          {
+            label: 'Constructed Area',
+            value:
+              form.assets?.constructedArea && form.assets.unitOfMeasurement
+                ? `${form.assets.constructedArea} ${form.assets.unitOfMeasurement}`
+                : '-',
+          },
+          {
+            label: 'Mortgage',
+            value: [form.assets?.mortgageType, form.assets?.mortgageSignedBy]
+              .filter(Boolean)
+              .join(' · ') || '-',
+          },
+          { label: 'CERSAI No.', value: form.assets?.cersaiNo || '-' },
+          {
+            label: 'Estimated Value',
+            value: inr(form.assets?.estimatedValue ?? '') || '-',
+          },
+          {
+            label: 'Coordinates',
+            value: [form.assets?.latitude, form.assets?.longitude]
+              .filter(Boolean)
+              .join(', ') || '-',
+          },
         ]}
       />
 
