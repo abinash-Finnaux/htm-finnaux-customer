@@ -80,9 +80,9 @@ function buildSteps(
     page => getProductPageMeta(page.MM_Id).key !== 'loanInfo',
   );
   return [
-    { key: 'product', label: 'Select Product', icon: Briefcase },
-    { key: 'branch', label: 'Nearest Branch', icon: MapPin },
-    { key: 'loanInfo', label: 'Loan Info', icon: IndianRupee },
+    { key: 'product', label: 'Loan Type', icon: Briefcase },
+    { key: 'branch', label: 'Select Branch', icon: MapPin },
+    { key: 'loanInfo', label: 'Loan Details', icon: IndianRupee },
     ...dynamic.map(page => {
       const meta = getProductPageMeta(page.MM_Id);
       if (isVehicle && meta.key === 'assets') {
@@ -90,7 +90,7 @@ function buildSteps(
       }
       return { key: meta.key, label: page.MM_Name, icon: meta.icon };
     }),
-    { key: 'review', label: 'Review Application', icon: ClipboardList },
+    { key: 'review', label: 'Review & Submit', icon: ClipboardList },
   ];
 }
 

@@ -198,22 +198,29 @@ export function createStyles(
       flexWrap: 'wrap',
       gap: 12,
     },
-    loanGridEmpty: {
+    loanListEmpty: {
       width: '100%',
       textAlign: 'center',
       color: colors.textSecondary,
+      paddingVertical: 24,
     },
     loadingWrap: {
       alignItems: 'center',
       paddingVertical: 32,
     },
-    loanCard: {
-      width: '47%',
-      borderWidth: 1.5,
-      padding: 16,
+    loanGridCard: {
+      width: '47.5%',
       alignItems: 'center',
+      padding: 16,
+      paddingTop: 18,
       overflow: 'hidden',
+      borderWidth: 1.5,
       borderRadius: radius.lg,
+      shadowColor: '#0F172A',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.05,
+      shadowRadius: 12,
+      elevation: 2,
     },
     loanCardSelected: {
       backgroundColor: palette.primary,
@@ -227,25 +234,299 @@ export function createStyles(
       backgroundColor: headerBgLight,
     },
     loanIconWrap: {
-      width: 52,
-      height: 52,
-      borderRadius: 16,
+      width: 56,
+      height: 56,
+      borderRadius: 19,
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: 10,
     },
-    loanIcon: {
-      fontSize: 26,
+    loanIconWrapSelected: {
+      backgroundColor: 'rgba(255,255,255,0.2)',
     },
-    loanLabel: {
+    loanGridLabel: {
       fontSize: 14,
-      fontWeight: '700',
+      fontWeight: '800',
+      color: colors.text,
       textAlign: 'center',
+      marginTop: 10,
     },
-    loanRange: {
+    loanGridLabelSelected: {
+      color: '#FFFFFF',
+    },
+    loanGridMeta: {
       fontSize: 11,
-      fontWeight: '500',
-      marginTop: 3,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    loanGridMetaSelected: {
+      color: 'rgba(255,255,255,0.78)',
+    },
+    loanRangePill: {
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+    },
+    loanRangePillGrid: {
+      marginTop: 10,
+    },
+    loanRangePillSelected: {
+      backgroundColor: 'rgba(255,255,255,0.22)',
+    },
+    loanRangeText: {
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    loanRangeTextSelected: {
+      color: '#FFFFFF',
+    },
+    loanIdChip: {
+      position: 'absolute',
+      top: 12,
+      right: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: 'rgba(148,163,184,0.55)',
+    },
+    loanIdChipSelected: {
+      borderColor: 'rgba(255,255,255,0.5)',
+      backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+    loanIdChipText: {
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+      color: colors.textSecondary,
+    },
+    loanIdChipTextSelected: {
+      color: '#FFFFFF',
+    },
+    loanTileBlue: {
+      backgroundColor: 'rgba(37,99,235,0.15)',
+    },
+    loanTextBlue: {
+      color: '#2563EB',
+    },
+    loanTileEmerald: {
+      backgroundColor: 'rgba(5,150,105,0.15)',
+    },
+    loanTextEmerald: {
+      color: '#0D9488',
+    },
+    loanTileAmber: {
+      backgroundColor: 'rgba(217,119,6,0.15)',
+    },
+    loanTextAmber: {
+      color: '#D97706',
+    },
+    loanTileViolet: {
+      backgroundColor: 'rgba(124,58,237,0.15)',
+    },
+    loanTextViolet: {
+      color: '#7C3AED',
+    },
+    loanTileSky: {
+      backgroundColor: 'rgba(2,132,199,0.15)',
+    },
+    loanTextSky: {
+      color: '#0284C7',
+    },
+    accHero: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+      marginTop: 16,
+      padding: 16,
+      borderRadius: radius.lg,
+      backgroundColor: palette.primary,
+    },
+    accHeroIcon: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+    accHeroBody: {
+      flex: 1,
+    },
+    accHeroTitle: {
+      color: '#FFFFFF',
+      fontSize: 15,
+      fontWeight: '800',
+    },
+    accHeroText: {
+      color: 'rgba(255,255,255,0.85)',
+      fontSize: 12,
+      lineHeight: 17,
+      marginTop: 2,
+    },
+    accCard: {
+      marginTop: 14,
+      padding: 16,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surfaceElevated,
+      shadowColor: '#0F172A',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.06,
+      shadowRadius: 12,
+      elevation: 2,
+    },
+    accCardHeadMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginTop: 2,
+    },
+    accHeadIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    accHeadIconBlue: {
+      backgroundColor: 'rgba(37,99,235,0.14)',
+    },
+    accHeadIconAmber: {
+      backgroundColor: 'rgba(217,119,6,0.14)',
+    },
+    accHeadIconViolet: {
+      backgroundColor: 'rgba(124,58,237,0.14)',
+    },
+    accHeadIconEmerald: {
+      backgroundColor: 'rgba(5,150,105,0.14)',
+    },
+    accHeadIconSky: {
+      backgroundColor: 'rgba(2,132,199,0.14)',
+    },
+    accStepNum: {
+      fontSize: 10,
+      fontWeight: '800',
+      letterSpacing: 1.1,
+    },
+    accStepNumBlue: {
+      color: '#2563EB',
+    },
+    accStepNumAmber: {
+      color: '#D97706',
+    },
+    accStepNumViolet: {
+      color: '#7C3AED',
+    },
+    accStepNumEmerald: {
+      color: '#059669',
+    },
+    accStepNumSky: {
+      color: '#0284C7',
+    },
+    accHeroChips: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 12,
+    },
+    accHeroChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+    accHeroChipText: {
+      color: 'rgba(255,255,255,0.92)',
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    accCardHead: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 2,
+    },
+    accCardHeadBody: {
+      flex: 1,
+    },
+    accStepBadge: {
+      width: 28,
+      height: 28,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(148,163,184,0.16)',
+    },
+    accStepBadgeText: {
+      fontSize: 11,
+      fontWeight: '800',
+      letterSpacing: 0.5,
+      color: colors.textSecondary,
+    },
+    accCardTitle: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: colors.text,
+    },
+    accCardSub: {
+      fontSize: 11,
+      marginTop: 1,
+      color: colors.textSecondary,
+    },
+    accChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingHorizontal: 8,
+      paddingVertical: 5,
+      borderRadius: 999,
+      backgroundColor: 'rgba(148,163,184,0.16)',
+    },
+    accChipOk: {
+      backgroundColor: 'rgba(16,185,129,0.16)',
+    },
+    accChipBad: {
+      backgroundColor: 'rgba(239,68,68,0.14)',
+    },
+    accChipText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.textSecondary,
+    },
+    accChipTextOk: {
+      color: '#10B981',
+    },
+    accChipTextBad: {
+      color: '#F87171',
+    },
+    accRow: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    accCol: {
+      flex: 1,
+    },
+    accNote: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginTop: 16,
+      padding: 12,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: 'rgba(37,99,235,0.18)',
+      backgroundColor: 'rgba(37,99,235,0.08)',
+    },
+    accNoteText: {
+      flex: 1,
+      fontSize: 12,
+      lineHeight: 17,
+      color: colors.textSecondary,
     },
     nearestCard: {
       flexDirection: 'row',

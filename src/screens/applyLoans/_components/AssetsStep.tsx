@@ -7,13 +7,19 @@ import {
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import {
+  Building,
+  Camera,
+  CloudUpload,
+  Eye,
+  FileText,
+  Info,
+  LocateFixed,
   PiggyBank,
   Plus,
-  Eye,
+  Ruler,
+  ShieldCheck,
+  Tags,
   X,
-  Info,
-  CloudUpload,
-  LocateFixed,
 } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import SectionHeaderText from '../../../components/typography/SectionHeaderText';
@@ -21,6 +27,7 @@ import FormTextInput from '../../../components/forms/FormTextInput';
 import FormSelectOption from '../../../components/forms/FormSelectOption';
 import ImagePreviewModal from './ImagePreviewModal';
 import LocationSelectField from './LocationSelectField';
+import { CardHead } from './FormSectionCard';
 import { useLocations } from '../../../hooks/useLocations';
 import { useCommonMasterOptions } from '../../../hooks/useCommonMasterOptions';
 import { useCollectionExecutives } from '../../../hooks/useCollectionExecutives';
@@ -278,20 +285,38 @@ export default function AssetsStep({
         subtitle="Share the property details used as security for this loan."
       />
 
-      <View style={themed.incomeHeroCard}>
-        <View style={themed.incomeHeroIcon}>
-          <PiggyBank size={24} color="#F59E0B" />
+      <View style={themed.accHero}>
+        <View style={themed.accHeroIcon}>
+          <PiggyBank size={22} color="#FFFFFF" />
         </View>
-        <View style={themed.incomeHeroBody}>
-          <Text style={themed.incomeHeroTitle}>Property Collateral</Text>
-          <Text style={themed.incomeHeroText}>
+        <View style={themed.accHeroBody}>
+          <Text style={themed.accHeroTitle}>Property Collateral</Text>
+          <Text style={themed.accHeroText}>
             The property you provide strengthens your application and supports
             your loan amount.
           </Text>
+          <View style={themed.accHeroChips}>
+            <View style={themed.accHeroChip}>
+              <LocateFixed size={12} color="#FFFFFF" />
+              <Text style={themed.accHeroChipText}>Live GPS</Text>
+            </View>
+            <View style={themed.accHeroChip}>
+              <Camera size={12} color="#FFFFFF" />
+              <Text style={themed.accHeroChipText}>Photo evidence</Text>
+            </View>
+          </View>
         </View>
       </View>
 
-      <Text style={themed.sectionTitle}>Property Details</Text>
+      <View style={themed.accCard}>
+        <CardHead
+          step="01"
+          title="Property Details"
+          subtitle="As per registered records"
+          themed={themed}
+          icon={Building}
+          accent="blue"
+        />
 
       <FormTextInput
         control={control}
@@ -397,7 +422,17 @@ export default function AssetsStep({
         }}
       />
 
-      <Text style={themed.sectionTitle}>Property Classification</Text>
+      </View>
+
+      <View style={themed.accCard}>
+        <CardHead
+          step="02"
+          title="Property Classification"
+          subtitle="How the property is used and held"
+          themed={themed}
+          icon={Tags}
+          accent="amber"
+        />
 
       <FormSelectOption
         control={control}
@@ -431,7 +466,17 @@ export default function AssetsStep({
         rules={{ required: 'Select ownership type' }}
       />
 
-      <Text style={themed.sectionTitle}>Property Measurement</Text>
+      </View>
+
+      <View style={themed.accCard}>
+        <CardHead
+          step="03"
+          title="Property Measurement"
+          subtitle="Land and built-up areas"
+          themed={themed}
+          icon={Ruler}
+          accent="emerald"
+        />
 
       <FormSelectOption
         control={control}
@@ -502,7 +547,17 @@ export default function AssetsStep({
         ))}
       </View>
 
-      <Text style={themed.sectionTitle}>Mortgage Details</Text>
+      </View>
+
+      <View style={themed.accCard}>
+        <CardHead
+          step="04"
+          title="Mortgage Details"
+          subtitle="Security, signing authority and valuation"
+          themed={themed}
+          icon={FileText}
+          accent="violet"
+        />
 
       <FormSelectOption
         control={control}
@@ -552,7 +607,17 @@ export default function AssetsStep({
         }}
       />
 
-      <Text style={themed.sectionTitle}>Location & Evidence</Text>
+      </View>
+
+      <View style={themed.accCard}>
+        <CardHead
+          step="05"
+          title="Location & Evidence"
+          subtitle="Geo coordinates and property photo"
+          themed={themed}
+          icon={LocateFixed}
+          accent="sky"
+        />
 
       <Pressable
         onPress={() => fetchCurrentLocation()}
@@ -713,9 +778,11 @@ export default function AssetsStep({
         )}
       />
 
-      <View style={themed.refEntryNote}>
-        <Info size={12} color={colors.textSecondary} />
-        <Text style={themed.refEntryNoteText}>
+      </View>
+
+      <View style={themed.accNote}>
+        <ShieldCheck size={16} color="#2563EB" />
+        <Text style={themed.accNoteText}>
           Make sure the property details match your registered documents to
           avoid delays in processing.
         </Text>
