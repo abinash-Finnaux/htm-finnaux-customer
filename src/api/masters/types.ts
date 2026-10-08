@@ -100,3 +100,43 @@ export type GetCollectionExecutivesRequest = {
   Branch_Id: number;
   ProductId: number;
 };
+
+export type GetPartnerListRequest = {
+  Type: string;
+};
+
+export type GetProductRequiredDocRequest = {
+  ProductId: number;
+};
+
+export type ProductRequiredDoc = {
+  DocId: number;
+  Doc_Category: string;
+  Doc_Name: string;
+  Doc_Ind_NI: string | null;
+  IsAlreadySelected: boolean;
+  IsHMandatory: boolean;
+  IsCMandatory: boolean;
+  IsGMandatory: boolean;
+};
+
+export type GetDealerManufactureMapRequest = {
+  Dealer_Id: number;
+};
+
+export type GetVehicleCategoriesRequest = {
+  ManufactureId: number;
+};
+
+export type GetVehicleModelsRequest = {
+  ManufactureId: number;
+  CategoryId: number;
+};
+
+export type GetVehicleVariantsRequest = {
+  ModelId: number;
+};
+
+export type GetCustomerByLoanNoRequest = {
+  Loan_Id: number | string;
+};

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Controller, type Control } from 'react-hook-form';
 import { Pressable, Text, View } from 'react-native';
-import { HeartHandshake, Info, Plus, Trash2, Users } from 'lucide-react-native';
+import { HeartHandshake, Plus, Trash2, Users } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import GlobalInputText from '../../../components/inputTexts/GlobalInputText';
 import SectionHeaderText from '../../../components/typography/SectionHeaderText';
@@ -42,7 +42,7 @@ export default function CustomerReferenceStep({ control, themed }: Props) {
   };
 
   const isReferenceValid = (ref: CustomerReference) =>
-    ref.type !== '' && (ref.name.trim() !== '' || ref.phone !== '');
+    ref.type !== '' && ref.name.trim() !== '' && ref.phone !== '';
 
   const hasInvalidPhone = (ref: CustomerReference) =>
     ref.phone !== '' && !/^[0-9]{10}$/.test(ref.phone);
@@ -55,7 +55,6 @@ export default function CustomerReferenceStep({ control, themed }: Props) {
       <>
         {refs.map((ref, index) => {
           const typeSelected = ref.type !== '';
-          const incomplete = !isReferenceValid(ref);
           const invalidPhone = hasInvalidPhone(ref);
 
           return (
@@ -118,15 +117,20 @@ export default function CustomerReferenceStep({ control, themed }: Props) {
               ) : null}
 
               <GlobalInputText
-                label="Name"
+                label="Name *"
                 placeholder="Enter the person's name"
                 value={ref.name}
                 onChangeText={text =>
                   updateReference(refs, onChange, ref.id, { name: text })
                 }
+                error={
+                  refs.length > 0 && ref.name.trim() === ''
+                    ? 'Name is required'
+                    : undefined
+                }
               />
               <GlobalInputText
-                label="Mobile Number"
+                label="Mobile Number *"
                 placeholder="Enter 10-digit mobile number"
                 keyboardType="phone-pad"
                 maxLength={10}
@@ -136,17 +140,15 @@ export default function CustomerReferenceStep({ control, themed }: Props) {
                     phone: formatPhone(text),
                   })
                 }
-                error={invalidPhone ? 'Enter a valid 10-digit mobile number' : undefined}
+                error={
+                  refs.length > 0 && ref.phone === ''
+                    ? 'Mobile number is required'
+                    : invalidPhone
+                    ? 'Enter a valid 10-digit mobile number'
+                    : undefined
+                }
               />
 
-              {incomplete && refs.length > 0 ? (
-                <View style={themed.refEntryNote}>
-                  <Info size={12} color={colors.textSecondary} />
-                  <Text style={themed.refEntryNoteText}>
-                    Add at least a name or a mobile number.
-                  </Text>
-                </View>
-              ) : null}
             </View>
           );
         })}
@@ -172,7 +174,7 @@ export default function CustomerReferenceStep({ control, themed }: Props) {
     <>
       <SectionHeaderText
         title="Customer Reference"
-        subtitle="Add one or more references — each needs a type and a name or mobile."
+        subtitle="Add one or more references — each needs a type, name and mobile."
       />
 
       <View style={themed.referenceCard}>
@@ -203,8 +205,8 @@ export default function CustomerReferenceStep({ control, themed }: Props) {
             const allValid = list.every(
               ref =>
                 ref.type !== '' &&
-                (ref.name.trim() !== '' || ref.phone !== '') &&
-                (ref.phone === '' || /^[0-9]{10}$/.test(ref.phone)),
+                ref.name.trim() !== '' &&
+                /^[0-9]{10}$/.test(ref.phone),
             );
             return allValid || 'Complete all references to continue.';
           },

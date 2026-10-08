@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Controller,
   useWatch,
   type Control,
+  type FieldPath,
   type RegisterOptions,
   type UseFormSetValue,
 } from 'react-hook-form';
@@ -19,15 +20,26 @@ import {
   IndianRupee,
   Sparkles,
   Settings2,
+  ChevronDown,
   type LucideIcon,
 } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import { palette } from '../../../constants/colors';
+import { useCommonMasterOptions } from '../../../hooks/useCommonMasterOptions';
+import {
+  useDealerOptions,
+  useManufactureOptions,
+  useVehicleCategories,
+  useVehicleModels,
+  useVehicleVariants,
+  useCustomerByLoan,
+  type VehicleMasterItem,
+} from '../../../hooks/useVehicleMasters';
 import SectionHeaderText from '../../../components/typography/SectionHeaderText';
 import FormTextInput from '../../../components/forms/FormTextInput';
-import FormSelectOption from '../../../components/forms/FormSelectOption';
 import FormDateOfBirthInput from '../../../components/forms/FormDateOfBirthInput';
 import ImagePreviewModal from './ImagePreviewModal';
+import ModalPicker from './ModalPicker';
 import type { createStyles } from '../styles';
 import type { ApplyLoanForm, UploadedDocument } from '../types';
 
@@ -74,13 +86,25 @@ const VEHICLE_CATEGORY_OPTIONS = [
 
 const MODEL_OPTIONS = ['Model 1', 'Model 2', 'Model 3', 'Other'];
 
-const VARIANT_OPTIONS = ['Base', 'LX', 'VX', 'ZX', 'ZXI', 'VXI', 'Sport', 'Other'];
+const VARIANT_OPTIONS = [
+  'Base',
+  'LX',
+  'VX',
+  'ZX',
+  'ZXI',
+  'VXI',
+  'Sport',
+  'Other',
+];
 
 const PAST_MIN = new Date(1985, 0, 1);
 const FUTURE_MAX = new Date(2099, 11, 31);
 
 const formatAlphanumeric = (text: string) =>
-  text.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 20);
+  text
+    .replace(/[^A-Za-z0-9]/g, '')
+    .toUpperCase()
+    .slice(0, 20);
 
 const formatReg = (text: string) =>
   text
@@ -100,9 +124,12 @@ const formatDecimal = (text: string) =>
 
 const formatFreeText = (text: string) => text.slice(0, 40);
 
-const moneyRules = (
-  label: string,
-): RegisterOptions<ApplyLoanForm> => ({
+const resolveOptionId = (items: VehicleMasterItem[], value: string): string =>
+  items.find(item => item.name === value)?.id ?? '';
+
+const itemNames = (items: VehicleMasterItem[]) => items.map(item => item.name);
+
+const moneyRules = (label: string): RegisterOptions<ApplyLoanForm> => ({
   pattern: {
     value: /^[0-9]+$/,
     message: `Enter a valid ${label.toLowerCase()}`,
@@ -136,14 +163,78 @@ function SegOption({
       <Text
         style={[
           themed.segOptionText,
-          selected
-            ? themed.segOptionTextActive
-            : themed.segOptionTextInactive,
+          selected ? themed.segOptionTextActive : themed.segOptionTextInactive,
         ]}
       >
         {label}
       </Text>
     </Pressable>
+  );
+}
+
+function DropdownSelectField({
+  control,
+  name,
+  label,
+  options,
+  placeholder = 'Select',
+  themed,
+  rules,
+}: {
+  control: Control<ApplyLoanForm>;
+  name: FieldPath<ApplyLoanForm>;
+  label: string;
+  options: string[];
+  placeholder?: string;
+  themed: ReturnType<typeof createStyles>;
+  rules?: RegisterOptions<ApplyLoanForm>;
+}) {
+  const { theme } = useTheme();
+  const { colors } = theme;
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Controller
+      control={control}
+      name={name}
+      rules={rules}
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
+        const text = typeof value === 'string' ? value : '';
+        return (
+          <>
+            <Text style={themed.locLabel}>{label}</Text>
+            <Pressable
+              onPress={() => setOpen(true)}
+              style={({ pressed }) => [
+                themed.locBox,
+                error ? themed.locBoxError : undefined,
+                { opacity: pressed ? 0.8 : 1 },
+              ]}
+            >
+              <Text
+                style={text ? themed.locValue : themed.locPlaceholder}
+                numberOfLines={1}
+              >
+                {text || placeholder}
+              </Text>
+              <ChevronDown size={16} color={colors.textSecondary} />
+            </Pressable>
+            {error?.message ? (
+              <Text style={themed.locError}>{error.message}</Text>
+            ) : null}
+            <ModalPicker
+              visible={open}
+              title={label}
+              options={options}
+              value={text}
+              onSelect={onChange}
+              onClose={() => setOpen(false)}
+              themed={themed}
+            />
+          </>
+        );
+      }}
+    />
   );
 }
 
@@ -182,12 +273,11 @@ function SectionCard({
           </View>
         </View>
         <View
-          style={[
-            themed.vehicleStepNumPill,
-            { backgroundColor: tint + '14' },
-          ]}
+          style={[themed.vehicleStepNumPill, { backgroundColor: tint + '14' }]}
         >
-          <Text style={[themed.vehicleStepNumText, { color: tint }]}>{num}</Text>
+          <Text style={[themed.vehicleStepNumText, { color: tint }]}>
+            {num}
+          </Text>
         </View>
       </View>
       {children}
@@ -235,7 +325,10 @@ function PriceDescriptionSection({ control, themed }: MoneySectionProps) {
 
   return (
     <>
-      {moneyGrid({ name: 'exShowroom', label: 'Ex-Showroom' }, { name: 'gst', label: 'GST' })}
+      {moneyGrid(
+        { name: 'exShowroom', label: 'Ex-Showroom' },
+        { name: 'gst', label: 'GST' },
+      )}
       {moneyGrid(
         { name: 'insurancePremium', label: 'Insurance' },
         { name: 'tdsTcs', label: 'TDS/TCS' },
@@ -248,7 +341,10 @@ function PriceDescriptionSection({ control, themed }: MoneySectionProps) {
         { name: 'transportation', label: 'Transportation' },
         { name: 'rto', label: 'RTO' },
       )}
-      {moneyGrid({ name: 'earthing', label: 'Earthing' }, { name: 'others', label: 'Others' })}
+      {moneyGrid(
+        { name: 'earthing', label: 'Earthing' },
+        { name: 'others', label: 'Others' },
+      )}
 
       <FormTextInput
         control={control}
@@ -271,20 +367,144 @@ type Props = {
   control: Control<ApplyLoanForm>;
   setValue: UseFormSetValue<ApplyLoanForm>;
   themed: ReturnType<typeof createStyles>;
+  loanId?: string;
 };
 
-export default function VehicleDetailStep({ control, setValue, themed }: Props) {
+export default function VehicleDetailStep({
+  control,
+  setValue,
+  themed,
+  loanId = '',
+}: Props) {
   const { theme } = useTheme();
   const { colors } = theme;
   const [previewUri, setPreviewUri] = useState<string | null>(null);
 
   const condition = useWatch({ control, name: 'vehicle.condition' });
   const usage = useWatch({ control, name: 'vehicle.usage' });
+  const dealer = useWatch({ control, name: 'vehicle.dealer' });
+  const manufacturer = useWatch({ control, name: 'vehicle.manufacturer' });
+  const vehicleCategory = useWatch({
+    control,
+    name: 'vehicle.vehicleCategory',
+  });
+  const modelName = useWatch({ control, name: 'vehicle.modelName' });
 
   const isUsed = condition === 'USED';
   const isNew = condition === 'NEW';
   const isCommercial = usage === 'COMMERCIAL';
   const showInvoiceHpn = !(isUsed && isCommercial);
+
+  const dealers = useDealerOptions();
+  const fuel = useCommonMasterOptions('FUEL TYPE', FUEL_TYPES);
+
+  const dealerId = resolveOptionId(dealers.items, dealer);
+  const manufactures = useManufactureOptions(dealerId);
+  const mfgId = resolveOptionId(manufactures.items, manufacturer);
+  const categories = useVehicleCategories(mfgId);
+  const catId = resolveOptionId(categories.items, vehicleCategory);
+  const models = useVehicleModels(mfgId, catId);
+  const modelId = resolveOptionId(models.items, modelName);
+  const variants = useVehicleVariants(modelId);
+  const quotationCustomers = useCustomerByLoan(loanId);
+
+  const chainHint = !isNew
+    ? ''
+    : !dealer
+    ? 'Select dealer to load vehicle options'
+    : manufactures.loading ||
+      categories.loading ||
+      models.loading ||
+      variants.loading
+    ? 'Loading vehicle options…'
+    : !manufacturer
+    ? 'Select manufacture to load vehicle options'
+    : !vehicleCategory
+    ? 'Select category to load vehicle options'
+    : !modelName
+    ? 'Select model to load variant'
+    : '';
+
+  const chainError = isNew
+    ? dealers.error ??
+      manufactures.error ??
+      categories.error ??
+      models.error ??
+      variants.error
+    : '';
+
+  const retryChain = () => {
+    if (dealers.error) dealers.refetch();
+    if (manufactures.error) manufactures.refetch();
+    if (categories.error) categories.refetch();
+    if (models.error) models.refetch();
+    if (variants.error) variants.refetch();
+  };
+
+  const prevDealerIdRef = useRef(dealerId);
+  useEffect(() => {
+    if (prevDealerIdRef.current !== dealerId) {
+      if (dealerId !== '') {
+        setValue('vehicle.manufacturer', '');
+        setValue('vehicle.vehicleCategory', '');
+        setValue('vehicle.modelName', '');
+        setValue('vehicle.variant', '');
+      }
+      prevDealerIdRef.current = dealerId;
+    }
+  }, [dealerId, setValue]);
+
+  const prevMfgIdRef = useRef(mfgId);
+  useEffect(() => {
+    if (prevMfgIdRef.current !== mfgId) {
+      if (mfgId !== '') {
+        setValue('vehicle.vehicleCategory', '');
+        setValue('vehicle.modelName', '');
+        setValue('vehicle.variant', '');
+      }
+      prevMfgIdRef.current = mfgId;
+    }
+  }, [mfgId, setValue]);
+
+  const prevCatIdRef = useRef(catId);
+  useEffect(() => {
+    if (prevCatIdRef.current !== catId) {
+      if (catId !== '') {
+        setValue('vehicle.modelName', '');
+        setValue('vehicle.variant', '');
+      }
+      prevCatIdRef.current = catId;
+    }
+  }, [catId, setValue]);
+
+  const prevModelIdRef = useRef(modelId);
+  useEffect(() => {
+    if (prevModelIdRef.current !== modelId) {
+      if (modelId !== '') {
+        setValue('vehicle.variant', '');
+      }
+      prevModelIdRef.current = modelId;
+    }
+  }, [modelId, setValue]);
+
+  const dealerOptions =
+    isNew && itemNames(dealers.items).length
+      ? itemNames(dealers.items)
+      : isNew
+      ? []
+      : DEALER_OPTIONS;
+
+  const manufactureOptions = isNew
+    ? itemNames(manufactures.items)
+    : MANUFACTURER_OPTIONS;
+
+  const categoryOptions = isNew
+    ? itemNames(categories.items)
+    : VEHICLE_CATEGORY_OPTIONS;
+  const modelOptions = isNew ? itemNames(models.items) : MODEL_OPTIONS;
+  const variantOptions = isNew ? itemNames(variants.items) : VARIANT_OPTIONS;
+  const fuelOptions = fuel.options.length ? fuel.options : FUEL_TYPES;
+  const quotationOptions = itemNames(quotationCustomers.items);
 
   const pickImage = (onChange: (doc: UploadedDocument | null) => void) => {
     launchImageLibrary(
@@ -490,156 +710,177 @@ export default function VehicleDetailStep({ control, setValue, themed }: Props) 
         </View>
       </SectionCard>
 
-      <SectionCard
-        themed={themed}
-        icon={CarFront}
-        tint={palette.primary}
-        title="Assets Info"
-        subtitle="Identification & registration details"
-        num="02"
-      >
-        {isNew ? (
-          <FormSelectOption
-            control={control}
-            name="vehicle.dealer"
-            label="Dealer *"
-            options={DEALER_OPTIONS}
-            rules={{ required: 'Select dealer' }}
-          />
-        ) : null}
-
-        <View style={themed.areaGrid}>
-          <View style={themed.areaCol}>
-            <FormSelectOption
+      {condition && usage ? (
+        <>
+          <SectionCard
+            themed={themed}
+            icon={CarFront}
+            tint={palette.primary}
+            title="Assets Info"
+            subtitle="Identification & registration details"
+            num="02"
+          >
+            {isNew ? (
+              <DropdownSelectField
+                control={control}
+                name="vehicle.dealer"
+                label="Dealer *"
+                options={dealerOptions}
+                rules={{ required: 'Select dealer' }}
+                themed={themed}
+              />
+            ) : null}
+            <DropdownSelectField
               control={control}
               name="vehicle.manufacturer"
-              label="Vehicle Manufacture *"
-              options={MANUFACTURER_OPTIONS}
+              label="Veh. Mfg. *"
+              options={manufactureOptions}
               rules={{ required: 'Select vehicle manufacture' }}
+              themed={themed}
             />
-          </View>
-          <View style={themed.areaCol}>
-            <FormSelectOption
+            <DropdownSelectField
               control={control}
               name="vehicle.vehicleCategory"
-              label="Vehicle Category *"
-              options={VEHICLE_CATEGORY_OPTIONS}
+              label="Category *"
+              options={categoryOptions}
               rules={{ required: 'Select vehicle category' }}
+              themed={themed}
             />
-          </View>
-        </View>
-
-        <View style={themed.areaGrid}>
-          <View style={themed.areaCol}>
-            <FormSelectOption
+            <DropdownSelectField
               control={control}
               name="vehicle.modelName"
-              label="Vehicle Model Name *"
-              options={MODEL_OPTIONS}
+              label="Model *"
+              options={modelOptions}
               rules={{ required: 'Select vehicle model name' }}
+              themed={themed}
             />
-          </View>
-          <View style={themed.areaCol}>
-            <FormSelectOption
+            <DropdownSelectField
               control={control}
               name="vehicle.variant"
               label="Variant *"
-              options={VARIANT_OPTIONS}
+              options={variantOptions}
               rules={{ required: 'Select variant' }}
+              themed={themed}
             />
-          </View>
-        </View>
 
-        <FormDateOfBirthInput
-          control={control}
-          name="vehicle.manufactureDate"
-          label="Manufacture Year *"
-          minimumDate={PAST_MIN}
-          maximumDate={new Date()}
-          rules={{ required: 'Manufacture year is required' }}
-        />
+            {chainHint ? (
+              <Text style={themed.vehicleChainHint}>{chainHint}</Text>
+            ) : null}
 
-        <FormTextInput
-          control={control}
-          name="vehicle.regNumber"
-          label={isUsed ? 'Vehicle Reg No. *' : 'Vehicle Reg No.'}
-          placeholder="e.g. MH12 AB1234"
-          autoCapitalize="characters"
-          maxLength={12}
-          formatText={formatReg}
-          rules={{
-            required: isUsed ? 'Registration number is required' : false,
-            pattern: {
-              value: /^[A-Z0-9 -]{4,14}$/,
-              message: 'Enter a valid registration number',
-            },
-          }}
-        />
+            {chainError ? (
+              <View style={themed.vehicleErrorRow}>
+                <Text style={themed.vehicleChainHintError}>{chainError}</Text>
+                <Pressable
+                  onPress={retryChain}
+                  style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                >
+                  <Text style={themed.vehicleRetryText}>Retry</Text>
+                </Pressable>
+              </View>
+            ) : null}
 
-        <View style={themed.areaGrid}>
-          <View style={themed.areaCol}>
             <FormDateOfBirthInput
               control={control}
-              name="vehicle.registrationDate"
-              label="Registration Date"
+              name="vehicle.manufactureDate"
+              label="Manufacture Year *"
               minimumDate={PAST_MIN}
               maximumDate={new Date()}
+              rules={{ required: 'Manufacture year is required' }}
             />
-          </View>
-          <View style={themed.areaCol}>
-            <FormDateOfBirthInput
+
+            <FormTextInput
               control={control}
-              name="vehicle.registrationExpiryDate"
-              label="Registration Expiry Date"
-              minimumDate={PAST_MIN}
-              maximumDate={FUTURE_MAX}
+              name="vehicle.regNumber"
+              label={isUsed ? 'Vehicle Reg No. *' : 'Vehicle Reg No.'}
+              placeholder="e.g. MH12 AB1234"
+              autoCapitalize="characters"
+              maxLength={12}
+              formatText={formatReg}
+              rules={{
+                required: isUsed ? 'Registration number is required' : false,
+                pattern: {
+                  value: /^[A-Z0-9 -]{4,14}$/,
+                  message: 'Enter a valid registration number',
+                },
+              }}
             />
-          </View>
-        </View>
 
-        <FormSelectOption
-          control={control}
-          name="vehicle.fuelType"
-          label="Fuel Type *"
-          options={FUEL_TYPES}
-          rules={{ required: 'Select fuel type' }}
-        />
+            <View style={themed.areaGrid}>
+              <View style={themed.areaCol}>
+                <FormDateOfBirthInput
+                  control={control}
+                  name="vehicle.registrationDate"
+                  label="Registration Date"
+                  minimumDate={PAST_MIN}
+                  maximumDate={new Date()}
+                />
+              </View>
+              <View style={themed.areaCol}>
+                <FormDateOfBirthInput
+                  control={control}
+                  name="vehicle.registrationExpiryDate"
+                  label="Registration Expiry Date"
+                  minimumDate={PAST_MIN}
+                  maximumDate={FUTURE_MAX}
+                />
+              </View>
+            </View>
 
-        {isCommercial ? (
-          <View style={themed.areaGrid}>
-            <View style={themed.areaCol}>
-              <FormDateOfBirthInput
-                control={control}
-                name="vehicle.roadTaxUpto"
-                label="Road Tax Upto"
-                minimumDate={PAST_MIN}
-                maximumDate={FUTURE_MAX}
-              />
-            </View>
-            <View style={themed.areaCol}>
-              <FormDateOfBirthInput
-                control={control}
-                name="vehicle.fitnessUpto"
-                label="Fitness Upto"
-                minimumDate={PAST_MIN}
-                maximumDate={FUTURE_MAX}
-              />
-            </View>
-          </View>
-        ) : null}
+            <DropdownSelectField
+              control={control}
+              name="vehicle.fuelType"
+              label="Fuel Type *"
+              options={fuelOptions}
+              rules={{ required: 'Select fuel type' }}
+              themed={themed}
+            />
 
-        {isCommercial ? (
-          <View style={themed.areaGrid}>
-            <View style={themed.areaCol}>
-              <FormDateOfBirthInput
-                control={control}
-                name="vehicle.permitUpto"
-                label="Permit Upto"
-                minimumDate={PAST_MIN}
-                maximumDate={FUTURE_MAX}
-              />
-            </View>
-            <View style={themed.areaCol}>
+            {isCommercial ? (
+              <View style={themed.areaGrid}>
+                <View style={themed.areaCol}>
+                  <FormDateOfBirthInput
+                    control={control}
+                    name="vehicle.roadTaxUpto"
+                    label="Road Tax Upto"
+                    minimumDate={PAST_MIN}
+                    maximumDate={FUTURE_MAX}
+                  />
+                </View>
+                <View style={themed.areaCol}>
+                  <FormDateOfBirthInput
+                    control={control}
+                    name="vehicle.fitnessUpto"
+                    label="Fitness Upto"
+                    minimumDate={PAST_MIN}
+                    maximumDate={FUTURE_MAX}
+                  />
+                </View>
+              </View>
+            ) : null}
+
+            {isCommercial ? (
+              <View style={themed.areaGrid}>
+                <View style={themed.areaCol}>
+                  <FormDateOfBirthInput
+                    control={control}
+                    name="vehicle.permitUpto"
+                    label="Permit Upto"
+                    minimumDate={PAST_MIN}
+                    maximumDate={FUTURE_MAX}
+                  />
+                </View>
+                <View style={themed.areaCol}>
+                  <FormTextInput
+                    control={control}
+                    name="vehicle.colour"
+                    label="Color"
+                    placeholder="e.g. Polar White"
+                    maxLength={24}
+                    formatText={formatFreeText}
+                  />
+                </View>
+              </View>
+            ) : (
               <FormTextInput
                 control={control}
                 name="vehicle.colour"
@@ -648,251 +889,265 @@ export default function VehicleDetailStep({ control, setValue, themed }: Props) 
                 maxLength={24}
                 formatText={formatFreeText}
               />
-            </View>
-          </View>
-        ) : (
-          <FormTextInput
-            control={control}
-            name="vehicle.colour"
-            label="Color"
-            placeholder="e.g. Polar White"
-            maxLength={24}
-            formatText={formatFreeText}
-          />
-        )}
+            )}
 
-        <FormTextInput
-          control={control}
-          name="vehicle.vehicleCost"
-          label="Vehicle Cost *"
-          placeholder="e.g. 750000"
-          keyboardType="numeric"
-          maxLength={12}
-          formatText={formatWhole}
-          rules={{
-            required: 'Vehicle cost is required',
-            ...moneyRules('Vehicle cost'),
-          }}
-        />
-
-        {isCommercial ? (
-          <FormTextInput
-            control={control}
-            name="vehicle.route"
-            label="Route"
-            placeholder="e.g. Pune - Mumbai"
-            maxLength={40}
-            formatText={formatFreeText}
-          />
-        ) : null}
-
-        <View style={themed.areaGrid}>
-          <View style={themed.areaCol}>
             <FormTextInput
               control={control}
-              name="vehicle.engineNumber"
-              label="Engine No. *"
-              placeholder="e.g. K12MN12345"
-              autoCapitalize="characters"
-              maxLength={20}
-              formatText={formatAlphanumeric}
+              name="vehicle.vehicleCost"
+              label="Vehicle Cost *"
+              placeholder="e.g. 750000"
+              keyboardType="numeric"
+              maxLength={12}
+              formatText={formatWhole}
               rules={{
-                required: 'Engine number is required',
-                pattern: {
-                  value: /^[A-Z0-9]{6,20}$/,
-                  message: 'Enter a valid engine number',
-                },
+                required: 'Vehicle cost is required',
+                ...moneyRules('Vehicle cost'),
               }}
             />
-          </View>
-          <View style={themed.areaCol}>
+
+            {isCommercial ? (
+              <FormTextInput
+                control={control}
+                name="vehicle.route"
+                label="Route"
+                placeholder="e.g. Pune - Mumbai"
+                maxLength={40}
+                formatText={formatFreeText}
+              />
+            ) : null}
+
+            <View style={themed.areaGrid}>
+              <View style={themed.areaCol}>
+                <FormTextInput
+                  control={control}
+                  name="vehicle.engineNumber"
+                  label="Engine No. *"
+                  placeholder="e.g. K12MN12345"
+                  autoCapitalize="characters"
+                  maxLength={20}
+                  formatText={formatAlphanumeric}
+                  rules={{
+                    required: 'Engine number is required',
+                    pattern: {
+                      value: /^[A-Z0-9]{6,20}$/,
+                      message: 'Enter a valid engine number',
+                    },
+                  }}
+                />
+              </View>
+              <View style={themed.areaCol}>
+                <FormTextInput
+                  control={control}
+                  name="vehicle.chassisNumber"
+                  label="Chassis No. *"
+                  placeholder="e.g. MA3EYD31S00555498"
+                  autoCapitalize="characters"
+                  maxLength={20}
+                  formatText={formatAlphanumeric}
+                  rules={{
+                    required: 'Chassis number is required',
+                    pattern: {
+                      value: /^[A-Z0-9]{6,20}$/,
+                      message: 'Enter a valid chassis number',
+                    },
+                  }}
+                />
+              </View>
+            </View>
+
             <FormTextInput
               control={control}
-              name="vehicle.chassisNumber"
-              label="Chassis No. *"
-              placeholder="e.g. MA3EYD31S00555498"
-              autoCapitalize="characters"
+              name="vehicle.keyNo"
+              label="Key No."
+              placeholder="e.g. K-1023"
               maxLength={20}
-              formatText={formatAlphanumeric}
-              rules={{
-                required: 'Chassis number is required',
-                pattern: {
-                  value: /^[A-Z0-9]{6,20}$/,
-                  message: 'Enter a valid chassis number',
-                },
-              }}
+              formatText={formatFreeText}
             />
-          </View>
-        </View>
 
-        <FormTextInput
-          control={control}
-          name="vehicle.keyNo"
-          label="Key No."
-          placeholder="e.g. K-1023"
-          maxLength={20}
-          formatText={formatFreeText}
-        />
+            {renderCheckbox('vehicle.rcHpn', 'RC HPN Endorsement')}
+            {showInvoiceHpn
+              ? renderCheckbox('vehicle.invoiceHpn', 'Invoice HPN Endorsement')
+              : null}
+          </SectionCard>
 
-        {renderCheckbox('vehicle.rcHpn', 'RC HPN Endorsement')}
-        {showInvoiceHpn
-          ? renderCheckbox('vehicle.invoiceHpn', 'Invoice HPN Endorsement')
-          : null}
-      </SectionCard>
+          <SectionCard
+            themed={themed}
+            icon={IndianRupee}
+            tint={palette.success}
+            title="Price Description"
+            subtitle="Complete breakup of the vehicle price"
+            num="03"
+          >
+            <PriceDescriptionSection control={control} themed={themed} />
+          </SectionCard>
 
-      <SectionCard
-        themed={themed}
-        icon={IndianRupee}
-        tint={palette.success}
-        title="Price Description"
-        subtitle="Complete breakup of the vehicle price"
-        num="03"
-      >
-        <PriceDescriptionSection control={control} themed={themed} />
-      </SectionCard>
-
-      {isNew ? (
-        <SectionCard
-          themed={themed}
-          icon={Sparkles}
-          tint={palette.warning}
-          title="New Vehicle"
-          subtitle="Dealer, quotation & invoice details"
-          num="04"
-        >
-          <FormTextInput
-            control={control}
-            name="vehicle.dealerContactPerson"
-            label="Dealer Contact Person *"
-            placeholder="e.g. Rahul Sharma"
-            maxLength={40}
-            formatText={formatFreeText}
-            rules={{ required: 'Contact person is required' }}
-          />
-
-          <FormTextInput
-            control={control}
-            name="vehicle.dealerContactNo"
-            label="Dealer Contact No. *"
-            placeholder="e.g. 9876543210"
-            keyboardType="phone-pad"
-            maxLength={10}
-            formatText={formatWhole}
-            rules={{
-              required: 'Contact number is required',
-              pattern: {
-                value: /^[0-9]{10}$/,
-                message: 'Enter a valid 10-digit number',
-              },
-            }}
-          />
-
-          <View style={themed.areaGrid}>
-            <View style={themed.areaCol}>
+          {isNew ? (
+            <SectionCard
+              themed={themed}
+              icon={Sparkles}
+              tint={palette.warning}
+              title="New Vehicle"
+              subtitle="Dealer, quotation & invoice details"
+              num="04"
+            >
               <FormTextInput
                 control={control}
-                name="vehicle.quotationNo"
-                label="Quotation No. *"
-                placeholder="e.g. QT-1042"
-                maxLength={20}
+                name="vehicle.dealerContactPerson"
+                label="Dealer Contact Person *"
+                placeholder="e.g. Rahul Sharma"
+                maxLength={40}
                 formatText={formatFreeText}
-                rules={{ required: 'Quotation number is required' }}
+                rules={{ required: 'Contact person is required' }}
               />
-            </View>
-            <View style={themed.areaCol}>
-              <FormDateOfBirthInput
-                control={control}
-                name="vehicle.quotationDate"
-                label="Quotation Date *"
-                minimumDate={PAST_MIN}
-                maximumDate={new Date()}
-                rules={{ required: 'Quotation date is required' }}
-              />
-            </View>
-          </View>
 
-          <View style={themed.areaGrid}>
-            <View style={themed.areaCol}>
               <FormTextInput
                 control={control}
-                name="vehicle.estimationAmount"
-                label="Estimation Amount *"
-                placeholder="e.g. 820000"
-                keyboardType="numeric"
-                maxLength={12}
+                name="vehicle.dealerContactNo"
+                label="Dealer Contact No. *"
+                placeholder="e.g. 9876543210"
+                keyboardType="phone-pad"
+                maxLength={10}
                 formatText={formatWhole}
                 rules={{
-                  required: 'Estimation amount is required',
-                  ...moneyRules('Estimation amount'),
+                  required: 'Contact number is required',
+                  pattern: {
+                    value: /^[0-9]{10}$/,
+                    message: 'Enter a valid 10-digit number',
+                  },
                 }}
               />
-            </View>
-            <View style={themed.areaCol}>
+
+              <View style={themed.areaGrid}>
+                <View style={themed.areaCol}>
+                  <FormTextInput
+                    control={control}
+                    name="vehicle.quotationNo"
+                    label="Quotation No. *"
+                    placeholder="e.g. QT-1042"
+                    maxLength={20}
+                    formatText={formatFreeText}
+                    rules={{ required: 'Quotation number is required' }}
+                  />
+                </View>
+                <View style={themed.areaCol}>
+                  <FormDateOfBirthInput
+                    control={control}
+                    name="vehicle.quotationDate"
+                    label="Quotation Date *"
+                    minimumDate={PAST_MIN}
+                    maximumDate={new Date()}
+                    rules={{ required: 'Quotation date is required' }}
+                  />
+                </View>
+              </View>
+
+              <View style={themed.areaGrid}>
+                <View style={themed.areaCol}>
+                  <FormTextInput
+                    control={control}
+                    name="vehicle.estimationAmount"
+                    label="Estimation Amount *"
+                    placeholder="e.g. 820000"
+                    keyboardType="numeric"
+                    maxLength={12}
+                    formatText={formatWhole}
+                    rules={{
+                      required: 'Estimation amount is required',
+                      ...moneyRules('Estimation amount'),
+                    }}
+                  />
+                </View>
+                <View style={themed.areaCol}>
+                  <FormTextInput
+                    control={control}
+                    name="vehicle.invoiceNo"
+                    label="Invoice No. *"
+                    placeholder="e.g. INV-8821"
+                    maxLength={20}
+                    formatText={formatFreeText}
+                    rules={{ required: 'Invoice number is required' }}
+                  />
+                </View>
+              </View>
+
+              <View style={themed.areaGrid}>
+                <View style={themed.areaCol}>
+                  <FormDateOfBirthInput
+                    control={control}
+                    name="vehicle.invoiceDate"
+                    label="Invoice Date *"
+                    minimumDate={PAST_MIN}
+                    maximumDate={new Date()}
+                    rules={{ required: 'Invoice date is required' }}
+                  />
+                </View>
+                <View style={themed.areaCol}>
+                  <FormTextInput
+                    control={control}
+                    name="vehicle.invoiceValue"
+                    label="Invoice Value *"
+                    placeholder="e.g. 815000"
+                    keyboardType="numeric"
+                    maxLength={12}
+                    formatText={formatWhole}
+                    rules={{
+                      required: 'Invoice value is required',
+                      ...moneyRules('Invoice value'),
+                    }}
+                  />
+                </View>
+              </View>
+
+              <DropdownSelectField
+                control={control}
+                name="vehicle.quotationInFavorOf"
+                label="Quotation In Favor Of"
+                options={quotationOptions}
+                themed={themed}
+              />
+
+              {quotationCustomers.loading && quotationOptions.length === 0 ? (
+                <Text style={themed.vehicleChainHint}>Loading options…</Text>
+              ) : null}
+              {quotationCustomers.error ? (
+                <View style={themed.vehicleErrorRow}>
+                  <Text style={themed.vehicleChainHintError}>
+                    {quotationCustomers.error}
+                  </Text>
+                  <Pressable
+                    onPress={() => quotationCustomers.refetch()}
+                    style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                  >
+                    <Text style={themed.vehicleRetryText}>Retry</Text>
+                  </Pressable>
+                </View>
+              ) : null}
+              {!loanId && quotationOptions.length === 0 ? (
+                <Text style={themed.vehicleChainHint}>
+                  No loan application linked yet — options load with the loan
+                  application
+                </Text>
+              ) : null}
+
               <FormTextInput
                 control={control}
-                name="vehicle.invoiceNo"
-                label="Invoice No. *"
-                placeholder="e.g. INV-8821"
-                maxLength={20}
-                formatText={formatFreeText}
-                rules={{ required: 'Invoice number is required' }}
+                name="vehicle.remark"
+                label="Remark"
+                placeholder="Any additional remarks"
+                maxLength={500}
+                formatText={text => text.slice(0, 500)}
+                multiline
+                textAlignVertical="top"
+                numberOfLines={4}
               />
-            </View>
-          </View>
 
-          <View style={themed.areaGrid}>
-            <View style={themed.areaCol}>
-              <FormDateOfBirthInput
-                control={control}
-                name="vehicle.invoiceDate"
-                label="Invoice Date *"
-                minimumDate={PAST_MIN}
-                maximumDate={new Date()}
-                rules={{ required: 'Invoice date is required' }}
-              />
-            </View>
-            <View style={themed.areaCol}>
-              <FormTextInput
-                control={control}
-                name="vehicle.invoiceValue"
-                label="Invoice Value *"
-                placeholder="e.g. 815000"
-                keyboardType="numeric"
-                maxLength={12}
-                formatText={formatWhole}
-                rules={{
-                  required: 'Invoice value is required',
-                  ...moneyRules('Invoice value'),
-                }}
-              />
-            </View>
-          </View>
-
-          <FormTextInput
-            control={control}
-            name="vehicle.quotationInFavorOf"
-            label="Quotation In Favor Of"
-            placeholder="e.g. ABC Pvt. Ltd."
-            maxLength={40}
-            formatText={formatFreeText}
-          />
-
-          <FormTextInput
-            control={control}
-            name="vehicle.remark"
-            label="Remark"
-            placeholder="Any additional remarks"
-            maxLength={120}
-            formatText={text => text.slice(0, 120)}
-          />
-
-          {renderVehicleImage()}
-        </SectionCard>
-      ) : (
-        <View style={themed.vehicleStepCard}>
-          {renderVehicleImage()}
-        </View>
-      )}
+              {renderVehicleImage()}
+            </SectionCard>
+          ) : (
+            <View style={themed.vehicleStepCard}>{renderVehicleImage()}</View>
+          )}
+        </>
+      ) : null}
 
       <View style={themed.refEntryNote}>
         <Info size={12} color={colors.textSecondary} />

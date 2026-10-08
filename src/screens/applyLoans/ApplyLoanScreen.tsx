@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Text,
   View,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ActivityIndicator,
+  AppState,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -13,6 +14,7 @@ import {
   CarFront,
   Check,
   ClipboardList,
+  House,
   IndianRupee,
   MapPin,
 } from 'lucide-react-native';
@@ -20,11 +22,21 @@ import type { LucideIcon } from 'lucide-react-native';
 import { createStyles } from './styles';
 import { useForm } from 'react-hook-form';
 import { useTheme } from '../../context/ThemeContext';
+import { useUser } from '../../context/UserContext';
 import { toast } from '../../components/toast/ToastProvider';
 import { useProductList } from '../../hooks/useProductList';
 import { useBranches } from '../../hooks/useBranches';
 import { useProductPages } from '../../hooks/useProductPages';
+import { useProductRequiredDocs } from '../../hooks/useProductRequiredDocs';
 import { mapProductsToLoanTypes } from './loanTypes';
+import {
+  loadLoanDraft,
+  saveLoanDraft,
+  clearLoanDraft,
+  reviveLoanDraftForm,
+  DRAFT_VERSION,
+  type LoanDraft,
+} from './services/draft';
 import {
   FALLBACK_PRODUCT_PAGES,
   getProductPageMeta,
@@ -38,7 +50,7 @@ import SelectBranchStep from './_components/SelectBranchStep';
 import LoanTypeStep from './_components/LoanTypeStep';
 import LoanAmountStep from './_components/LoanAmountStep';
 import EmploymentStep from './_components/EmploymentStep';
-import DocumentsStep, { DOCUMENTS } from './_components/DocumentsStep';
+import DocumentsStep from './_components/DocumentsStep';
 import CustomerReferenceStep from './_components/CustomerReferenceStep';
 import CustomerInfoStep from './_components/CustomerInfoStep';
 import AccountInfoStep from './_components/AccountInfoStep';
@@ -99,10 +111,21 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   const { products, loading } = useProductList();
   const loanTypes = mapProductsToLoanTypes(products);
 
+  const { user } = useUser();
+
+  const loanId = useMemo(
+    () =>
+      user?.applications?.[0]?.Loan_Id ??
+      (user?.applications?.[0]?.ApplicationIdentity
+        ? String(user.applications[0].ApplicationIdentity)
+        : ''),
+    [user],
+  );
+
   const { branches, coords, loading: branchesLoading, fallbackCoords, gpsStatus, refetch: refetchBranches } =
     useBranches();
 
-  const { control, watch, setValue } = useForm<ApplyLoanForm>({
+  const { control, watch, setValue, reset, getValues } = useForm<ApplyLoanForm>({
     mode: 'onChange',
     defaultValues: {
       branchId: '',
@@ -235,6 +258,11 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   const category = selectedLoanType?.category ?? '';
 
   const {
+    documents: productDocuments,
+    loading: productDocsLoading,
+  } = useProductRequiredDocs(productId);
+
+  const {
     pages: apiPages,
     loading: pagesLoading,
     error: pagesError,
@@ -251,6 +279,27 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   const safeStep = Math.min(Math.max(step, 1), totalSteps);
   const currentStep = steps[safeStep - 1];
 
+  const stepRef = useRef(safeStep);
+  stepRef.current = safeStep;
+  const totalStepsRef = useRef(totalSteps);
+  totalStepsRef.current = totalSteps;
+
+  const restoreStateRef = useRef<'pending' | 'restoring' | 'done'>('pending');
+  const draftStepRef = useRef<number | null>(null);
+  const draftPagesRequestedRef = useRef<number | null>(null);
+  const draftDisabledRef = useRef(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+  const [draftPagesReady, setDraftPagesReady] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     setStep(prev => Math.min(Math.max(prev, 1), totalSteps));
   }, [totalSteps]);
@@ -260,6 +309,134 @@ export default function ApplyLoanScreen({ navigation }: Props) {
     advanceAfterLoadRef.current = false;
     resetPages();
   }, [productId, resetPages]);
+
+  const persistDraft = useCallback(() => {
+    if (draftDisabledRef.current) return;
+    if (restoreStateRef.current !== 'done') return;
+    const values = getValues();
+    if (values.loanType === '') return;
+    const draft: LoanDraft = {
+      version: DRAFT_VERSION,
+      savedAt: new Date().toISOString(),
+      step: stepRef.current,
+      totalSteps: totalStepsRef.current,
+      productId: Number.isFinite(Number(values.loanType))
+        ? Number(values.loanType)
+        : null,
+      form: values,
+    };
+    saveLoanDraft(draft);
+    if (mountedRef.current) {
+      setLastSavedAt(Date.now());
+    }
+  }, [getValues]);
+
+  const flushDraftSave = useCallback(() => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    persistDraft();
+  }, [persistDraft]);
+
+  const scheduleDraftSave = useCallback(() => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      persistDraft();
+    }, 600);
+  }, [persistDraft]);
+
+  useEffect(() => {
+    const subscription = watch(() => {
+      scheduleDraftSave();
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [watch, scheduleDraftSave]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState !== 'active') {
+        flushDraftSave();
+      }
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, [flushDraftSave]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+      persistDraft();
+    };
+  }, [persistDraft]);
+
+  useEffect(() => {
+    if (restoreStateRef.current !== 'done') return;
+    flushDraftSave();
+  }, [safeStep, flushDraftSave]);
+
+  useEffect(() => {
+    if (restoreStateRef.current !== 'pending') return;
+    let active = true;
+    (async () => {
+      const draft = await loadLoanDraft();
+      if (!active) return;
+      restoreStateRef.current = 'done';
+      if (!draft || !draft.form) return;
+      const values = reviveLoanDraftForm(draft.form);
+      if (values.loanType === '') {
+        clearLoanDraft();
+        return;
+      }
+      restoreStateRef.current = 'restoring';
+      draftStepRef.current = draft.step;
+      reset(values);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [reset]);
+
+  useEffect(() => {
+    if (restoreStateRef.current !== 'restoring') return;
+    if (draftPagesReady) return;
+    if (productId === null) {
+      setDraftPagesReady(true);
+      return;
+    }
+    if (draftPagesRequestedRef.current === productId) return;
+    draftPagesRequestedRef.current = productId;
+    loadPages(productId).then(() => {
+      setFetchedProductId(productId);
+      setDraftPagesReady(true);
+    });
+  }, [draftPagesReady, productId, loadPages]);
+
+  useEffect(() => {
+    if (restoreStateRef.current !== 'restoring') return;
+    if (!draftPagesReady) return;
+    if (loading) return;
+    const target = draftStepRef.current ?? 1;
+    draftStepRef.current = null;
+    restoreStateRef.current = 'done';
+    const pagesForSteps =
+      productPages.length > 0 ? productPages : FALLBACK_PRODUCT_PAGES;
+    const maxStep = buildSteps(pagesForSteps, category).length;
+    setStep(Math.min(Math.max(target, 1), maxStep));
+    toast.show(
+      'Welcome back! Your saved loan application has been restored.',
+      'info',
+    );
+  }, [draftPagesReady, loading, productPages, category]);
 
   useEffect(() => {
     const scroller = stepperRef.current;
@@ -323,7 +500,12 @@ export default function ApplyLoanScreen({ navigation }: Props) {
       );
     }
     if (stepKey === 'documents') {
-      const requiredKeys = DOCUMENTS.filter(d => d.required).map(d => d.key);
+      if (productDocsLoading || productDocuments.length === 0) {
+        return false;
+      }
+      const requiredKeys = productDocuments
+        .filter(d => d.required)
+        .map(d => d.key);
       return requiredKeys.every(pk => documents.some(d => d.key === pk));
     }
     if (stepKey === 'incomeExpense') return monthlyIncome !== '' && employment !== '';
@@ -334,8 +516,8 @@ export default function ApplyLoanScreen({ navigation }: Props) {
         list.every(
           ref =>
             ref.type !== '' &&
-            (ref.name.trim() !== '' || ref.phone !== '') &&
-            (ref.phone === '' || /^[0-9]{10}$/.test(ref.phone)),
+            ref.name.trim() !== '' &&
+            /^[0-9]{10}$/.test(ref.phone),
         )
       );
     }
@@ -432,6 +614,12 @@ export default function ApplyLoanScreen({ navigation }: Props) {
       pages: productPages.map(page => page.MM_Id),
     };
     console.log('[ApplyLoanScreen] submitted:', submitted);
+    draftDisabledRef.current = true;
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    clearLoanDraft();
     toast.show(
       'Your loan application has been submitted successfully. Our team will contact you shortly.',
       'success',
@@ -446,6 +634,11 @@ export default function ApplyLoanScreen({ navigation }: Props) {
     } else {
       navigation.goBack();
     }
+  };
+
+  const handleGoHome = () => {
+    flushDraftSave();
+    navigation.navigate('Home');
   };
 
   const handleContinue = () => {
@@ -525,6 +718,7 @@ export default function ApplyLoanScreen({ navigation }: Props) {
           branchId={branchId}
           branches={branches}
           loanTypes={loanTypes}
+          stepKeys={steps.map(step => step.key)}
           themed={themed}
           form={{
             branchId,
@@ -564,12 +758,23 @@ export default function ApplyLoanScreen({ navigation }: Props) {
         );
       case 'vehicle':
         return (
-          <VehicleDetailStep control={control} setValue={setValue} themed={themed} />
+          <VehicleDetailStep
+              control={control}
+              setValue={setValue}
+              themed={themed}
+              loanId={loanId}
+            />
         );
       case 'loanInfo':
         return <LoanAmountStep control={control} themed={themed} />;
       case 'documents':
-        return <DocumentsStep control={control} themed={themed} />;
+        return (
+          <DocumentsStep
+            control={control}
+            productId={productId}
+            themed={themed}
+          />
+        );
       case 'incomeExpense':
         return <EmploymentStep control={control} themed={themed} />;
       case 'reference':
@@ -596,13 +801,30 @@ export default function ApplyLoanScreen({ navigation }: Props) {
             onPress={handleBack}
             style={({ pressed }) => [
               themed.backBtn,
-              { opacity: pressed ? 0.6 : 1 },
+              pressed && themed.backBtnPressed,
             ]}
           >
             <ArrowLeft size={20} color="#FFFFFF" />
           </Pressable>
           <Text style={themed.topTitle}>Apply Loan</Text>
-          <View style={themed.topSpacer} />
+          <View style={themed.topRight}>
+            {lastSavedAt !== null ? (
+              <View style={themed.savedChip}>
+                <Check size={11} color="#FFFFFF" strokeWidth={3} />
+                <Text style={themed.savedChipText}>Progress saved</Text>
+              </View>
+            ) : null}
+            <Pressable
+              onPress={handleGoHome}
+              accessibilityLabel="Go to home"
+              style={({ pressed }) => [
+                themed.backBtn,
+                pressed && themed.backBtnPressed,
+              ]}
+            >
+              <House size={19} color="#FFFFFF" />
+            </Pressable>
+          </View>
         </View>
 
         <View style={themed.headerBody}>

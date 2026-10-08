@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Controller,
   type Control,
-  type UseFormSetValue,
+  UseFormSetValue,
 } from 'react-hook-form';
-import { Image, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import {
   PiggyBank,
@@ -13,6 +13,7 @@ import {
   X,
   Info,
   CloudUpload,
+  LocateFixed,
 } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import SectionHeaderText from '../../../components/typography/SectionHeaderText';
@@ -23,6 +24,7 @@ import LocationSelectField from './LocationSelectField';
 import { useLocations } from '../../../hooks/useLocations';
 import { useCommonMasterOptions } from '../../../hooks/useCommonMasterOptions';
 import { useCollectionExecutives } from '../../../hooks/useCollectionExecutives';
+import { getCurrentPosition } from '../../../services/location';
 import type { createStyles } from '../styles';
 import type { ApplyLoanForm, AssetInfo, UploadedDocument } from '../types';
 
@@ -111,6 +113,65 @@ export default function AssetsStep({
   const { theme } = useTheme();
   const { colors } = theme;
   const [previewUri, setPreviewUri] = useState<string | null>(null);
+
+  const [locLoading, setLocLoading] = useState(false);
+  const [locNote, setLocNote] = useState<string | null>(null);
+  const autoLocRef = useRef(false);
+  const assetsRef = useRef(assets);
+  assetsRef.current = assets;
+
+  const fetchCurrentLocation = useCallback(
+    async (onlyIfEmpty: boolean = false) => {
+      setLocLoading(true);
+      setLocNote('Fetching your current location…');
+      const result = await getCurrentPosition();
+      if (result.status === 'ok') {
+        const alreadyFilled =
+          assetsRef.current.latitude !== '' ||
+          assetsRef.current.longitude !== '';
+        if (onlyIfEmpty && alreadyFilled) {
+          setLocNote('Coordinates already present — kept existing values.');
+          setLocLoading(false);
+          return;
+        }
+        setValue(
+          'assets.latitude',
+          result.coords.latitude.toFixed(6),
+          { shouldValidate: true, shouldDirty: true },
+        );
+        setValue(
+          'assets.longitude',
+          result.coords.longitude.toFixed(6),
+          { shouldValidate: true, shouldDirty: true },
+        );
+        setLocNote(
+          result.accuracy != null
+            ? `Location captured (accuracy \u00b1${Math.round(result.accuracy)} m).`
+            : 'Location captured successfully.',
+        );
+      } else if (result.status === 'denied') {
+        setLocNote(
+          'Location permission denied. Allow permission or enter the coordinates manually.',
+        );
+      } else {
+        setLocNote(
+          'Could not fetch location. Enter the coordinates manually.',
+        );
+      }
+      setLocLoading(false);
+    },
+    [setValue],
+  );
+
+  useEffect(() => {
+    if (autoLocRef.current) {
+      return;
+    }
+    autoLocRef.current = true;
+    if (assets.latitude === '' && assets.longitude === '') {
+      fetchCurrentLocation(true);
+    }
+  }, [assets.latitude, assets.longitude, fetchCurrentLocation]);
 
   const {
     states,
@@ -492,6 +553,32 @@ export default function AssetsStep({
       />
 
       <Text style={themed.sectionTitle}>Location & Evidence</Text>
+
+      <Pressable
+        onPress={() => fetchCurrentLocation()}
+        disabled={locLoading}
+        style={({ pressed }) => [
+          themed.refAddBtn,
+          pressed && themed.refAddBtnPressed,
+          locLoading && themed.refAddBtnDisabled,
+        ]}
+      >
+        {locLoading ? (
+          <ActivityIndicator size="small" color={colors.primary} />
+        ) : (
+          <LocateFixed size={16} color={colors.primary} />
+        )}
+        <Text style={themed.refAddBtnText}>
+          {locLoading ? 'Fetching location…' : 'Fetch current location'}
+        </Text>
+      </Pressable>
+
+      {locNote ? (
+        <View style={themed.refEntryNote}>
+          <Info size={12} color={colors.textSecondary} />
+          <Text style={themed.refEntryNoteText}>{locNote}</Text>
+        </View>
+      ) : null}
 
       <View style={themed.areaGrid}>
         <View style={themed.areaCol}>

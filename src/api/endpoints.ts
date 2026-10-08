@@ -3,9 +3,16 @@ export const API_ENDPOINTS = {
     GET_PRODUCT_LIST: '/Masters/GetProductList',
     GET_BRANCHES: '/Masters/GetBranches',
     GET_PRODUCT_PAGE_INFO: '/CustomerLogin/CA_Get_ProductPage_Info',
+    GET_PRODUCT_REQUIRED_DOC: '/Masters/GetProductRequiredDoc',
     GET_STATE: '/Masters/GetState',
     GET_DISTRICTS: '/Masters/GetDistricts',
     GET_TAHSIL: '/Masters/GetTahsil',
+    GET_VEHICLE_DEALER_MANUFACTURE_MAP:
+      '/Masters/Get_Vehicle_Dealer_Manufacture_Map',
+    GET_VEHICLE_CATEGORY_FOR_DROPDOWN:
+      '/Masters/GetVehicleCategoryForDropdown',
+    GET_VEHICLE_MODEL_FOR_DROPDOWN: '/Masters/GetVehicleModelForDropdown',
+    GET_VEHICLE_VARIANT_FOR_DROPDOWN: '/Masters/Get_VehicleVariant_For_Dropdown',
   },
   AUTH: {
     VERIFY_USER: '/CustomerLogin/ValidateCustomerCIF',
@@ -26,6 +33,9 @@ export const API_ENDPOINTS = {
     LOAN_DETAILS: '/LMS/LMS_GetLoanDetails',
     COMMON_MASTER: '/LMS/LMS_Commaon_Master',
     GET_COLLECTION_EXECUTIVE: '/LMS/GetCollectionExecutive',
+    GET_PARTNER_LIST: '/LMS/GET_Partner_List',
+    GET_CUSTOMER_BY_LOAN_NO: '/LMS/GetCustomerByLoanNo',
+    SAVE_APPLICATION: '/LMS/Save_Application',
   },
   LOANS: {
     BASE: '/loans',

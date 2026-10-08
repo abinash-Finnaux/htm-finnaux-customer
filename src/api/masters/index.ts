@@ -7,6 +7,13 @@ export {
   masterGetTehsils,
   masterGetCommonMaster,
   masterGetCollectionExecutives,
+  masterGetPartnerList,
+  masterGetProductRequiredDoc,
+  masterGetDealerManufactureMap,
+  masterGetVehicleCategories,
+  masterGetVehicleModels,
+  masterGetVehicleVariants,
+  masterGetCustomerByLoanNo,
 } from './api';
 export type {
   ProductMaster,
@@ -21,4 +28,12 @@ export type {
   GetTehsilsRequest,
   GetCommonMasterRequest,
   GetCollectionExecutivesRequest,
+  GetPartnerListRequest,
+  GetProductRequiredDocRequest,
+  ProductRequiredDoc,
+  GetDealerManufactureMapRequest,
+  GetVehicleCategoriesRequest,
+  GetVehicleModelsRequest,
+  GetVehicleVariantsRequest,
+  GetCustomerByLoanNoRequest,
 } from './types';

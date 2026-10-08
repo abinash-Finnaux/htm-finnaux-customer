@@ -18,12 +18,13 @@ import type { createStyles } from '../styles';
 import type { ApplyLoanForm } from '../types';
 import type { LoanType } from '../loanTypes';
 import type { RankedBranch } from '../../../hooks/useBranches';
-import { DOCUMENTS } from './DocumentsStep';
+import { useProductRequiredDocs } from '../../../hooks/useProductRequiredDocs';
 
 type Props = {
   branchId: string;
   branches: RankedBranch[];
   loanTypes: LoanType[];
+  stepKeys: string[];
   form: ApplyLoanForm;
   themed: ReturnType<typeof createStyles>;
 };
@@ -104,6 +105,7 @@ export default function SummaryStep({
   branchId,
   branches,
   loanTypes,
+  stepKeys,
   form,
   themed,
 }: Props) {
@@ -111,8 +113,13 @@ export default function SummaryStep({
   const branch = branches.find(b => String(b.branch.BranchId) === branchId);
   const loanType = loanTypes.find(l => l.id === form.loanType);
   const uploadedKeys = form.documents.map(d => d.key);
-  const requiredCount = DOCUMENTS.filter(d => d.required).length;
-  const satisfiedRequired = DOCUMENTS.filter(
+  const productId =
+    form.loanType !== '' && Number.isFinite(Number(form.loanType))
+      ? Number(form.loanType)
+      : null;
+  const { documents: documentConfigs } = useProductRequiredDocs(productId);
+  const requiredCount = documentConfigs.filter(d => d.required).length;
+  const satisfiedRequired = documentConfigs.filter(
     d => d.required && uploadedKeys.includes(d.key),
   ).length;
 
@@ -178,60 +185,67 @@ export default function SummaryStep({
         ]}
       />
 
-      <Section
-        themed={themed}
-        tint="#10B981"
-        icon={Wallet}
-        title="Income Summary"
-        rows={[
-          { label: 'Monthly Income', value: inr(form.monthlyIncome) || '-' },
-          { label: 'Employment', value: form.employment || '-' },
-        ]}
-      />
+      {stepKeys.includes('incomeExpense') ? (
+        <Section
+          themed={themed}
+          tint="#10B981"
+          icon={Wallet}
+          title="Income Summary"
+          rows={[
+            { label: 'Monthly Income', value: inr(form.monthlyIncome) || '-' },
+            { label: 'Employment', value: form.employment || '-' },
+          ]}
+        />
+      ) : null}
 
-      <Section
-        themed={themed}
-        tint="#3B82F6"
-        icon={UserRound}
-        title="Customer Info"
-        rows={[
-          { label: 'Full Name', value: form.customerInfo?.fullName || '-' },
-          { label: 'Mobile', value: form.customerInfo?.mobile || '-' },
-          { label: 'Email', value: form.customerInfo?.email || '-' },
-          {
-            label: 'Date of Birth',
-            value: form.customerInfo?.dob
-              ? formatDate(form.customerInfo.dob)
-              : '-',
-          },
-          { label: 'Gender', value: form.customerInfo?.gender || '-' },
-          { label: 'PAN', value: form.customerInfo?.pan || '-' },
-          { label: 'Aadhaar', value: form.customerInfo?.aadhaar || '-' },
-        ]}
-      />
+      {stepKeys.includes('customerInfo') ? (
+        <Section
+          themed={themed}
+          tint="#3B82F6"
+          icon={UserRound}
+          title="Customer Info"
+          rows={[
+            { label: 'Full Name', value: form.customerInfo?.fullName || '-' },
+            { label: 'Mobile', value: form.customerInfo?.mobile || '-' },
+            { label: 'Email', value: form.customerInfo?.email || '-' },
+            {
+              label: 'Date of Birth',
+              value: form.customerInfo?.dob
+                ? formatDate(form.customerInfo.dob)
+                : '-',
+            },
+            { label: 'Gender', value: form.customerInfo?.gender || '-' },
+            { label: 'PAN', value: form.customerInfo?.pan || '-' },
+            { label: 'Aadhaar', value: form.customerInfo?.aadhaar || '-' },
+          ]}
+        />
+      ) : null}
 
-      <Section
-        themed={themed}
-        tint="#F59E0B"
-        icon={Landmark}
-        title="Account Info"
-        rows={[
-          {
-            label: 'Account Holder',
-            value: form.accountInfo?.accountHolderName || '-',
-          },
-          { label: 'Bank Name', value: form.accountInfo?.bankName || '-' },
-          { label: 'Account No.', value: form.accountInfo?.accountNumber || '-' },
-          { label: 'IFSC', value: form.accountInfo?.ifsc || '-' },
-          { label: 'Account Type', value: form.accountInfo?.accountType || '-' },
-        ]}
-      />
+      {stepKeys.includes('accountInfo') ? (
+        <Section
+          themed={themed}
+          tint="#F59E0B"
+          icon={Landmark}
+          title="Account Info"
+          rows={[
+            {
+              label: 'Account Holder',
+              value: form.accountInfo?.accountHolderName || '-',
+            },
+            { label: 'Bank Name', value: form.accountInfo?.bankName || '-' },
+            { label: 'Account No.', value: form.accountInfo?.accountNumber || '-' },
+            { label: 'IFSC', value: form.accountInfo?.ifsc || '-' },
+            { label: 'Account Type', value: form.accountInfo?.accountType || '-' },
+          ]}
+        />
+      ) : null}
 
-      <Section
-        themed={themed}
-        tint="#0EA5E9"
-        icon={CarFront}
-        title="Vehicle Details"
+      {stepKeys.includes('vehicle') ? (
+        <Section
+          themed={themed}
+          tint="#0EA5E9"
+          icon={CarFront}
+          title="Vehicle Details"
         rows={[
           {
             label: 'Condition',
@@ -296,8 +310,10 @@ export default function SummaryStep({
             value: form.vehicle?.invoiceNo || '-',
           },
         ]}
-      />
+        />
+      ) : null}
 
+      {stepKeys.includes('assets') ? (
       <Section
         themed={themed}
         tint="#F59E0B"
@@ -366,8 +382,10 @@ export default function SummaryStep({
               .join(', ') || '-',
           },
         ]}
-      />
+        />
+      ) : null}
 
+      {stepKeys.includes('reference') ? (
       <View style={themed.summarySection}>
         <View style={themed.summarySectionHeader}>
           <View style={themed.summarySectionIconRed}>
@@ -401,7 +419,9 @@ export default function SummaryStep({
           )}
         </View>
       </View>
+      ) : null}
 
+      {stepKeys.includes('documents') ? (
       <View style={themed.summarySection}>
         <View style={themed.summarySectionHeader}>
           <View
@@ -433,7 +453,7 @@ export default function SummaryStep({
         <View style={themed.docList}>
           {form.documents.length > 0 ? (
             form.documents.map(doc => {
-              const config = DOCUMENTS.find(d => d.key === doc.key);
+              const config = documentConfigs.find(d => d.key === doc.key);
               return (
                 <View key={doc.key} style={themed.docRow}>
                   <FileCheck2
@@ -466,6 +486,7 @@ export default function SummaryStep({
           )}
         </View>
       </View>
+      ) : null}
 
       <ImagePreviewModal
         uri={previewUri}

@@ -64,6 +64,29 @@ export function createStyles(
       justifyContent: 'center',
       alignItems: 'center',
     },
+    backBtnPressed: {
+      opacity: 0.6,
+    },
+    topRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    savedChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingHorizontal: 9,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+    savedChipText: {
+      color: '#FFFFFF',
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.2,
+    },
     backBtnText: {
       color: '#FFFFFF',
       fontSize: 18,
@@ -1069,6 +1092,12 @@ export function createStyles(
       fontWeight: '700',
       color: colors.primary,
     },
+    refAddBtnPressed: {
+      opacity: 0.7,
+    },
+    refAddBtnDisabled: {
+      opacity: 0.6,
+    },
     refSummaryRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -1192,6 +1221,20 @@ export function createStyles(
     },
     areaCol: {
       width: '48%',
+    },
+    areaFifthCol: {
+      width: '19%',
+      minWidth: 0,
+    },
+    vehicleRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginHorizontal: -4,
+    },
+    vehicleRowCol: {
+      flex: 1,
+      minWidth: 0,
+      paddingHorizontal: 4,
     },
     imageWrap: {
       marginTop: 16,
@@ -1611,6 +1654,16 @@ export function createStyles(
     docWrap: {
       gap: 12,
     },
+    docCategoryBlock: {
+      gap: 12,
+    },
+    docCategoryHeader: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+    },
     docProgressCard: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -1740,6 +1793,13 @@ export function createStyles(
       marginTop: 2,
       flexShrink: 1,
     },
+    docLoadingText: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.textSecondary,
+      marginTop: 12,
+      textAlign: 'center',
+    },
     docActionRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -1849,6 +1909,31 @@ export function createStyles(
       fontSize: 14,
       fontWeight: '600',
       color: colors.text,
+    },
+    vehicleChainHint: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: palette.info,
+      marginTop: 10,
+    },
+    vehicleErrorRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 8,
+      marginTop: 10,
+    },
+    vehicleChainHintError: {
+      flex: 1,
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.error,
+    },
+    vehicleRetryText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: palette.primary,
+      textTransform: 'uppercase',
     },
     footer: {
       paddingHorizontal: 24,

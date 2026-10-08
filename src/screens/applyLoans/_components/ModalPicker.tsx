@@ -87,7 +87,7 @@ export default function ModalPicker({
           ) : (
             <FlatList
               data={filtered}
-              keyExtractor={item => item}
+              keyExtractor={(item, index) => `${index}-${item}`}
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={themed.pickerList}
               showsVerticalScrollIndicator={false}

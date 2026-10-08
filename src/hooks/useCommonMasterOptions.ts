@@ -26,10 +26,7 @@ const extractName = (item: unknown): string => {
 const cache = new Map<string, string[]>();
 const inFlight = new Map<string, Promise<string[]>>();
 
-export function useCommonMasterOptions(
-  type: string,
-  fallback: string[] = [],
-) {
+export function useCommonMasterOptions(type: string, fallback: string[] = []) {
   const [options, setOptions] = useState<string[]>(cache.get(type) ?? fallback);
   const [loading, setLoading] = useState<boolean>(!cache.has(type));
   const [error, setError] = useState<string | null>(null);
@@ -43,9 +40,7 @@ export function useCommonMasterOptions(
       Type: type,
     })
       .then(items => {
-        const names = items
-          .map(extractName)
-          .filter(name => name !== '');
+        const names = items.map(extractName).filter(name => name !== '');
         cache.set(type, names);
         return names;
       })

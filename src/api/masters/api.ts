@@ -6,11 +6,19 @@ import type {
   GetBranchesRequest,
   GetCollectionExecutivesRequest,
   GetCommonMasterRequest,
+  GetCustomerByLoanNoRequest,
+  GetDealerManufactureMapRequest,
   GetDistrictsRequest,
+  GetPartnerListRequest,
   GetProductPageInfoRequest,
+  GetProductRequiredDocRequest,
   GetTehsilsRequest,
+  GetVehicleCategoriesRequest,
+  GetVehicleModelsRequest,
+  GetVehicleVariantsRequest,
   ProductMaster,
   ProductPageInfo,
+  ProductRequiredDoc,
   StateMaster,
   TehsilMaster,
 } from './types';
@@ -131,6 +139,17 @@ export async function masterGetTehsils(
   return [];
 }
 
+function findDeepArray(value: unknown): unknown[] | null {
+  if (Array.isArray(value)) return value as unknown[];
+  if (value && typeof value === 'object') {
+    for (const item of Object.values(value as Record<string, unknown>)) {
+      const found = findDeepArray(item);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 async function fetchLmsMasterList<T = unknown>(
   endpoint: string,
   request: Record<string, unknown>,
@@ -139,7 +158,11 @@ async function fetchLmsMasterList<T = unknown>(
 
   let data: unknown = response.data;
   if (typeof data === 'string') {
-    data = JSON.parse(data);
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return [];
+    }
   }
 
   if (Array.isArray(data)) {
@@ -155,6 +178,11 @@ async function fetchLmsMasterList<T = unknown>(
   }
   if (record && Array.isArray(record.Item2)) {
     return record.Item2 as T[];
+  }
+
+  const deep = findDeepArray(data);
+  if (deep) {
+    return deep as T[];
   }
 
   return [];
@@ -174,6 +202,69 @@ export async function masterGetCollectionExecutives(
 ): Promise<unknown[]> {
   return fetchLmsMasterList<unknown>(
     API_ENDPOINTS.LMS.GET_COLLECTION_EXECUTIVE,
+    request,
+  );
+}
+
+export async function masterGetProductRequiredDoc(
+  request: GetProductRequiredDocRequest,
+): Promise<ProductRequiredDoc[]> {
+  return fetchLmsMasterList<ProductRequiredDoc>(
+    API_ENDPOINTS.MASTERS.GET_PRODUCT_REQUIRED_DOC,
+    request,
+  );
+}
+
+export async function masterGetPartnerList(
+  request: GetPartnerListRequest,
+): Promise<unknown[]> {
+  return fetchLmsMasterList<unknown>(
+    API_ENDPOINTS.LMS.GET_PARTNER_LIST,
+    request,
+  );
+}
+
+export async function masterGetDealerManufactureMap(
+  request: GetDealerManufactureMapRequest,
+): Promise<unknown[]> {
+  return fetchLmsMasterList<unknown>(
+    API_ENDPOINTS.MASTERS.GET_VEHICLE_DEALER_MANUFACTURE_MAP,
+    request,
+  );
+}
+
+export async function masterGetVehicleCategories(
+  request: GetVehicleCategoriesRequest,
+): Promise<unknown[]> {
+  return fetchLmsMasterList<unknown>(
+    API_ENDPOINTS.MASTERS.GET_VEHICLE_CATEGORY_FOR_DROPDOWN,
+    request,
+  );
+}
+
+export async function masterGetVehicleModels(
+  request: GetVehicleModelsRequest,
+): Promise<unknown[]> {
+  return fetchLmsMasterList<unknown>(
+    API_ENDPOINTS.MASTERS.GET_VEHICLE_MODEL_FOR_DROPDOWN,
+    request,
+  );
+}
+
+export async function masterGetVehicleVariants(
+  request: GetVehicleVariantsRequest,
+): Promise<unknown[]> {
+  return fetchLmsMasterList<unknown>(
+    API_ENDPOINTS.MASTERS.GET_VEHICLE_VARIANT_FOR_DROPDOWN,
+    request,
+  );
+}
+
+export async function masterGetCustomerByLoanNo(
+  request: GetCustomerByLoanNoRequest,
+): Promise<unknown[]> {
+  return fetchLmsMasterList<unknown>(
+    API_ENDPOINTS.LMS.GET_CUSTOMER_BY_LOAN_NO,
     request,
   );
 }

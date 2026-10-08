@@ -11,6 +11,7 @@ export type DocumentConfig = {
   label: string;
   hint: string;
   required: boolean;
+  category?: string;
 };
 
 export type CustomerReference = {

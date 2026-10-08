@@ -17,8 +17,14 @@ import type { LucideIcon } from 'lucide-react-native';
 import { Sun, Moon } from 'lucide-react-native';
 import ApplicationCard from './_components/ApplicationCard';
 import ApplyLoanCard from './_components/ApplyLoanCard';
+import ContinueApplicationCard from './_components/ContinueApplicationCard';
 import FloatingApplyLoanButton from './_components/FloatingApplyLoanButton';
 import ProfileDrawerModal from './_components/ProfileDrawerModal';
+import { useFocusEffect } from '@react-navigation/native';
+import {
+  loadLoanDraft,
+  type LoanDraft,
+} from '../applyLoans/services/draft';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -90,6 +96,18 @@ export default function HomeScreen({ navigation }: Props) {
   const greeting = useMemo(() => getGreeting(), []);
 
   const [profileOpen, setProfileOpen] = useState(false);
+  const [loanDraft, setLoanDraft] = useState<LoanDraft | null>(null);
+
+  const refreshLoanDraft = useCallback(async () => {
+    const draft = await loadLoanDraft();
+    setLoanDraft(draft);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshLoanDraft();
+    }, [refreshLoanDraft]),
+  );
 
   const fetchCustomerDetails = async () => {
     try {
@@ -257,10 +275,22 @@ export default function HomeScreen({ navigation }: Props) {
           </View> */}
         </View>
 
-        <ApplyLoanCard
-          onPress={() => navigation.navigate('ApplyLoan')}
-          activeApplications={user?.applications?.length}
-        />
+        {loanDraft ? (
+          <ContinueApplicationCard
+            onPress={() => navigation.navigate('ApplyLoan')}
+            completedSteps={Math.max(
+              0,
+              Math.min(loanDraft.step - 1, loanDraft.totalSteps),
+            )}
+            totalSteps={loanDraft.totalSteps}
+            savedAt={loanDraft.savedAt}
+          />
+        ) : (
+          <ApplyLoanCard
+            onPress={() => navigation.navigate('ApplyLoan')}
+            activeApplications={user?.applications?.length}
+          />
+        )}
 
         <View style={themed.loansSection}>
           <Text style={themed.sectionTitle}>
@@ -270,7 +300,7 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </>
     ),
-    [themed, greeting, user, isDark, toggleTheme, navigation],
+    [themed, greeting, user, isDark, toggleTheme, navigation, loanDraft],
   );
 
   const listEmpty = useMemo(
