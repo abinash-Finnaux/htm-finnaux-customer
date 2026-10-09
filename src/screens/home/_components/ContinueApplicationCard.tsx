@@ -100,7 +100,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     },
     card: {
       borderRadius: radius.lg,
-      backgroundColor: colors.primary + '0D',
+      backgroundColor: colors.surface,
       borderWidth: 1.5,
       borderColor: colors.primary + '33',
       padding: spacing.lg,

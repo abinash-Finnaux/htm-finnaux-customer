@@ -77,9 +77,13 @@ export default function LoanTypeSelector({
           >
             <View
               style={[
-                themed.loanIdChip,
-                selected && themed.loanIdChipSelected,
+                themed.loanGridDecor,
+                selected ? themed.loanGridDecorSelected : themed[accent.tile],
               ]}
+            />
+
+            <View
+              style={[themed.loanIdChip, selected && themed.loanIdChipSelected]}
             >
               <Text
                 style={[
@@ -94,9 +98,7 @@ export default function LoanTypeSelector({
             <View
               style={[
                 themed.loanIconWrap,
-                selected
-                  ? themed.loanIconWrapSelected
-                  : themed[accent.tile],
+                selected && themed.loanIconWrapSelected,
               ]}
             >
               <item.icon
@@ -106,14 +108,20 @@ export default function LoanTypeSelector({
             </View>
 
             <Text
-              numberOfLines={1}
-              style={[themed.loanGridLabel, selected && themed.loanGridLabelSelected]}
+              numberOfLines={2}
+              style={[
+                themed.loanGridLabel,
+                selected && themed.loanGridLabelSelected,
+              ]}
             >
               {item.label}
             </Text>
             <Text
               numberOfLines={1}
-              style={[themed.loanGridMeta, selected && themed.loanGridMetaSelected]}
+              style={[
+                themed.loanGridMeta,
+                selected && themed.loanGridMetaSelected,
+              ]}
             >
               {item.category}
             </Text>
@@ -128,9 +136,7 @@ export default function LoanTypeSelector({
               <Text
                 style={[
                   themed.loanRangeText,
-                  selected
-                    ? themed.loanRangeTextSelected
-                    : themed[accent.text],
+                  selected ? themed.loanRangeTextSelected : themed[accent.text],
                 ]}
               >
                 {item.range}

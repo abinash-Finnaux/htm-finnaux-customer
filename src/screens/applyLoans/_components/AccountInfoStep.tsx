@@ -4,12 +4,16 @@ import { useWatch, type Control } from 'react-hook-form';
 import {
   CircleAlert,
   CircleCheck,
+  CreditCard,
   Landmark,
+  Repeat,
   ShieldCheck,
+  UserRound,
+  Zap,
 } from 'lucide-react-native';
-import SectionHeaderText from '../../../components/typography/SectionHeaderText';
 import FormTextInput from '../../../components/forms/FormTextInput';
 import FormSelectOption from '../../../components/forms/FormSelectOption';
+import { useTheme } from '../../../context/ThemeContext';
 import { CardHead } from './FormSectionCard';
 import type { createStyles } from '../styles';
 import type { ApplyLoanForm } from '../types';
@@ -31,6 +35,9 @@ type Props = {
 };
 
 export default function AccountInfoStep({ control, themed }: Props) {
+  const { theme } = useTheme();
+  const { colors } = theme;
+
   const accountNumber = useWatch({
     control,
     name: 'accountInfo.accountNumber',
@@ -41,37 +48,35 @@ export default function AccountInfoStep({ control, themed }: Props) {
   });
 
   const hasBoth = Boolean(accountNumber && confirmAccountNumber);
+  const hasAny = Boolean(accountNumber || confirmAccountNumber);
   const accountsMatch = hasBoth && accountNumber === confirmAccountNumber;
   const accountsMismatch = hasBoth && accountNumber !== confirmAccountNumber;
 
-  const matchLabel = accountsMatch
-    ? 'Numbers match'
-    : accountsMismatch
-    ? 'Does not match'
-    : 'Verify twice';
-
-  const matchIcon = accountsMatch ? (
-    <CircleCheck size={12} color="#10B981" strokeWidth={3} />
-  ) : accountsMismatch ? (
-    <CircleAlert size={12} color="#F87171" strokeWidth={3} />
-  ) : null;
-
   return (
     <>
-      <SectionHeaderText
-        title="Account Info"
-        subtitle="Share the bank account where your loan will be disbursed."
-      />
-
       <View style={themed.accHero}>
-        <View style={themed.accHeroIcon}>
-          <Landmark size={22} color="#FFFFFF" />
+        <View style={themed.accHeroDecor1} />
+        <View style={themed.accHeroDecor2} />
+        <View style={themed.accHeroTop}>
+          <View style={themed.accHeroIcon}>
+            <Landmark size={22} color="#FFFFFF" />
+          </View>
+          <View style={themed.accHeroBody}>
+            <Text style={themed.accHeroTitle}>Disbursal Account</Text>
+            <Text style={themed.accHeroText}>
+              Funds are credited here and EMIs are debited automatically.
+            </Text>
+          </View>
         </View>
-        <View style={themed.accHeroBody}>
-          <Text style={themed.accHeroTitle}>Disbursal Account</Text>
-          <Text style={themed.accHeroText}>
-            Funds are credited here and EMIs are debited automatically.
-          </Text>
+        <View style={themed.accHeroChips}>
+          <View style={themed.accHeroChip}>
+            <Zap size={12} color="#FFFFFF" />
+            <Text style={themed.accHeroChipText}>Instant credit</Text>
+          </View>
+          <View style={themed.accHeroChip}>
+            <Repeat size={12} color="#FFFFFF" />
+            <Text style={themed.accHeroChipText}>Auto-EMI debit</Text>
+          </View>
         </View>
       </View>
 
@@ -81,6 +86,8 @@ export default function AccountInfoStep({ control, themed }: Props) {
           title="Account Holder"
           subtitle="Exactly as per bank records"
           themed={themed}
+          icon={UserRound}
+          accent="blue"
         />
         <FormTextInput
           control={control}
@@ -108,26 +115,8 @@ export default function AccountInfoStep({ control, themed }: Props) {
           title="Account Number"
           subtitle="Enter it twice for safety"
           themed={themed}
-          right={
-            <View
-              style={[
-                themed.accChip,
-                accountsMatch && themed.accChipOk,
-                accountsMismatch && themed.accChipBad,
-              ]}
-            >
-              {matchIcon}
-              <Text
-                style={[
-                  themed.accChipText,
-                  accountsMatch && themed.accChipTextOk,
-                  accountsMismatch && themed.accChipTextBad,
-                ]}
-              >
-                {matchLabel}
-              </Text>
-            </View>
-          }
+          icon={CreditCard}
+          accent="emerald"
         />
         <FormTextInput
           control={control}
@@ -164,6 +153,35 @@ export default function AccountInfoStep({ control, themed }: Props) {
               'Account numbers do not match',
           }}
         />
+
+        {hasAny && !hasBoth ? (
+          <View
+            style={[themed.accMatchBanner, themed.accMatchBannerNeutral]}
+          >
+            <ShieldCheck size={15} color={colors.textSecondary} />
+            <Text style={themed.accMatchBannerText}>
+              Enter the account number twice to verify it.
+            </Text>
+          </View>
+        ) : accountsMatch ? (
+          <View style={[themed.accMatchBanner, themed.accMatchBannerOk]}>
+            <CircleCheck size={15} color="#10B981" strokeWidth={3} />
+            <Text
+              style={[themed.accMatchBannerText, themed.accMatchBannerTextOk]}
+            >
+              Account numbers match — all set.
+            </Text>
+          </View>
+        ) : accountsMismatch ? (
+          <View style={[themed.accMatchBanner, themed.accMatchBannerBad]}>
+            <CircleAlert size={15} color="#F87171" strokeWidth={3} />
+            <Text
+              style={[themed.accMatchBannerText, themed.accMatchBannerTextBad]}
+            >
+              Account numbers don't match — please re-check.
+            </Text>
+          </View>
+        ) : null}
       </View>
 
       <View style={themed.accCard}>
@@ -172,6 +190,8 @@ export default function AccountInfoStep({ control, themed }: Props) {
           title="Bank Identification"
           subtitle="IFSC locates your branch"
           themed={themed}
+          icon={Landmark}
+          accent="violet"
         />
 
         {/* <View style={themed.accRow}> */}

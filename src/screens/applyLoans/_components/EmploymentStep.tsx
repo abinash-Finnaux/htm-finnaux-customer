@@ -37,24 +37,28 @@ export default function EmploymentStep({ control, themed }: Props) {
   return (
     <>
       <View style={themed.accHero}>
-        <View style={themed.accHeroIcon}>
-          <Wallet size={24} color="#FFFFFF" />
+        <View style={themed.accHeroDecor1} />
+        <View style={themed.accHeroDecor2} />
+        <View style={themed.accHeroTop}>
+          <View style={themed.accHeroIcon}>
+            <Wallet size={24} color="#FFFFFF" />
+          </View>
+          <View style={themed.accHeroBody}>
+            <Text style={themed.accHeroTitle}>Income & Expenditure</Text>
+            <Text style={themed.accHeroText}>
+              Your income and employment help us assess your repayment
+              capability.
+            </Text>
+          </View>
         </View>
-        <View style={themed.accHeroBody}>
-          <Text style={themed.accHeroTitle}>Income & Expenditure</Text>
-          <Text style={themed.accHeroText}>
-            Your income and employment help us assess your repayment
-            capability.
-          </Text>
-          <View style={themed.accHeroChips}>
-            <View style={themed.accHeroChip}>
-              <IndianRupee size={12} color="#FFFFFF" />
-              <Text style={themed.accHeroChipText}>Loan eligibility</Text>
-            </View>
-            <View style={themed.accHeroChip}>
-              <TrendingUp size={12} color="#FFFFFF" />
-              <Text style={themed.accHeroChipText}>Repayment capacity</Text>
-            </View>
+        <View style={themed.accHeroChips}>
+          <View style={themed.accHeroChip}>
+            <IndianRupee size={12} color="#FFFFFF" />
+            <Text style={themed.accHeroChipText}>Loan eligibility</Text>
+          </View>
+          <View style={themed.accHeroChip}>
+            <TrendingUp size={12} color="#FFFFFF" />
+            <Text style={themed.accHeroChipText}>Repayment capacity</Text>
           </View>
         </View>
       </View>

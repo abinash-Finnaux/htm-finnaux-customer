@@ -21,6 +21,9 @@ import {
   Sparkles,
   Settings2,
   ChevronDown,
+  RotateCcw,
+  Briefcase,
+  UserRound,
   type LucideIcon,
 } from 'lucide-react-native';
 import { useTheme } from '../../../context/ThemeContext';
@@ -40,17 +43,28 @@ import FormTextInput from '../../../components/forms/FormTextInput';
 import FormDateOfBirthInput from '../../../components/forms/FormDateOfBirthInput';
 import ImagePreviewModal from './ImagePreviewModal';
 import ModalPicker from './ModalPicker';
+import { CardHead } from './FormSectionCard';
 import type { createStyles } from '../styles';
 import type { ApplyLoanForm, UploadedDocument } from '../types';
 
-export const VEHICLE_CONDITIONS = [
-  { value: 'NEW', label: 'New Vehicle' },
-  { value: 'USED', label: 'Used Vehicle' },
+export const VEHICLE_CONDITIONS: {
+  value: string;
+  label: string;
+  icon: LucideIcon;
+  sub: string;
+}[] = [
+  { value: 'NEW', label: 'New Vehicle', icon: CarFront, sub: 'Zero-km showroom buy' },
+  { value: 'USED', label: 'Used Vehicle', icon: RotateCcw, sub: 'Pre-owned, RC registered' },
 ];
 
-export const VEHICLE_USAGES = [
-  { value: 'COMMERCIAL', label: 'Commercial' },
-  { value: 'NON_COMMERCIAL', label: 'Non-Commercial' },
+export const VEHICLE_USAGES: {
+  value: string;
+  label: string;
+  icon: LucideIcon;
+  sub: string;
+}[] = [
+  { value: 'COMMERCIAL', label: 'Commercial', icon: Briefcase, sub: 'For business use' },
+  { value: 'NON_COMMERCIAL', label: 'Non-Commercial', icon: UserRound, sub: 'Personal use' },
 ];
 
 const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'Electric', 'Hybrid'];
@@ -144,30 +158,73 @@ function SegOption({
   themed,
   selected,
   label,
+  sub,
+  icon: Icon,
   onPress,
 }: {
   themed: ReturnType<typeof createStyles>;
   selected: boolean;
   label: string;
+  sub: string;
+  icon: LucideIcon;
   onPress: () => void;
 }) {
+  const { theme } = useTheme();
+  const { colors } = theme;
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
-        themed.segOption,
-        selected ? themed.segOptionActive : themed.segOptionInactive,
-        { opacity: pressed ? 0.7 : 1 },
+        themed.vehicleOptCard,
+        selected
+          ? themed.vehicleOptCardSelected
+          : pressed
+          ? themed.vehicleOptCardPressed
+          : themed.vehicleOptCardUnselected,
       ]}
     >
-      <Text
+      <View
         style={[
-          themed.segOptionText,
-          selected ? themed.segOptionTextActive : themed.segOptionTextInactive,
+          themed.vehicleOptIcon,
+          selected
+            ? themed.vehicleOptIconSelected
+            : themed.vehicleOptIconUnselected,
         ]}
       >
-        {label}
-      </Text>
+        <Icon size={16} color={selected ? '#FFFFFF' : colors.primary} />
+      </View>
+      <View style={themed.vehicleOptBody}>
+        <Text
+          style={[
+            themed.vehicleOptTitle,
+            selected
+              ? themed.vehicleOptTitleSelected
+              : themed.vehicleOptTitleUnselected,
+          ]}
+        >
+          {label}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={[
+            themed.vehicleOptSub,
+            selected
+              ? themed.vehicleOptSubSelected
+              : themed.vehicleOptSubUnselected,
+          ]}
+        >
+          {sub}
+        </Text>
+      </View>
+      {selected ? (
+        <Check
+          size={14}
+          color="#FFFFFF"
+          strokeWidth={3}
+          style={themed.vehicleOptTick}
+        />
+      ) : null}
     </Pressable>
   );
 }
@@ -241,7 +298,7 @@ function DropdownSelectField({
 function SectionCard({
   themed,
   icon: Icon,
-  tint,
+  accent,
   title,
   subtitle,
   num,
@@ -249,37 +306,22 @@ function SectionCard({
 }: {
   themed: ReturnType<typeof createStyles>;
   icon: LucideIcon;
-  tint: string;
+  accent: 'blue' | 'amber' | 'violet' | 'emerald' | 'sky';
   title: string;
   subtitle: string;
   num: string;
   children: React.ReactNode;
 }) {
   return (
-    <View style={themed.vehicleStepCard}>
-      <View style={themed.vehicleStepCardRow}>
-        <View style={themed.vehicleStepHeadLeft}>
-          <View
-            style={[
-              themed.vehicleStepIconBadge,
-              { backgroundColor: tint + '1A' },
-            ]}
-          >
-            <Icon size={20} color={tint} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={themed.vehicleStepHeadTitle}>{title}</Text>
-            <Text style={themed.vehicleStepHeadSub}>{subtitle}</Text>
-          </View>
-        </View>
-        <View
-          style={[themed.vehicleStepNumPill, { backgroundColor: tint + '14' }]}
-        >
-          <Text style={[themed.vehicleStepNumText, { color: tint }]}>
-            {num}
-          </Text>
-        </View>
-      </View>
+    <View style={themed.accCard}>
+      <CardHead
+        step={num}
+        title={title}
+        subtitle={subtitle}
+        themed={themed}
+        icon={Icon}
+        accent={accent}
+      />
       {children}
     </View>
   );
@@ -645,25 +687,22 @@ export default function VehicleDetailStep({
     <>
       <SectionHeaderText
         title="Vehicle Details"
-        subtitle="Select the vehicle condition and usage, then share the vehicle details."
+        subtitle="Select the vehicle condition and usage, then share the vehicle information."
       />
 
       <SectionCard
         themed={themed}
         icon={Settings2}
-        tint={palette.info}
+        accent="sky"
         title="Vehicle Type"
         subtitle="Condition & usage of the vehicle"
         num="01"
       >
         <Text style={themed.locLabel}>Vehicle Condition *</Text>
-        <View style={[themed.segRow, { marginTop: themed.locBox.marginTop }]}>
+        <View style={themed.assetGrid}>
           {VEHICLE_CONDITIONS.map(option => (
-            <SegOption
+            <Pressable
               key={option.value}
-              themed={themed}
-              selected={condition === option.value}
-              label={option.label}
               onPress={() => {
                 setValue('vehicle.condition', option.value, {
                   shouldValidate: true,
@@ -682,18 +721,38 @@ export default function VehicleDetailStep({
                   setValue('vehicle.remark', '');
                 }
               }}
-            />
+              style={({ pressed }) => [
+                themed.assetChip,
+                condition === option.value
+                  ? themed.assetChipSelected
+                  : pressed
+                  ? themed.assetChipPressed
+                  : themed.assetChipUnselected,
+              ]}
+            >
+              <option.icon size={16} color={condition === option.value ? '#FFFFFF' : colors.primary} />
+              <Text
+                style={[
+                  themed.assetChipText,
+                  condition === option.value
+                    ? themed.assetChipTextSelected
+                    : themed.assetChipTextUnselected,
+                ]}
+              >
+                {option.label}
+              </Text>
+              {condition === option.value && (
+                <Check size={14} color="#FFFFFF" strokeWidth={3} />
+              )}
+            </Pressable>
           ))}
         </View>
 
-        <Text style={[themed.locLabel, { marginTop: 22 }]}>Usage *</Text>
-        <View style={[themed.segRow, { marginTop: themed.locBox.marginTop }]}>
+        <Text style={[themed.locLabel, { marginTop: 22 }]}>Vehicle Usage *</Text>
+        <View style={themed.assetGrid}>
           {VEHICLE_USAGES.map(option => (
-            <SegOption
+            <Pressable
               key={option.value}
-              themed={themed}
-              selected={usage === option.value}
-              label={option.label}
               onPress={() => {
                 setValue('vehicle.usage', option.value, {
                   shouldValidate: true,
@@ -705,7 +764,30 @@ export default function VehicleDetailStep({
                   setValue('vehicle.route', '');
                 }
               }}
-            />
+              style={({ pressed }) => [
+                themed.assetChip,
+                usage === option.value
+                  ? themed.assetChipSelected
+                  : pressed
+                  ? themed.assetChipPressed
+                  : themed.assetChipUnselected,
+              ]}
+            >
+              <option.icon size={16} color={usage === option.value ? '#FFFFFF' : colors.primary} />
+              <Text
+                style={[
+                  themed.assetChipText,
+                  usage === option.value
+                    ? themed.assetChipTextSelected
+                    : themed.assetChipTextUnselected,
+                ]}
+              >
+                {option.label}
+              </Text>
+              {usage === option.value && (
+                <Check size={14} color="#FFFFFF" strokeWidth={3} />
+              )}
+            </Pressable>
           ))}
         </View>
       </SectionCard>
@@ -715,9 +797,9 @@ export default function VehicleDetailStep({
           <SectionCard
             themed={themed}
             icon={CarFront}
-            tint={palette.primary}
-            title="Assets Info"
-            subtitle="Identification & registration details"
+            accent="blue"
+            title="Vehicle Information"
+            subtitle="Identification, registration & vehicle details"
             num="02"
           >
             {isNew ? (
@@ -733,7 +815,7 @@ export default function VehicleDetailStep({
             <DropdownSelectField
               control={control}
               name="vehicle.manufacturer"
-              label="Veh. Mfg. *"
+              label="Vehicle Manufacturer *"
               options={manufactureOptions}
               rules={{ required: 'Select vehicle manufacture' }}
               themed={themed}
@@ -741,7 +823,7 @@ export default function VehicleDetailStep({
             <DropdownSelectField
               control={control}
               name="vehicle.vehicleCategory"
-              label="Category *"
+              label="Vehicle Category *"
               options={categoryOptions}
               rules={{ required: 'Select vehicle category' }}
               themed={themed}
@@ -749,7 +831,7 @@ export default function VehicleDetailStep({
             <DropdownSelectField
               control={control}
               name="vehicle.modelName"
-              label="Model *"
+              label="Vehicle Model *"
               options={modelOptions}
               rules={{ required: 'Select vehicle model name' }}
               themed={themed}
@@ -757,7 +839,7 @@ export default function VehicleDetailStep({
             <DropdownSelectField
               control={control}
               name="vehicle.variant"
-              label="Variant *"
+              label="Vehicle Variant *"
               options={variantOptions}
               rules={{ required: 'Select variant' }}
               themed={themed}
@@ -791,7 +873,7 @@ export default function VehicleDetailStep({
             <FormTextInput
               control={control}
               name="vehicle.regNumber"
-              label={isUsed ? 'Vehicle Reg No. *' : 'Vehicle Reg No.'}
+              label={isUsed ? 'Registration Number *' : 'Registration Number'}
               placeholder="e.g. MH12 AB1234"
               autoCapitalize="characters"
               maxLength={12}
@@ -873,7 +955,7 @@ export default function VehicleDetailStep({
                   <FormTextInput
                     control={control}
                     name="vehicle.colour"
-                    label="Color"
+                    label="Vehicle Color"
                     placeholder="e.g. Polar White"
                     maxLength={24}
                     formatText={formatFreeText}
@@ -884,7 +966,7 @@ export default function VehicleDetailStep({
               <FormTextInput
                 control={control}
                 name="vehicle.colour"
-                label="Color"
+                label="Vehicle Color"
                 placeholder="e.g. Polar White"
                 maxLength={24}
                 formatText={formatFreeText}
@@ -918,47 +1000,47 @@ export default function VehicleDetailStep({
 
             <View style={themed.areaGrid}>
               <View style={themed.areaCol}>
-                <FormTextInput
-                  control={control}
-                  name="vehicle.engineNumber"
-                  label="Engine No. *"
-                  placeholder="e.g. K12MN12345"
-                  autoCapitalize="characters"
-                  maxLength={20}
-                  formatText={formatAlphanumeric}
-                  rules={{
-                    required: 'Engine number is required',
-                    pattern: {
-                      value: /^[A-Z0-9]{6,20}$/,
-                      message: 'Enter a valid engine number',
-                    },
-                  }}
-                />
+            <FormTextInput
+              control={control}
+              name="vehicle.engineNumber"
+              label="Engine Number *"
+              placeholder="e.g. K12MN12345"
+              autoCapitalize="characters"
+              maxLength={20}
+              formatText={formatAlphanumeric}
+              rules={{
+                required: 'Engine number is required',
+                pattern: {
+                  value: /^[A-Z0-9]{6,20}$/,
+                  message: 'Enter a valid engine number',
+                },
+              }}
+            />
               </View>
               <View style={themed.areaCol}>
-                <FormTextInput
-                  control={control}
-                  name="vehicle.chassisNumber"
-                  label="Chassis No. *"
-                  placeholder="e.g. MA3EYD31S00555498"
-                  autoCapitalize="characters"
-                  maxLength={20}
-                  formatText={formatAlphanumeric}
-                  rules={{
-                    required: 'Chassis number is required',
-                    pattern: {
-                      value: /^[A-Z0-9]{6,20}$/,
-                      message: 'Enter a valid chassis number',
-                    },
-                  }}
-                />
+            <FormTextInput
+              control={control}
+              name="vehicle.chassisNumber"
+              label="Chassis Number *"
+              placeholder="e.g. MA3EYD31S00555498"
+              autoCapitalize="characters"
+              maxLength={20}
+              formatText={formatAlphanumeric}
+              rules={{
+                required: 'Chassis number is required',
+                pattern: {
+                  value: /^[A-Z0-9]{6,20}$/,
+                  message: 'Enter a valid chassis number',
+                },
+              }}
+            />
               </View>
             </View>
 
             <FormTextInput
               control={control}
               name="vehicle.keyNo"
-              label="Key No."
+              label="Key Number"
               placeholder="e.g. K-1023"
               maxLength={20}
               formatText={formatFreeText}
@@ -973,7 +1055,7 @@ export default function VehicleDetailStep({
           <SectionCard
             themed={themed}
             icon={IndianRupee}
-            tint={palette.success}
+            accent="emerald"
             title="Price Description"
             subtitle="Complete breakup of the vehicle price"
             num="03"
@@ -985,8 +1067,8 @@ export default function VehicleDetailStep({
             <SectionCard
               themed={themed}
               icon={Sparkles}
-              tint={palette.warning}
-              title="New Vehicle"
+              accent="amber"
+              title="New Vehicle Details"
               subtitle="Dealer, quotation & invoice details"
               num="04"
             >
@@ -1003,7 +1085,7 @@ export default function VehicleDetailStep({
               <FormTextInput
                 control={control}
                 name="vehicle.dealerContactNo"
-                label="Dealer Contact No. *"
+                label="Dealer Contact Number *"
                 placeholder="e.g. 9876543210"
                 keyboardType="phone-pad"
                 maxLength={10}
@@ -1022,7 +1104,7 @@ export default function VehicleDetailStep({
                   <FormTextInput
                     control={control}
                     name="vehicle.quotationNo"
-                    label="Quotation No. *"
+                    label="Quotation Number *"
                     placeholder="e.g. QT-1042"
                     maxLength={20}
                     formatText={formatFreeText}
@@ -1061,7 +1143,7 @@ export default function VehicleDetailStep({
                   <FormTextInput
                     control={control}
                     name="vehicle.invoiceNo"
-                    label="Invoice No. *"
+                    label="Invoice Number *"
                     placeholder="e.g. INV-8821"
                     maxLength={20}
                     formatText={formatFreeText}
@@ -1132,7 +1214,7 @@ export default function VehicleDetailStep({
               <FormTextInput
                 control={control}
                 name="vehicle.remark"
-                label="Remark"
+                label="Remarks"
                 placeholder="Any additional remarks"
                 maxLength={500}
                 formatText={text => text.slice(0, 500)}
@@ -1144,7 +1226,7 @@ export default function VehicleDetailStep({
               {renderVehicleImage()}
             </SectionCard>
           ) : (
-            <View style={themed.vehicleStepCard}>{renderVehicleImage()}</View>
+            <View style={themed.accCard}>{renderVehicleImage()}</View>
           )}
         </>
       ) : null}
@@ -1152,8 +1234,7 @@ export default function VehicleDetailStep({
       <View style={themed.refEntryNote}>
         <Info size={12} color={colors.textSecondary} />
         <Text style={themed.refEntryNoteText}>
-          Make sure the vehicle details match your RC book and insurance papers
-          to avoid delays in processing.
+          Ensure vehicle details match RC book and insurance papers to avoid delays.
         </Text>
       </View>
 
