@@ -1,11 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Controller, type Control } from 'react-hook-form';
 import {
@@ -27,11 +21,7 @@ import SectionHeaderText from '../../../components/typography/SectionHeaderText'
 import ImagePreviewModal from './ImagePreviewModal';
 import { useProductRequiredDocs } from '../../../hooks/useProductRequiredDocs';
 import type { createStyles } from '../styles';
-import type {
-  ApplyLoanForm,
-  DocumentConfig,
-  UploadedDocument,
-} from '../types';
+import type { ApplyLoanForm, DocumentConfig, UploadedDocument } from '../types';
 
 const CATEGORY_ICONS: Record<string, typeof FileText> = {
   KYC: IdCard,
@@ -61,11 +51,7 @@ type Props = {
   themed: ReturnType<typeof createStyles>;
 };
 
-export default function DocumentsStep({
-  control,
-  productId,
-  themed,
-}: Props) {
+export default function DocumentsStep({ control, productId, themed }: Props) {
   const { theme } = useTheme();
   const { colors } = theme;
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -180,7 +166,10 @@ export default function DocumentsStep({
             return requiredKeys.every(k => uploadedKeys.includes(k));
           },
         }}
-        render={({ field: { value, onChange }, fieldState: { error: fieldError } }) => {
+        render={({
+          field: { value, onChange },
+          fieldState: { error: fieldError },
+        }) => {
           const docs = value ?? [];
           const uploadedCount = docs.length;
           const requiredCount = documentConfigs.filter(d => d.required).length;
@@ -226,16 +215,13 @@ export default function DocumentsStep({
                   </View>
                 </View>
               </View>
-
               {grouped.map(([category, items]) => (
                 <View key={category} style={themed.docCategoryBlock}>
                   <Text style={themed.docCategoryHeader}>{category}</Text>
                   {items.map(item => {
                     const Icon = CATEGORY_ICONS[category] ?? FileText;
-                    const tint =
-                      CATEGORY_TINTS[category] ?? colors.primary;
+                    const tint = CATEGORY_TINTS[category] ?? colors.primary;
                     const uploaded = docs.find(d => d.key === item.key);
-
                     return (
                       <View
                         key={item.key}
@@ -248,9 +234,7 @@ export default function DocumentsStep({
                       >
                         <Pressable
                           onPress={() =>
-                            uploaded
-                              ? null
-                              : pickDocument(item, docs, onChange)
+                            uploaded ? null : pickDocument(item, docs, onChange)
                           }
                           disabled={!!uploaded}
                           style={({ pressed }) => [
@@ -275,10 +259,7 @@ export default function DocumentsStep({
                           </View>
                           <View style={themed.docInfo}>
                             <View style={themed.docNameRow}>
-                              <Text
-                                style={themed.docName}
-                                numberOfLines={1}
-                              >
+                              <Text style={themed.docName} numberOfLines={1}>
                                 {item.label}
                               </Text>
                               {uploaded ? (
@@ -297,10 +278,7 @@ export default function DocumentsStep({
                             </View>
                             {uploaded ? (
                               <>
-                                <Text
-                                  style={themed.docMeta}
-                                  numberOfLines={1}
-                                >
+                                <Text style={themed.docMeta} numberOfLines={1}>
                                   {uploaded.fileName}
                                 </Text>
                                 {uploaded.size > 0 ? (
@@ -311,9 +289,7 @@ export default function DocumentsStep({
                               </>
                             ) : (
                               <>
-                                <Text style={themed.docMeta}>
-                                  {item.hint}
-                                </Text>
+                                <Text style={themed.docMeta}>{item.hint}</Text>
                                 <View style={themed.docActionRow}>
                                   <Plus size={12} color={tint} />
                                   <Text
@@ -340,9 +316,7 @@ export default function DocumentsStep({
                             </Pressable>
                             <Pressable
                               onPress={() =>
-                                onChange(
-                                  docs.filter(d => d.key !== item.key),
-                                )
+                                onChange(docs.filter(d => d.key !== item.key))
                               }
                               style={({ pressed }) => [
                                 themed.docRemoveBtn,
@@ -368,10 +342,7 @@ export default function DocumentsStep({
           );
         }}
       />
-      <ImagePreviewModal
-        uri={previewUri}
-        onClose={() => setPreviewUri(null)}
-      />
+      <ImagePreviewModal uri={previewUri} onClose={() => setPreviewUri(null)} />
     </>
   );
 }

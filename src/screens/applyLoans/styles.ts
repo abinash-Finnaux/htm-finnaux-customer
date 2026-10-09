@@ -2768,5 +2768,33 @@ export function createStyles(
       fontSize: 16,
       fontWeight: '700',
     },
+    debugJsonLabel: {
+      marginTop: 10,
+      fontSize: 10,
+      fontWeight: '800',
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      color: colors.error,
+    },
+    debugJsonBox: {
+      marginTop: 6,
+      maxHeight: 220,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surfaceElevated,
+      padding: 10,
+    },
+    debugJsonPath: {
+      marginTop: 4,
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    debugJsonText: {
+      fontSize: 10,
+      lineHeight: 14,
+      color: colors.textSecondary,
+    },
   });
 }

@@ -209,9 +209,13 @@ export async function masterGetCollectionExecutives(
 export async function masterGetProductRequiredDoc(
   request: GetProductRequiredDocRequest,
 ): Promise<ProductRequiredDoc[]> {
-  return fetchLmsMasterList<ProductRequiredDoc>(
+  const items = await fetchLmsMasterList<ProductRequiredDoc>(
     API_ENDPOINTS.MASTERS.GET_PRODUCT_REQUIRED_DOC,
     request,
+  );
+
+  return items.filter(
+    doc => doc.Doc_Category === 'KYC' && doc.Doc_Ind_NI === 'I',
   );
 }
 

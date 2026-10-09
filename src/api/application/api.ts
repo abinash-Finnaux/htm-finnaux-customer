@@ -140,11 +140,12 @@ export type SubmitDocument = {
   Doc_Key: string;
   File_Name: string;
   File_Size: number;
-  ContentBase64: string | null;
+  ContentBase64: string;
 };
 
 export type SubmitApplicationRequest = {
   ApplicationId: number | null;
+  CIF_No: string;
   Branch_Id: number | null;
   Branch_Name: string;
   Product_Id: number | null;
@@ -299,22 +300,32 @@ const mapReference = (reference: CustomerReference): SubmitReference => ({
   Ref_Mobile: reference.phone,
 });
 
-const mapDocument = (document: UploadedDocument): SubmitDocument => ({
+const mapDocument = (
+  document: UploadedDocument,
+  contentBase64: string,
+): SubmitDocument => ({
   Doc_Key: document.key,
   File_Name: document.fileName,
   File_Size: document.size,
-  ContentBase64: null,
+  ContentBase64: contentBase64,
 });
 
 export function buildSubmitApplicationPayload(
   form: ApplyLoanForm,
-  meta: { ApplicationId?: number },
+  meta: {
+    ApplicationId?: number;
+    CIF?: string;
+    contentBase64?: Record<string, string>;
+  },
 ): SubmitApplicationRequest {
   const references = (form.references ?? []).map(mapReference);
-  const documents = (form.documents ?? []).map(mapDocument);
+  const documents = (form.documents ?? []).map(doc =>
+    mapDocument(doc, meta.contentBase64?.[doc.key] ?? ''),
+  );
 
   return {
     ApplicationId: meta.ApplicationId ?? null,
+    CIF_No: meta.CIF ?? '',
     Branch_Id: form.branchId ? Number(form.branchId) : null,
     Branch_Name: form.branchName,
     Product_Id: form.loanType ? Number(form.loanType) : null,

@@ -28,6 +28,13 @@ import { useProductList } from '../../hooks/useProductList';
 import { useBranches } from '../../hooks/useBranches';
 import { useProductPages } from '../../hooks/useProductPages';
 import { useProductRequiredDocs } from '../../hooks/useProductRequiredDocs';
+import { buildSubmitApplicationPayload } from '../../api/application/api';
+import { readDocumentsAsBase64 } from '../../utils/base64';
+import { logFullJson } from '../../utils/logFullJson';
+import {
+  redactLongStrings,
+  writeJsonFile,
+} from '../../utils/debugJson';
 import { mapProductsToLoanTypes } from './loanTypes';
 import {
   loadLoanDraft,
@@ -292,6 +299,10 @@ export default function ApplyLoanScreen({ navigation }: Props) {
   const mountedRef = useRef(true);
   const [draftPagesReady, setDraftPagesReady] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const [submittedJson, setSubmittedJson] = useState<string | null>(null);
+  const [submittedFilePath, setSubmittedFilePath] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     mountedRef.current = true;
@@ -595,25 +606,39 @@ export default function ApplyLoanScreen({ navigation }: Props) {
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const contentBase64 = await readDocumentsAsBase64(documents);
     const submitted = {
-      branchId,
-      branchName,
-      loanType,
-      amount,
-      tenure,
-      purpose,
-      documents,
-      monthlyIncome,
-      employment,
-      references,
-      customerInfo,
-      accountInfo,
-      assets,
-      vehicle,
+      ...buildSubmitApplicationPayload(
+        {
+          branchId,
+          branchName,
+          loanType,
+          amount,
+          tenure,
+          purpose,
+          documents,
+          monthlyIncome,
+          employment,
+          references,
+          customerInfo,
+          accountInfo,
+          assets,
+          vehicle,
+        },
+        { CIF: user?.CIF ?? '', contentBase64 },
+      ),
       pages: productPages.map(page => page.MM_Id),
     };
-    console.log('[ApplyLoanScreen] submitted:', submitted);
+    const preview = redactLongStrings(submitted);
+    logFullJson('[ApplyLoanScreen] submitted', preview);
+    setSubmittedJson(JSON.stringify(preview, null, 2));
+    setSubmittedFilePath(null);
+    writeJsonFile('submit_application', submitted).then(path => {
+      if (path) {
+        setSubmittedFilePath(path);
+      }
+    });
     draftDisabledRef.current = true;
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
@@ -624,7 +649,6 @@ export default function ApplyLoanScreen({ navigation }: Props) {
       'Your loan application has been submitted successfully. Our team will contact you shortly.',
       'success',
     );
-    navigation.goBack();
   };
 
   const handleBack = () => {
@@ -935,6 +959,27 @@ export default function ApplyLoanScreen({ navigation }: Props) {
               {safeStep < totalSteps ? 'Continue' : 'Submit Application'}
             </Text>
           </Pressable>
+          {submittedJson ? (
+            <>
+              <Text style={themed.debugJsonLabel}>
+                Submitted JSON (temporary)
+              </Text>
+              {submittedFilePath ? (
+                <Text style={themed.debugJsonPath} selectable>
+                  Full JSON saved: {submittedFilePath}
+                </Text>
+              ) : null}
+              <ScrollView
+                style={themed.debugJsonBox}
+                nestedScrollEnabled
+                showsVerticalScrollIndicator
+              >
+                <Text style={themed.debugJsonText} selectable>
+                  {submittedJson}
+                </Text>
+              </ScrollView>
+            </>
+          ) : null}
         </View>
       </KeyboardAvoidingView>
     </View>
